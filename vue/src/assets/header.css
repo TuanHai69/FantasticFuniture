@@ -1,0 +1,249 @@
+/* custom.css navbar*/
+.navbar {
+    font-size: 1.2rem;
+    /* Tăng kích thước font chữ */
+    padding: 1rem 2rem;
+    /* Tăng khoảng cách */
+}
+
+body {
+    padding-top: 70px;
+    /* Điều chỉnh giá trị này theo chiều cao của navbar */
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    /* Tăng kích thước font chữ cho thương hiệu */
+}
+
+.nav-link {
+    margin-right: 1rem;
+    /* Tăng khoảng cách giữa các liên kết */
+    transition: color 0.3s ease;
+    /* Thêm hiệu ứng chuyển đổi màu */
+}
+
+.nav-link:hover {
+    color: #007bff;
+    /* Thay đổi màu khi hover */
+}
+
+.navbar-toggler {
+    border: none;
+    /* Loại bỏ viền của nút toggler */
+}
+
+.navbar-toggler-icon {
+    background-image: url('path/to/your/icon.png');
+    /* Thay đổi biểu tượng toggler */
+}
+
+.bg-light {
+    background-color: white !important;
+    /* Thay đổi màu nền */
+}
+
+.search-group {
+    display: flex;
+    align-items: center;
+    /* Căn chỉnh các phần tử theo chiều dọc */
+}
+
+.search-group .search-input,
+.search-group .search-button {
+    height: 40px;
+    /* Đặt chiều cao cố định */
+    border-radius: 25px;
+    /* Bo tròn các góc */
+    border: 2px solid #007bff;
+    /* Viền đậm */
+}
+
+.search-group .search-input {
+    border-right: none;
+    /* Loại bỏ viền bên phải của input */
+    border-radius: 25px 0 0 25px;
+    /* Bo tròn các góc trái */
+}
+
+.search-group .search-button {
+    border-left: none;
+    /* Loại bỏ viền bên trái của button */
+    border-radius: 0 25px 25px 0;
+    /* Bo tròn các góc phải */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Trang home */
+.homebg {
+    background-image: url("https://donggia.vn/wp-content/uploads/2019/11/thiet-ke-noi-that-phong-khach-chung-cu-dep-2020-12.jpg");
+    background-size: cover;
+    /* Đảm bảo hình nền bao phủ toàn bộ phần tử */
+    background-position: center;
+    /* Đặt hình nền ở giữa */
+    background-repeat: no-repeat;
+    /* Không lặp lại hình nền */
+    width: 100vw;
+    /* Chiều rộng bằng 100% của viewport */
+    height: 90vh;
+    /* Chiều cao bằng 100% của viewport */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.container-fluid {
+    height: 100%;
+    overflow-y: auto;
+    /* Đảm bảo rằng trang web có thanh cuộn */
+}
+
+.fixed-col {
+    position: sticky;
+    top: 0;
+    height: 90vh;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.shopbg {
+    background-color: #f8f9fa;
+}
+
+/* Shoplist */
+.shoplistcard {
+    width: 100%;
+    /* Đảm bảo hình ảnh chiếm toàn bộ chiều rộng của thẻ cha */
+    height: 130px;
+    /* Đặt chiều cao cố định cho hình ảnh */
+    object-fit: cover;
+    /* Đảm bảo hình ảnh không bị méo */
+}
+
+.card-title {
+    white-space: nowrap;
+    /* Không cho phép xuống dòng */
+    overflow: hidden;
+    /* Ẩn phần nội dung tràn */
+    text-overflow: ellipsis;
+    /* Hiển thị dấu "..." khi nội dung quá dài */
+}
+
+.card-address {
+    white-space: nowrap;
+    /* Không cho phép xuống dòng */
+    overflow: hidden;
+    /* Ẩn phần nội dung tràn */
+    text-overflow: ellipsis;
+    /* Hiển thị dấu "..." khi nội dung quá dài */
+    font-size: 0.9em;
+}
+
+/* shopcard */
+.shopcardbg {
+    background-color: whitesmoke;
+}
+
+/* productcard */
+
+.product-card {
+    position: relative;
+    height: 250px;
+    /* Default height */
+    transition: height 0.3s ease;
+}
+
+.card-buttons {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    text-align: center;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.product-card:hover {
+    height: 300px;
+    /* Height when hovered */
+}
+
+.product-card:hover .card-buttons {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ShopHeadCard */
+
+.shop-head-card .image-container {
+    padding: 10px;
+    /* Thêm khoảng cách xung quanh hình ảnh */
+}
+
+.shop-head-card .large-image {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    /* Đảm bảo hình ảnh không bị méo */
+}
+
+.shop-head-card .text-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    /* Đặt chiều cao của phần chứa */
+}
+
+.shop-head-card .review .negative {
+    color: red;
+    /* Màu đỏ cho chữ "Tiêu cực" */
+}
+
+.shop-head-card .address {
+    color: #eab106;
+    /* Màu vàng cho chữ "địa chỉ" */
+}
+
+.shop-head-card .review .positive {
+    color: green;
+    /* Màu xanh lá cho chữ "tích cực" */
+}
+
+.shop-head-card .review .recommend {
+    color: blue;
+    /* Màu xanh dương cho chữ "Khuyến nghị" */
+}
+
+.shop-head-card .open {
+    color: green;
+    /* Màu xanh lá cho chữ "mở cửa" */
+}
+
+.shop-head-card .phone {
+    font-weight: bold;
+    /* In đậm chữ "Số điện thoại" */
+}
+
+/* ShopBodyCard */
+.tag-container {
+    position: sticky;
+    /* Giữ vị trí cố định khi cuộn */
+    top: 0;
+    /* Đặt vị trí cố định từ đầu trang */
+    overflow: hidden;
+}
+
+.tag {
+    white-space: nowrap;
+    /* Không cho phép xuống dòng */
+    overflow: hidden;
+    /* Ẩn phần nội dung tràn */
+    text-overflow: ellipsis;
+    /* Hiển thị dấu ... nếu nội dung quá dài */
+}
