@@ -29,6 +29,24 @@ const routes = [
         component: () => import("@/views/ShopHeadCardView.vue"),
         props: true // Truyền các biến trong $route.params vào làm props
     },
+    {
+        path: "/product/:id", // Thêm dynamic segment :id
+        name: "productitem",
+        component: () => import("@/views/ProductDetailView.vue"),
+        props: true // Truyền các biến trong $route.params vào làm props
+    },
+    {
+        path: "/login", // Thêm dynamic segment :id
+        name: "login",
+        component: () => import("@/views/LoginView.vue"),
+        props: true // Truyền các biến trong $route.params vào làm props
+    },
+    {
+        path: "/register", // Thêm dynamic segment :id
+        name: "register",
+        component: () => import("@/views/RegisterView.vue"),
+        props: true // Truyền các biến trong $route.params vào làm props
+    },
 ];
 
 const router = createRouter({

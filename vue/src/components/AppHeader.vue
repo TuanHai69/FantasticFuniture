@@ -6,25 +6,25 @@
             <li class="nav-item">
                 <router-link :to="{ name: 'sachview' }" class="nav-link">
                     Sách
-                    <i class="fas fa-book"></i>
+                    
                 </router-link>
             </li>
             <li class="nav-item">
                 <router-link :to="{ name: 'nhaxuatbanview' }" class="nav-link">
                     Nhà xuất bản
-                    <i class="fas fa-book"></i>
+                    
                 </router-link>
             </li>
             <li class="nav-item" v-if="chucvu === 'staff' || chucvu === 'admin' || chucvu === 'client'">
                 <router-link :to="{ name: 'theogioimuonsachview' }" class="nav-link">
                     Hàng đợi mượn Sách
-                    <i class="fas fa-book"></i>
+                    
                 </router-link>
             </li>
             <li class="nav-item" v-if="chucvu === 'staff' || chucvu === 'admin'">
                 <router-link :to="{ name: 'nhanvienview' }" class="nav-link">
                     Nhân viên
-                    <i class="fas fa-book"></i>
+                    
                 </router-link>
             </li>
             <li class="nav-item" v-if="isLoggedIn && chucvu === 'client'">
@@ -69,33 +69,35 @@
                 <li class="nav-item active">
                     <router-link :to="{ name: 'home' }" class="nav-link">
                         Home
-                        <i class="fas fa-book"></i>
+                        
                     </router-link>
                     <!-- <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a> -->
                 </li>
                 <li class="nav-item active">
                     <router-link :to="{ name: 'shop' }" class="nav-link">
                         Cửa hàng
-                        <i class="fas fa-book"></i>
+                        
                     </router-link>
                     <!-- <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a> -->
                 </li>
                 <li class="nav-item active">
                     <router-link :to="{ name: 'product' }" class="nav-link">
                         Sản phẩm
-                        <i class="fas fa-book"></i>
+                        
                     </router-link>
                     <!-- <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a> -->
                 </li>
                 <li class="nav-item active">
                     <router-link :to="{ name: 'shopcard', params: { id: 121113 } }" class="nav-link">
                         Chi tiết
-                        <i class="fas fa-book"></i>
+                        
                     </router-link>
                 </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
+                <li class="nav-item active">
+                    <router-link :to="{ name: 'productitem', params: { id: 1213 } }" class="nav-link">
+                        Product
+                        
+                    </router-link>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
@@ -123,10 +125,20 @@
             </form>
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link disabled" href="#">Login</a>
+                    <router-link :to="{ name: 'login' }" class="nav-link">
+                        Login
+                        
+                    </router-link>
                 </li>
             </ul>
-
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <router-link :to="{ name: 'register' }" class="nav-link">
+                        Register
+                        
+                    </router-link>
+                </li>
+            </ul>
         </div>
     </nav>
 </template>
