@@ -8,17 +8,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Import the NhaXuatBan router
-const nhaxuatbanRouter = require("./app/routes/nhaxuatban.route");
-
-// Use the NhaXuatBan router
-app.use("/api/nhaxuatban", nhaxuatbanRouter);
-
-// Import the Sach router
-const sachRouter = require("./app/routes/sach.route");
-
-// Use the Sach router
-app.use("/api/sach", sachRouter);
 
 // Import the DocGia router
 const docgiaRouter = require("./app/routes/docgia.route");
@@ -26,17 +15,19 @@ const docgiaRouter = require("./app/routes/docgia.route");
 // Use the DocGia router
 app.use("/api/docgia", docgiaRouter);
 
+// Import the Accounts router
+const accountsRouter = require("./app/routes/accounts.route");
+
+// Use the Accounts router
+app.use("/api/accounts", accountsRouter);
+
+
 // Import the NhanVien router
 const nhanvienRouter = require("./app/routes/nhanvien.route");
 
 // Use the NhanVien router
 app.use("/api/nhanvien", nhanvienRouter);
 
-// Import the TheoGioiMuonSach router
-const theogioimuonsachRouter = require("./app/routes/theogioimuonsach.route");
-
-// Use the TheoGioiMuonSach router
-app.use("/api/theogioimuonsach", theogioimuonsachRouter);
 
 // handle 404 response
 app.use((req, res, next) => {
@@ -51,7 +42,7 @@ app.use((err, req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-    res.json({ message: "Welcome to publisher book application." });
+    res.json({ message: "Welcome to ff" });
 });
 
 module.exports = app;
