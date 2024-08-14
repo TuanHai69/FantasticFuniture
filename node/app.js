@@ -21,6 +21,11 @@ const accountsRouter = require("./app/routes/accounts.route");
 // Use the Accounts router
 app.use("/api/accounts", accountsRouter);
 
+// Import the Store router
+const storeRouter = require("./app/routes/store.route");
+
+// Use the Store router
+app.use("/api/store", storeRouter);
 
 // Import the NhanVien router
 const nhanvienRouter = require("./app/routes/nhanvien.route");
