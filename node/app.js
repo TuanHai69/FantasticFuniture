@@ -27,6 +27,24 @@ const storeRouter = require("./app/routes/store.route");
 // Use the Store router
 app.use("/api/store", storeRouter);
 
+// Import the Branch router
+const branchRouter = require("./app/routes/branch.route");
+
+// Use the Branch router
+app.use("/api/branch", branchRouter);
+
+// Import the Type router
+const typeRouter = require("./app/routes/type.route");
+
+// Use the Type router
+app.use("/api/type", typeRouter);
+
+// Import the Product router
+const productRouter = require("./app/routes/product.route");
+
+// Use the Product router
+app.use("/api/product", productRouter);
+
 // Import the NhanVien router
 const nhanvienRouter = require("./app/routes/nhanvien.route");
 
