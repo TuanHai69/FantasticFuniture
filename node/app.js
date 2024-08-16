@@ -45,6 +45,18 @@ const productRouter = require("./app/routes/product.route");
 // Use the Product router
 app.use("/api/product", productRouter);
 
+// Import the ProductType router
+const producttypeRouter = require("./app/routes/producttype.route");
+
+// Use the ProductType router
+app.use("/api/producttype", producttypeRouter);
+
+// Import the Cart router
+const cartRouter = require("./app/routes/cart.route");
+
+// Use the Cart router
+app.use("/api/cart", cartRouter);
+
 // Import the NhanVien router
 const nhanvienRouter = require("./app/routes/nhanvien.route");
 
