@@ -1,43 +1,41 @@
 const { ObjectId } = require("mongodb");
 
-class ProductService {
+class OrderdetailService {
     constructor(client) {
-        this.Product = client.db().collection("products");
+        this.Orderdetail = client.db().collection("orderdetails");
     }
 
-    extractProductData(payload) {
-        const product = {
+    extractOrderdetailData(payload) {
+        const orderdetail = {
+            orderid: payload.orderid,
             name: payload.name,
             cost: payload.cost,
+            count: payload.count,
             picture: payload.picture,
             material: payload.material,
             size: payload.size,
             description: payload.description,
-            warranty: payload.warranty,
-            delivery: payload.delivery,
-            discount: payload.discount,
-            storeid: payload.storeid,
             state: payload.state,
         };
 
-        Object.keys(product).forEach(
-            (key) => product[key] === undefined && delete product[key]
+        Object.keys(orderdetail).forEach(
+            (key) => orderdetail[key] === undefined && delete orderdetail[key]
         );
-        return product;
+        return orderdetail;
     }
 
     async create(payload) {
-        const product = this.extractProductData(payload);
-        const result = await this.Product.findOneAndUpdate(
-            product,
-            { $set: product },
+        const orderdetail = this.extractOrderdetailData(payload);
+        const result = await this.Orderdetail.findOneAndUpdate(
+            orderdetail,
+            { $set: orderdetail },
             { returnDocument: "after", upsert: true }
         );
         return result.value;
     }
 
     async find(filter) {
-        const cursor = await this.Product.find(filter);
+        const cursor = await this.Orderdetail.find(filter);
         return await cursor.toArray();
     }
 
@@ -46,13 +44,13 @@ class ProductService {
             name: { $regex: new RegExp(keyword), $options: "i" },
         });
     }
-    async findByStore(keyword) {
+    async findByOrder(keyword) {
         return await this.find({
-            storeid: { $regex: new RegExp(keyword), $options: "i" },
+            orderid: { $regex: new RegExp(keyword), $options: "i" },
         });
     }
     async findById(id) {
-        return await this.Product.findOne({
+        return await this.Orderdetail.findOne({
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
     }
@@ -61,8 +59,8 @@ class ProductService {
         const filter = {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         };
-        const update = this.extractProductData(payload);
-        const result = await this.Product.findOneAndUpdate(
+        const update = this.extractOrderdetailData(payload);
+        const result = await this.Orderdetail.findOneAndUpdate(
             filter,
             { $set: update },
             { ReturnDocument: "after" }
@@ -70,11 +68,11 @@ class ProductService {
         return result;
     }
     async delete(id) {
-        const result = await this.Product.findOneAndDelete({
+        const result = await this.Orderdetail.findOneAndDelete({
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
         return result;
     }
 }
 
-module.exports = ProductService;
+module.exports = OrderdetailService;

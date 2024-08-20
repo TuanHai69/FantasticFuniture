@@ -16,6 +16,7 @@ class StoreService {
             opentime: payload.opentime,
             userid: payload.userid,
             branchid: payload.branchid,
+            state: payload.state,
         };
 
         Object.keys(store).forEach(

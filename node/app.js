@@ -57,6 +57,18 @@ const cartRouter = require("./app/routes/cart.route");
 // Use the Cart router
 app.use("/api/cart", cartRouter);
 
+// Import the Order router
+const orderRouter = require("./app/routes/order.route");
+
+// Use the Order router
+app.use("/api/order", orderRouter);
+
+// Import the Orderdetail router
+const orderdetailRouter = require("./app/routes/orderdetail.route");
+
+// Use the Orderdetail router
+app.use("/api/orderdetail", orderdetailRouter);
+
 // Import the NhanVien router
 const nhanvienRouter = require("./app/routes/nhanvien.route");
 
