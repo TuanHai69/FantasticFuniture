@@ -69,12 +69,29 @@ const orderdetailRouter = require("./app/routes/orderdetail.route");
 // Use the Orderdetail router
 app.use("/api/orderdetail", orderdetailRouter);
 
-// Import the NhanVien router
-const nhanvienRouter = require("./app/routes/nhanvien.route");
+// Import the Comment router
+const commentRouter = require("./app/routes/comment.route");
 
-// Use the NhanVien router
-app.use("/api/nhanvien", nhanvienRouter);
+// Use the Comment router
+app.use("/api/comment", commentRouter);
 
+// Import the Coded router
+const codedRouter = require("./app/routes/coded.route");
+
+// Use the Coded router
+app.use("/api/coded", codedRouter);
+
+// Import the Codeuse router
+const codeuseRouter = require("./app/routes/codeuse.route");
+
+// Use the Codeuse router
+app.use("/api/codeuse", codeuseRouter);
+
+// Import the Commentstore router
+const commentstoreRouter = require("./app/routes/commentstore.route");
+
+// Use the Commentstore router
+app.use("/api/commentstore", commentstoreRouter);
 
 // handle 404 response
 app.use((req, res, next) => {
