@@ -49,13 +49,13 @@ class AccountsService {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
     }
-    async loginCheck(keyword, password) {
+    async loginCheck(keyword) {
         const filter = {
             $or: [
                 { email: keyword },
                 { username: keyword }
             ],
-            password: password
+            // password: password
         };
     
         const account = await this.Account.findOne(filter);

@@ -7,8 +7,8 @@
                         <h3 class="card-title text-center">Đăng nhập</h3>
                         <form @submit.prevent="handleLogin">
                             <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" v-model="email" class="form-control" id="email" required>
+                                <label for="username">Username or email</label>
+                                <input type="text" v-model="username" class="form-control" id="username" required>
                             </div>
                             <div class="form-group">
                                 <label for="password">Mật khẩu</label>
@@ -32,20 +32,50 @@
 </template>
 
 <script>
+import AccountsService from '@/services/accounts.service'; // Đường dẫn tới file 
+import bcrypt from 'bcryptjs';
+import LocalStorageHelper from '@/services/local.service';
+
 export default {
     data() {
         return {
-            email: '',
+            username: '',
             password: ''
         };
     },
     methods: {
-        handleLogin() {
-            // Xử lý đăng nhập ở đây
-            console.log('Email:', this.email);
-            console.log('Password:', this.password);
+        async handleLogin() {
+            try {
+                const response = await AccountsService.login({
+                    username: this.username,
+                });
+
+                if (response) {
+                    const isMatch = bcrypt.compareSync(this.password, response.password);
+                    if (isMatch) {
+                        // Successful login
+                        LocalStorageHelper.setItem('id', response._id);
+                        LocalStorageHelper.setItem('role', response.role);
+                        const ro = LocalStorageHelper.getItem('role');
+                        const hi = LocalStorageHelper.getItem('id');
+                        console.log(hi +"|| " + ro);
+                        
+                        alert("Login successful! Press OK to continue.");
+                        this.$router.push('/home'); // Redirect to the dashboard or desired page
+                    } else {
+                        alert("Incorrect password. Please try again.");
+                    }
+                } else {
+                    alert("User not found. Please check your username.");
+                }
+            } catch (error) {
+                console.error("Login error:", error);
+                alert("An error occurred during login. Please try again later.");
+            }
         }
+
     }
+
 };
 </script>
 

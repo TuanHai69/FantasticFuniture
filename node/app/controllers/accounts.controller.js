@@ -55,14 +55,14 @@ exports.findOne = async (req, res, next) => {
 }
 
 exports.checkLogin = async (req, res, next) => {
-    const {username, password } = req.body;
-    if (!username || !password) {
+    const { username } = req.body;
+    if (!username) {
         return next(new ApiError(400, "Username and password cant be empty"));
     }
 
     try {
         const accountsService = new AccountsService(MongoDB.client);
-        const document = await accountsService.loginCheck(username,password);
+        const document = await accountsService.loginCheck(username);
         if (!document) {
             return next(new ApiError(401, "Username or password aren't correct"));
         }

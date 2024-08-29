@@ -40,7 +40,6 @@
 <script>
 import AccountsService from '@/services/accounts.service'; // Đường dẫn tới file 
 import bcrypt from 'bcryptjs';
-import swal from 'sweetalert';
 export default {
     data() {
         return {
