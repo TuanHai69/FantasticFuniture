@@ -38,6 +38,9 @@
 </template>
 
 <script>
+import AccountsService from '@/services/accounts.service'; // Đường dẫn tới file 
+import bcrypt from 'bcryptjs';
+import swal from 'sweetalert';
 export default {
     data() {
         return {
@@ -48,13 +51,41 @@ export default {
         };
     },
     methods: {
-        handleRegister() {
-            // Xử lý đăng ký ở đây
-            console.log('Username:', this.username);
-            console.log('Email:', this.email);
-            console.log('Password:', this.password);
-            console.log('Confirm Password:', this.confirmPassword);
-        }
+        async handleRegister() {
+            if (this.password !== this.confirmPassword) {
+                // Xử lý thông báo lỗi khi mật khẩu không khớp
+                return;
+            }
+
+            try {
+                // Hash mật khẩu
+                const saltRounds = 10;
+                const hashedPassword = bcrypt.hashSync(this.password, saltRounds);
+
+                // Tạo tài khoản
+                const newAccount = {
+                    username: this.username,
+                    email: this.email,
+                    password: hashedPassword,
+                    role: "client",
+                };
+
+                // Gọi phương thức tạo tài khoản từ AccountsService
+                const createdAccount = await AccountsService.create(newAccount);
+
+                // Xử lý thành công (chuyển hướng, hiển thị thông báo, v.v.)
+                console.log('Tạo tài khoản thành công:', createdAccount);
+                // Sau khi đăng ký thành công
+                alert('Đăng ký thành công! Nhấn OK để tiếp tục.');
+                // Hoặc sử dụng Vue Router để chuyển hướng
+                this.$router.push('/login');
+
+            } catch (error) {
+                // Xử lý lỗi (hiển thị thông báo lỗi, ghi log, v.v.)
+                console.error('Lỗi khi tạo tài khoản:', error);
+            }
+        },
+
     }
 };
 </script>
