@@ -9,6 +9,7 @@ class AccountsService {
         const account = {
             username: payload.username,
             name: payload.name,
+            picture: payload.picture,
             birthday: payload.birthday,
             gender: payload.gender,
             password: payload.password,
