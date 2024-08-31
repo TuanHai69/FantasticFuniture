@@ -9,6 +9,7 @@ class StoreService {
         const store = {
             name: payload.name,
             birthday: payload.birthday,
+            pucture: payload.picture,
             address: payload.address,
             phonenumber: payload.phonenumber,
             email: payload.email,

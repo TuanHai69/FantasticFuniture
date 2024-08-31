@@ -63,6 +63,7 @@ exports.findByuser = async (req, res, next) => {
         if (documents.length === 0) {
             return next(new ApiError(404, "Can't find this branch"));
         }
+        return res.send(documents);
     } catch (error) {
         return next(
             new ApiError(
@@ -70,7 +71,7 @@ exports.findByuser = async (req, res, next) => {
             )
         );
     }
-    return res.send(documents);
+    
 }
 
 exports.update = async (req, res, next) => {

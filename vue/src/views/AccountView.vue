@@ -2,8 +2,9 @@
     <AppHeader />
     <hr>
     <div class="account-page">
-        <AccountInfo v-if="!isEditing" :account="account" @edit="toggleEdit" />
-        <UpdateAccountForm v-else :account="account" @update-account="updateAccount" @cancel="toggleEdit" />
+        <AccountInfo v-if="!isEditing && !isRegistering" :account="account" @edit="toggleEdit" @register="toggleRegister" />
+        <UpdateAccountForm v-else-if="isEditing" :account="account" @update-account="updateAccount" @cancel="toggleEdit" />
+        <BranchForm v-else :branch="branch" @update-branch="updateBranch" @create-branch="createBranch" @cancel="toggleRegister" />
     </div>
 </template>
 
@@ -13,12 +14,16 @@ import AppHeader from "@/components/AppHeader.vue";
 import LocalStorageHelper from '@/services/local.service';
 import AccountService from "@/services/accounts.service"; // Đường dẫn tới API service của account
 import UpdateAccountForm from "@/components/AccountForm.vue";
+import BranchForm from "@/components/BranchForm.vue"; // Đường dẫn tới component BranchForm
+import BranchService from '@/services/branch.service';
+
 export default {
     name: 'AccountPage',
     components: {
         AccountInfo,
         AppHeader,
         UpdateAccountForm,
+        BranchForm,
     },
     data() {
         return {
@@ -33,7 +38,18 @@ export default {
                 email: '',
                 role: '',
             }, // Khởi tạo account là null
+            branch: {
+                name: '',
+                birthday: '',
+                address: '',
+                phonenumber: '',
+                email: '',
+                description: '',
+                userid: '',
+                storecount: 1,
+            },
             isEditing: false,
+            isRegistering: false,
 
         };
     },
@@ -43,6 +59,11 @@ export default {
             if (accountId) {
                 // Gọi API service để lấy thông tin tài khoản dựa trên id
                 this.account = await AccountService.get(accountId);
+
+                const branchData = await BranchService.findByUser(accountId);
+                if (branchData) {
+                    this.branch = branchData[0];
+                }
             } else {
                 console.error("No account id found in LocalStorage.");
             }
@@ -53,6 +74,9 @@ export default {
     methods: {
         toggleEdit() {
             this.isEditing = !this.isEditing;
+        },
+        toggleRegister() {
+            this.isRegistering = !this.isRegistering;
         },
         async updateAccount(updatedAccount) {
             try {
@@ -67,10 +91,31 @@ export default {
                 alert('Có lỗi xảy ra khi cập nhật thông tin.');
             }
         },
+        async updateBranch(updatedBranch) {
+            try {
+                // Gọi API để cập nhật thông tin chi nhánh
+                await BranchService.update(updatedBranch._id, updatedBranch);
+                this.branch = updatedBranch;
+                this.isRegistering = false;
+                alert('Cập nhật thông tin chi nhánh thành công!');
+                this.$router.push('/account');
+            } catch (error) {
+                console.error('Error updating branch:', error);
+                alert('Có lỗi xảy ra khi cập nhật thông tin chi nhánh.');
+            }
+        },
+        async createBranch(newBranch) {
+            try {
+                await BranchService.create(newBranch);
+                this.branch = newBranch;
+                this.isRegistering = false;
+                alert('Tạo chi nhánh mới thành công!');
+                this.$router.push('/account');
+            } catch (error) {
+                console.error('Error creating branch:', error);
+                alert('Có lỗi xảy ra khi tạo chi nhánh mới.');
+            }
+        },
     },
 };
 </script>
-
-<style scoped>
-/* Thêm các kiểu CSS tùy chỉnh cho trang chính */
-</style>

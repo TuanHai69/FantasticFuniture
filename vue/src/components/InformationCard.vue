@@ -24,7 +24,7 @@
                     <p><strong>Địa chỉ:</strong> {{ account.address }}</p>
                     <p><strong>Số điện thoại:</strong> {{ account.phonenumber }}</p>
                     <p><strong>Email:</strong> {{ account.email }}</p>
-                    <p><strong>Vai trò:</strong> {{ account.role }}</p>
+                    <p><strong>Vai trò:</strong> {{ account.role }} || <button @click="$emit('register')" class="btn btn-primary">Đăng ký bán hàng</button> </p>
 
                 </div>
 
