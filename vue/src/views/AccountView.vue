@@ -2,9 +2,13 @@
     <AppHeader />
     <hr>
     <div class="account-page">
-        <AccountInfo v-if="!isEditing && !isRegistering" :account="account" @edit="toggleEdit" @register="toggleRegister" />
-        <UpdateAccountForm v-else-if="isEditing" :account="account" @update-account="updateAccount" @cancel="toggleEdit" />
-        <BranchForm v-else :branch="branch" @update-branch="updateBranch" @create-branch="createBranch" @cancel="toggleRegister" />
+        <AccountInfo v-if="!isEditing && !isRegistering && !isCreatingStore" :account="account" :branch-data="branch" @edit="toggleEdit"
+            @register="toggleRegister" @create-store="toggleCreateStore" />
+        <UpdateAccountForm v-else-if="isEditing" :account="account" @update-account="updateAccount"
+            @cancel="toggleEdit" />
+        <BranchForm v-else-if="isRegistering" :branch="branch" @update-branch="updateBranch" @create-branch="createBranch"
+            @cancel="toggleRegister" />
+        <StoreForm v-else :branch="branch" @create-store="createStore" @cancel="toggleCreateStore" />
     </div>
 </template>
 
@@ -16,6 +20,8 @@ import AccountService from "@/services/accounts.service"; // Đường dẫn t�
 import UpdateAccountForm from "@/components/AccountForm.vue";
 import BranchForm from "@/components/BranchForm.vue"; // Đường dẫn tới component BranchForm
 import BranchService from '@/services/branch.service';
+import StoreForm from "@/components/StoreForm.vue";
+import StoreService from '@/services/store.service'; // Đường dẫn tới API service của store
 
 export default {
     name: 'AccountPage',
@@ -24,6 +30,7 @@ export default {
         AppHeader,
         UpdateAccountForm,
         BranchForm,
+        StoreForm,
     },
     data() {
         return {
@@ -50,6 +57,7 @@ export default {
             },
             isEditing: false,
             isRegistering: false,
+            isCreatingStore: false,
 
         };
     },
@@ -77,6 +85,9 @@ export default {
         },
         toggleRegister() {
             this.isRegistering = !this.isRegistering;
+        },
+        toggleCreateStore() {
+            this.isCreatingStore = !this.isCreatingStore;
         },
         async updateAccount(updatedAccount) {
             try {
@@ -114,6 +125,18 @@ export default {
             } catch (error) {
                 console.error('Error creating branch:', error);
                 alert('Có lỗi xảy ra khi tạo chi nhánh mới.');
+            }
+        },
+        async createStore(newStore) {
+            try {
+                console.log(newStore);
+                await StoreService.create(newStore);
+                alert('Tạo cửa hàng mới thành công!');
+                this.isCreatingStore = false;
+                this.$router.push('/account');
+            } catch (error) {
+                console.error('Error creating store:', error);
+                alert('Có lỗi xảy ra khi tạo cửa hàng mới.');
             }
         },
     },

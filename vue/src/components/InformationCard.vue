@@ -24,7 +24,12 @@
                     <p><strong>Địa chỉ:</strong> {{ account.address }}</p>
                     <p><strong>Số điện thoại:</strong> {{ account.phonenumber }}</p>
                     <p><strong>Email:</strong> {{ account.email }}</p>
-                    <p><strong>Vai trò:</strong> {{ account.role }} || <button @click="$emit('register')" class="btn btn-primary">Đăng ký bán hàng</button> </p>
+                    <p>
+                        <strong>Vai trò:</strong> {{ account.role }} ||
+                        <button @click="$emit('register')" class="btn btn-primary">Đăng ký bán hàng</button>||
+                        <button v-if="branchData._id" @click="$emit('create-store')" class="btn btn-primary">Tạo cửa
+                            hàng</button>
+                    </p>
 
                 </div>
 
@@ -37,6 +42,7 @@
 export default {
     props: {
         account: Object, // Nhận thông tin tài khoản từ parent component
+        branchData: Object, // Nhận thông tin chi nhánh từ parent component
     },
     computed: {
         accountPicture() {
