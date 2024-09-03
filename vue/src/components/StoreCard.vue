@@ -61,7 +61,7 @@ export default {
             }
         },
         storePicture(picture) {
-            console.log(picture);
+            // console.log(picture);
             if (picture) {
                 return `data:image/jpeg;base64,${picture}`;
             }

@@ -67,7 +67,6 @@ export default {
             if (accountId) {
                 // Gọi API service để lấy thông tin tài khoản dựa trên id
                 this.account = await AccountService.get(accountId);
-
                 const branchData = await BranchService.findByUser(accountId);
                 if (branchData) {
                     this.branch = branchData[0];
@@ -91,7 +90,7 @@ export default {
         },
         async updateAccount(updatedAccount) {
             try {
-                console.log(updatedAccount.picture);
+                // console.log(updatedAccount.picture);
                 await AccountService.update(updatedAccount._id, updatedAccount);
                 this.account = updatedAccount;
                 this.isEditing = false;

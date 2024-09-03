@@ -102,6 +102,7 @@ export default {
     async mounted() {
         try {
             if (this.storeId) {
+                console.log(this.storeId);
                 await this.fetchStore();
             } else {
                 this.store.userid = LocalStorageHelper.getItem('id');
@@ -115,8 +116,8 @@ export default {
     methods: {
         async fetchStore() {
             try {
-                const response = await StoreService.findById(this.storeId);
-                this.store = response.data;
+                const response = await StoreService.get(this.storeId);
+                this.store = response;
             } catch (error) {
                 console.error('Error fetching store:', error);
                 alert('Có lỗi xảy ra khi lấy thông tin cửa hàng.');
@@ -178,6 +179,7 @@ export default {
                         // Gọi API để cập nhật thông tin cửa hàng
                         await StoreService.update(this.storeId, this.store);
                         alert('Cập nhật cửa hàng thành công!');
+                        this.$emit('cancel');
                     } else {
                         // Gọi API để cập nhật thông tin cửa hàng
                         await this.$emit('create-store', this.store);
