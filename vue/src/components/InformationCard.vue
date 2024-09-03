@@ -34,12 +34,20 @@
                 </div>
 
             </div>
+            <div class="col-12" v-if="branchData._id">
+                <StoreCard :branchId="branchData._id" />
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+import StoreCard from '@/components/StoreCard.vue';
+
 export default {
+    components: {
+        StoreCard,
+    },
     props: {
         account: Object, // Nhận thông tin tài khoản từ parent component
         branchData: Object, // Nhận thông tin chi nhánh từ parent component

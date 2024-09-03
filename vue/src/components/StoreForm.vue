@@ -1,6 +1,6 @@
 <template>
     <div class="update-store-form">
-        <h2>Tạo cửa hàng mới</h2>
+        <h2>{{ storeId ? 'Cập nhật cửa hàng' : 'Tạo mới cửa hàng' }}</h2>
         <form @submit.prevent="handleSubmit">
             <div class="form-group">
                 <label for="name">Tên cửa hàng:</label>
@@ -43,23 +43,23 @@
             </div>
             <div class="form-group">
                 <label for="userid">ID người dùng:</label>
-                <input type="text" id="userid" v-model="store.userid" class="form-control" readonly/>
+                <input type="text" id="userid" v-model="store.userid" class="form-control" readonly />
                 <span v-if="errors.userid">{{ errors.userid }}</span>
             </div>
             <div class="form-group">
                 <label for="branchid">ID chi nhánh:</label>
-                <input type="text" id="branchid" v-model="store.branchid" class="form-control" readonly/>
+                <input type="text" id="branchid" v-model="store.branchid" class="form-control" readonly />
                 <span v-if="errors.branchid">{{ errors.branchid }}</span>
             </div>
             <div class="form-group">
                 <label for="state">Trạng thái:</label>
-                <input type="text" id="state" v-model="store.state" class="form-control" readonly/>
+                <input type="text" id="state" v-model="store.state" class="form-control" readonly />
                 <span v-if="errors.state">{{ errors.state }}</span>
             </div>
             <div class="container">
                 <div class="row justify-content-evenly">
                     <div class="col-4">
-                        <button type="submit" class="btn btn-primary">Tạo mới</button>
+                        <button type="submit" class="btn btn-secondary">{{ storeId ? 'Cập nhật' : 'Tạo mới' }}</button>
                     </div>
                     <div class="col-4">
                         <button type="button" class="btn btn-secondary bg-danger" @click="handleCancel">Hủy</button>
@@ -72,9 +72,14 @@
 
 <script>
 import LocalStorageHelper from '@/services/local.service';
+import StoreService from '@/services/store.service';
 export default {
     props: {
         branch: Object, // Nhận thông tin chi nhánh từ parent component
+        storeId: {
+            type: String,
+            default: null,
+        },
     },
     data() {
         return {
@@ -96,14 +101,27 @@ export default {
     },
     async mounted() {
         try {
-            this.store.userid = LocalStorageHelper.getItem('id');
-            this.store.branchid = this.branch._id;
-            this.store.state = 1;
+            if (this.storeId) {
+                await this.fetchStore();
+            } else {
+                this.store.userid = LocalStorageHelper.getItem('id');
+                this.store.branchid = this.branch._id;
+                this.store.state = 1;
+            }
         } catch (error) {
             console.error("Error fetching account data:", error);
         }
     },
     methods: {
+        async fetchStore() {
+            try {
+                const response = await StoreService.findById(this.storeId);
+                this.store = response.data;
+            } catch (error) {
+                console.error('Error fetching store:', error);
+                alert('Có lỗi xảy ra khi lấy thông tin cửa hàng.');
+            }
+        },
         handleFileChange(event) {
             const file = event.target.files[0];
             if (file) {
@@ -156,9 +174,16 @@ export default {
         async handleSubmit() {
             if (this.validateForm()) {
                 try {
-                    // Gọi API để cập nhật thông tin cửa hàng
-                    await this.$emit('create-store', this.store);
-                    this.resetForm();
+                    if (this.storeId) {
+                        // Gọi API để cập nhật thông tin cửa hàng
+                        await StoreService.update(this.storeId, this.store);
+                        alert('Cập nhật cửa hàng thành công!');
+                    } else {
+                        // Gọi API để cập nhật thông tin cửa hàng
+                        await this.$emit('create-store', this.store);
+                        this.resetForm();
+                    }
+
                 } catch (error) {
                     console.error('Error updating store:', error);
                     if (error.response && error.response.data) {
