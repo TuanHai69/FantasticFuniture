@@ -53,6 +53,12 @@ const routes = [
         component: () => import("@/views/AccountView.vue"),
         props: true // Truyền các biến trong $route.params vào làm props
     },
+    {
+        path: "/type", // Thêm dynamic segment :id
+        name: "type",
+        component: () => import("@/views/TypeView.vue"),
+        props: true // Truyền các biến trong $route.params vào làm props
+    },
 ];
 
 const router = createRouter({

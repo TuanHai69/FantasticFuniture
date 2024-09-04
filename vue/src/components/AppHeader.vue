@@ -21,6 +21,11 @@
                     </router-link>
                 </li>
                 <li class="nav-item active">
+                    <router-link :to="{ name: 'type' }" class="nav-link">
+                        Type
+                    </router-link>
+                </li>
+                <li class="nav-item active">
                     <router-link :to="{ name: 'product' }" class="nav-link">
                         Sản phẩm
                         

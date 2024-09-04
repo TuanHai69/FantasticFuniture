@@ -10,6 +10,7 @@ class TypeService {
             name: payload.name,
             description: payload.description,
             userid: payload.userid,
+            state: payload.state,
         };
 
         Object.keys(type).forEach(

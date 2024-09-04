@@ -2,12 +2,12 @@
     <AppHeader />
     <hr>
     <div class="account-page">
-        <AccountInfo v-if="!isEditing && !isRegistering && !isCreatingStore" :account="account" :branch-data="branch" @edit="toggleEdit"
-            @register="toggleRegister" @create-store="toggleCreateStore" />
+        <AccountInfo v-if="!isEditing && !isRegistering && !isCreatingStore" :account="account" :branch-data="branch"
+            @edit="toggleEdit" @register="toggleRegister" @create-store="toggleCreateStore" />
         <UpdateAccountForm v-else-if="isEditing" :account="account" @update-account="updateAccount"
             @cancel="toggleEdit" />
-        <BranchForm v-else-if="isRegistering" :branch="branch" @update-branch="updateBranch" @create-branch="createBranch"
-            @cancel="toggleRegister" />
+        <BranchForm v-else-if="isRegistering" :branch="branch" @update-branch="updateBranch"
+            @create-branch="createBranch" @cancel="toggleRegister" />
         <StoreForm v-else :branch="branch" @create-store="createStore" @cancel="toggleCreateStore" />
     </div>
 </template>
