@@ -25,7 +25,7 @@
                     <p><strong>Số điện thoại:</strong> {{ account.phonenumber }}</p>
                     <p><strong>Email:</strong> {{ account.email }}</p>
                     <p>
-                        <strong>Vai trò:</strong> {{ account.role }} ||
+                        <strong>Vai trò:</strong> {{ account.role }} || 
                         <button @click="$emit('register')" class="btn btn-primary">Đăng ký bán hàng</button>||
                         <button v-if="branchData._id" @click="$emit('create-store')" class="btn btn-primary">Tạo cửa
                             hàng</button>

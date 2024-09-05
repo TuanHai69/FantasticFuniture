@@ -102,7 +102,6 @@ export default {
     async mounted() {
         try {
             if (this.storeId) {
-                console.log(this.storeId);
                 await this.fetchStore();
             } else {
                 this.store.userid = LocalStorageHelper.getItem('id');

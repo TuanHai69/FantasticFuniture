@@ -76,11 +76,22 @@
 </template>
 
 <script>
+import ProductService from "@/services/product.service";
+
 export default {
     props: {
-        product: {
-            type: Object,
-            default: () => ({
+        storeid: {
+            type: String,
+            required: true,
+        },
+        productid: {
+            type: String,
+            default: null,
+        },
+    },
+    data() {
+        return {
+            product: {
                 name: '',
                 cost: '',
                 picture: '',
@@ -92,24 +103,26 @@ export default {
                 discount: '',
                 storeid: '',
                 state: 'Hoạt động',
-            }),
-        },
-        storeid: {
-            type: String,
-            required: true,
-        },
-    },
-    data() {
-        return {
+            },
             errors: {},
             isLoading: false,
         };
     },
-    mounted() {
-        
+    async mounted() {
         this.product.storeid = this.storeid;
+        if (this.productid) {
+            await this.fetchProduct();
+        }
     },
     methods: {
+        async fetchProduct() {
+            try {
+                const response = await ProductService.get(this.productid);
+                this.product = response;
+            } catch (error) {
+                console.error('Error fetching product:', error);
+            }
+        },
         validateForm() {
             this.errors = {};
             if (!this.product.name) this.errors.name = 'Tên sản phẩm là bắt buộc.';
@@ -132,7 +145,6 @@ export default {
                     if (this.product._id) {
                         await this.$emit('update-product', this.product);
                     } else {
-                        // console.log(this.product);
                         await this.$emit('create-product', this.product);
                     }
                 } catch (error) {

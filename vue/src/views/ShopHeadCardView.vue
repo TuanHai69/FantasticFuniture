@@ -4,16 +4,18 @@
         <div class="container-fluid">
             <div class="page row">
                 <div class="offset-1 col-md-10">
-                    <div v-if="!editingStoreId && !creatingProduct">
+                    <div v-if="!editingStoreId && !creatingProduct && !editingProductId">
                         <div class="d-flex justify-content-center mt-3" v-if="id">
                             <ShopHeadCard :id="id" @edit-store="handleEditStore"
                                 @create-product="handleCreateProduct" />
                         </div>
-                        <ShopBodyCard :storeid="id" />
+                        <ShopBodyCard :storeid="id"  @edit-product="handleEditProduct"/>
                     </div>
                     <StoreForm v-if="editingStoreId" :storeId="editingStoreId" @cancel="handleCancelEdit" />
                     <productForm v-else-if="creatingProduct" :storeid="id" @cancel="handleCancelCreate"
-                        @create-product="handleCreateProductSubmit" @update-product="handleUpdateProductSubmit" />
+                        @create-product="handleCreateProductSubmit" />
+                    <productForm v-else-if="editingProductId" :storeid="id" :productid="editingProductId"
+                        @cancel="handleCancelEditProduct" @update-product="handleUpdateProductSubmit" />
                 </div>
             </div>
         </div>
@@ -25,8 +27,8 @@ import AppHeader from "@/components/AppHeader.vue";
 import ShopHeadCard from "@/components/ShopHeadCard.vue";
 import ShopBodyCard from "@/components/ShopBodyCard.vue";
 import StoreForm from "@/components/StoreForm.vue";
-import productForm from "@/components/ProductForm.vue"; // Giả sử bạn có component này
-import ProductService from "@/services/product.service"; // Giả sử bạn có service này
+import productForm from "@/components/ProductForm.vue"; 
+import ProductService from "@/services/product.service"; 
 
 export default {
     props: {
@@ -46,6 +48,7 @@ export default {
         return {
             editingStoreId: null,
             creatingProduct: false,
+            editingProductId: null,
         };
     },
     methods: {
@@ -60,6 +63,12 @@ export default {
         },
         handleCancelCreate() {
             this.creatingProduct = false;
+        },
+        handleEditProduct(productId) {
+            this.editingProductId = productId;
+        },
+        handleCancelEditProduct() {
+            this.editingProductId = null;
         },
         async handleCreateProductSubmit(product) {
             try {
@@ -76,7 +85,7 @@ export default {
             try {
                 await ProductService.update(product._id, product);
                 alert('Cập nhật thông tin sản phẩm thành công!');
-                this.creatingProduct = false;
+                this.editingProductId = null;
                 // Optionally, refresh the product list or perform other actions
             } catch (error) {
                 console.error('Error updating product:', error);

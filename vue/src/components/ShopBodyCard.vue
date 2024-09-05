@@ -25,6 +25,7 @@
                                 <div class="card-buttons d-flex justify-content-evenly">
                                     <button class="btn btn-secondary">Xem thêm</button>
                                     <button class="btn btn-primary">Thêm vào giỏ</button>
+                                    <button class="btn btn-secondary" @click="editProduct(Product._id)">Chỉnh sửa</button>
                                 </div>
                             </div>
                         </div>
@@ -60,16 +61,16 @@ export default {
     async created() {
         await this.fetchProducts();
         this.displayedproducts = this.products.slice(0, this.itemsToShow);
-        console.log(this.displayedproducts);
+        // console.log(this.displayedproducts);
     },
     methods: {
         async fetchProducts() {
             try {
-                console.log(this.storeid);
+                // console.log(this.storeid);
                 const response = await ProductService.findByStore(this.storeid);
-                console.log(response);
+                // console.log(response);
                 this.products = response;
-                console.log(this.products);
+                // console.log(this.products);
             } catch (error) {
                 console.error('Error fetching products:', error);
             }
@@ -90,6 +91,9 @@ export default {
                 return `data:image/jpeg;base64,${picture}`;
             }
             return 'https://th.bing.com/th?id=OIP.XqGBZKSVcAqsEghNyEn1wAHaE8&w=306&h=204&c=8&rs=1&qlt=90&r=0&o=6&dpr=1.1&pid=3.1&rm=2.jpg';
+        },
+        editProduct(productId) {
+            this.$emit('edit-product', productId);
         }
     }
 }
