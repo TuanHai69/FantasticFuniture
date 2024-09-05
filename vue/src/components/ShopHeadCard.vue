@@ -21,18 +21,17 @@
                     </div>
                     <div class="col-3">
                         <button @click="editStore" class="btn btn-secondary bg-primary">Chỉnh sửa</button>
+                        <button @click="createProduct" class="btn btn-secondary bg-success mt-2">Tạo sản phẩm</button>
                     </div>
                 </div>
-
-
-
             </div>
         </div>
     </div>
     <div v-else class="loading">
-        Đang tải dữ liệu...
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Đang tải dữ liệu...</span>
+        </div>
     </div>
-
 </template>
 
 <script>
@@ -58,9 +57,7 @@ export default {
         async fetchStoreData() {
             try {
                 this.store = await StoreService.get(this.id);
-                // console.log('Fetched store data:', this.store);
                 this.loading = false;
-                // console.log('Loading:', this.loading); // Kiểm tra giá trị của loading
             } catch (error) {
                 console.error('Error fetching store data:', error);
                 alert('Có lỗi xảy ra khi lấy thông tin cửa hàng.');
@@ -76,6 +73,9 @@ export default {
         },
         editStore() {
             this.$emit('edit-store', this.store._id);
+        },
+        createProduct() {
+            this.$emit('create-product');
         }
     }
 };
@@ -96,5 +96,11 @@ export default {
     text-align: center;
     padding: 20px;
     font-size: 18px;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.3rem;
 }
 </style>
