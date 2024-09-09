@@ -23,8 +23,8 @@
                                 <div class="card-cost d-flex justify-content-end">{{ formatCurrency(Product.cost) }}
                                 </div>
                                 <div class="card-buttons d-flex justify-content-evenly">
-                                    <button class="btn btn-secondary">Xem thêm</button>
-                                    <button class="btn btn-primary">Thêm vào giỏ</button>
+                                    <button class="btn btn-primary" @click="addToCart(Product._id)">Xem thêm</button>
+                                    <button class="btn btn-secondary">Thêm vào giỏ</button>
                                     <button class="btn btn-secondary" @click="editProduct(Product._id)">Chỉnh sửa</button>
                                 </div>
                             </div>
@@ -72,7 +72,7 @@ export default {
                 this.products = response;
                 // console.log(this.products);
             } catch (error) {
-                console.error('Error fetching products:', error);
+                console.log('Error fetching products:', error);
             }
         },
         loadMore() {
@@ -94,7 +94,10 @@ export default {
         },
         editProduct(productId) {
             this.$emit('edit-product', productId);
-        }
+        },
+        addToCart(productId) {
+            this.$router.push( `/product/${productId}`);
+        },
     }
 }
 </script>

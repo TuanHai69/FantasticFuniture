@@ -31,18 +31,6 @@
                         
                     </router-link>
                 </li>
-                <li class="nav-item active">
-                    <router-link :to="{ name: 'shopcard', params: { id: 121113 } }" class="nav-link">
-                        Chi tiết
-                        
-                    </router-link>
-                </li>
-                <li class="nav-item active">
-                    <router-link :to="{ name: 'productitem', params: { id: 1213 } }" class="nav-link">
-                        Product
-                        
-                    </router-link>
-                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

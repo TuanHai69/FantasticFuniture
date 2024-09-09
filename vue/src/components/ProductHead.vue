@@ -1,25 +1,25 @@
 <template>
     <div class="container shop-head-card bg-white">
         <div class="row justify-content-evenly">
-            <div class=" col-5 image-container m-4">
-                <img src="https://donggia.vn/wp-content/uploads/2019/11/thiet-ke-noi-that-phong-khach-chung-cu-dep-2020-12.jpg"
-                    alt="Large Image" class="img-fluid large-image" />
+            <div class="col-5 image-container m-4">
+                <img :src="productPicture(product.picture)" alt="Large Image"
+                    class="img-fluid large-image limited-height" />
             </div>
             <div class="col-6 text-container m-4">
-                <h3>Tên sản phẩm <p>ID: {{ id }}</p>
+                <h3>Tên sản phẩm {{ product.name }}
+                    <!-- <p>ID: {{ id }}</p> -->
                 </h3>
-                <p>Giá</p>
-                <p>Vật liệu</p>
-
-                <p class="address">kích thước</p>
+                <p>Giá: {{ product.cost }}</p>
+                <p>Vật liệu: {{ product.material }}</p>
+                <p class="address">Kích thước: {{ product.size }}</p>
                 <p class="review">
-                    đánh giá:
+                    Đánh giá:
                     <span class="negative">Tiêu cực 2222</span> /
                     <span class="positive">Bình thường 2222</span> /
-                    <span class="recommend">tích cực 2222</span>
+                    <span class="recommend">Tích cực 2222</span>
                 </p>
                 <p class="open">Danh mục</p>
-                <p class="phone">Số lượng</p>
+                <p class="phone">Số lượng: {{ product.count }}</p>
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
                         <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab"
@@ -35,13 +35,13 @@
                 </nav>
                 <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-                        aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaâ</div>
+                        {{ product.description }}</div>
                     <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">...
                     </div>
-                    <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...
-                    </div>
-                    <div class="tab-pane fade" id="nav-move" role="tabpanel" aria-labelledby="nav-move-tab">Vận chuyển
-                    </div>
+                    <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">{{
+                        product.warranty }}</div>
+                    <div class="tab-pane fade" id="nav-move" role="tabpanel" aria-labelledby="nav-move-tab">{{
+                        product.delivery }}</div>
                 </div>
             </div>
         </div>
@@ -49,16 +49,88 @@
 </template>
 
 <script>
+import ProductService from "@/services/product.service";
+
 export default {
     props: {
         id: {
             type: String,
             required: true
         }
+    },
+    data() {
+        return {
+            product: {
+                name: '',
+                cost: '',
+                picture: '',
+                material: '',
+                size: '',
+                description: '',
+                warranty: '',
+                delivery: '',
+                discount: '',
+                count: '',
+                storeid: '',
+                state: '',
+            },
+            error: {}
+        };
+    },
+    methods: {
+        productPicture(picture) {
+            if (picture) {
+                return `data:image/jpeg;base64,${picture}`;
+            }
+            return 'https://donggia.vn/wp-content/uploads/2019/11/thiet-ke-noi-that-phong-khach-chung-cu-dep-2020-12.jpg';
+        }
+    },
+    mounted() {
+        console.log('Product ID:', this.id);
+        ProductService.get(this.id)
+            .then(response => {
+                this.product = response;
+            })
+            .catch(error => {
+                console.error('Error fetching product:', error);
+                this.error = error;
+            });
     }
 };
 </script>
 
 <style scoped>
+.image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.limited-height {
+    max-height: 450px;
+    object-fit: contain;
+}
+
+.text-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 /* Thêm các style tùy chỉnh ở đây */
+.tab-pane {
+    min-height: 7.5rem;
+    /* Chiều cao cố định, mỗi dòng text khoảng 1.5rem */
+    max-height: 7.5rem;
+    overflow-y: auto;
+    /* Thêm thanh cuộn nếu nội dung dài hơn */
+    padding: 1rem;
+    /* Thêm khoảng cách bên trong */
+    border: 1px solid #ddd;
+    /* Thêm viền để dễ nhìn */
+    border-radius: 5px;
+    /* Bo góc */
+    background-color: #f9f9f9;
+    /* Màu nền nhẹ */
+}
 </style>

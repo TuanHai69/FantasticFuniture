@@ -13,6 +13,11 @@
                 <span v-if="errors.cost">{{ errors.cost }}</span>
             </div>
             <div class="form-group">
+                <label for="count">Số lượng:</label>
+                <input type="number" id="count" v-model="product.count" class="form-control" />
+                <span v-if="errors.count">{{ errors.count }}</span>
+            </div>
+            <div class="form-group">
                 <label for="picture">Ảnh đại diện:</label>
                 <input type="file" id="picture" @change="handleFileChange" class="form-control" />
                 <span v-if="errors.picture">{{ errors.picture }}</span>
@@ -101,6 +106,7 @@ export default {
                 warranty: '',
                 delivery: '',
                 discount: '',
+                count: '',
                 storeid: '',
                 state: 'Hoạt động',
             },
@@ -127,6 +133,7 @@ export default {
             this.errors = {};
             if (!this.product.name) this.errors.name = 'Tên sản phẩm là bắt buộc.';
             if (!this.product.cost) this.errors.cost = 'Giá là bắt buộc.';
+            if (!this.product.count) this.errors.count = 'Giá là bắt buộc.';
             if (!this.product.picture) this.errors.picture = 'Hình ảnh là bắt buộc.';
             if (!this.product.material) this.errors.material = 'Chất liệu là bắt buộc.';
             if (!this.product.size) this.errors.size = 'Kích thước là bắt buộc.';
@@ -188,6 +195,7 @@ export default {
                 description: '',
                 warranty: '',
                 delivery: '',
+                count: '',
                 discount: '',
                 storeid: this.storeid,
                 state: 'Hoạt động',

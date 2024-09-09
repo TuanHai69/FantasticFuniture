@@ -18,6 +18,7 @@ class ProductService {
             discount: payload.discount,
             storeid: payload.storeid,
             state: payload.state,
+            count: payload.count,
         };
 
         Object.keys(product).forEach(
