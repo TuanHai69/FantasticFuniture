@@ -17,12 +17,12 @@
 <script>
 import AppHeader from "@/components/AppHeader.vue";
 import ShopCard from "@/components/ShopCard.vue";
-import ShopList from "@/components/ShopList.vue";
+// import ShopList from "@/components/ShopList.vue";
 export default {
     components: {
         AppHeader,
         ShopCard,
-        ShopList,
+        // ShopList,
     },
 };
 </script>

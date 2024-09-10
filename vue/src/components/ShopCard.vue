@@ -3,8 +3,8 @@
         <h2>Categories</h2>
         <div class="row m-3">
             <div class="col-md-3" v-for="(category, index) in displayedCategories" :key="category.id">
-                <div class="card mb-4">
-                    <img :src="category.image" class="card-img-top shoplistcard" :alt="category.name">
+                <div class="card mb-4" @click="navigateToStore(category._id)">
+                    <img :src="storePicture(category.picture)" class="card-img-top shoplistcard" :alt="category.name">
                     <div class="card-body">
                         <h5 class="card-title">{{ category.name }}</h5>
                         <div class="card-address">{{ category.address }}</div>
@@ -14,47 +14,31 @@
         </div>
         <div class="d-flex justify-content-center mb-4">
             <button v-if="displayedCategories.length < categories.length" @click="loadMore" class="btn btn-primary">Hiển
-                thị
-                thêm</button>
+                thị thêm</button>
         </div>
     </div>
 </template>
 
 <script>
+import StoreService from '@/services/store.service';
+
 export default {
     name: 'CategoryList',
     data() {
         return {
-            categories: [
-                { id: 1, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 1', image: 'https://donggia.vn/wp-content/uploads/2019/11/thiet-ke-noi-that-phong-khach-chung-cu-dep-2020-12.jpg' },
-                { id: 2, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 2', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 3, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 3', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 4, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 4', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 5, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 5', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 6, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 6', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 7, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 7', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 8, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 8', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 9, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 9', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 10, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 10', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 11, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 11', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 12, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 12', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 13, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 13', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 14, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 14', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 15, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 15', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 16, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 16', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 17, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 17', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 18, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 18', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 19, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 19', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 20, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 20', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                { id: 20, address: 'Số 213012 ,Ấp AAAAA, Xã BBBBBBBBBB, Huyện CCCCCCC, Tĩnh DDDDDD', name: 'Category 20', image: 'https://th.bing.com/th?q=%e1%ba%a2nh+Shop+Th%e1%bb%9di+Trang+Nh%e1%ba%adt&w=120&h=120&c=1&rs=1&qlt=90&cb=1&dpr=1.3&pid=InlineBlock&mkt=en-WW&cc=VN&setlang=vi&adlt=moderate&t=1&mw=247.jpg' },
-                // Thêm các danh mục khác
-            ],
+            categories: [],
             displayedCategories: [],
             itemsToShow: 20
         }
     },
-    created() {
-        this.displayedCategories = this.categories.slice(0, this.itemsToShow);
+    async created() {
+        try {
+            const data = await StoreService.getAll();
+            this.categories = data;
+            this.displayedCategories = this.categories.slice(0, this.itemsToShow);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        }
     },
     methods: {
         loadMore() {
@@ -64,7 +48,54 @@ export default {
             } else {
                 this.displayedCategories = this.categories;
             }
+        },
+        storePicture(picture) {
+            if (picture) {
+                return `data:image/jpeg;base64,${picture}`;
+            }
+            return 'https://th.bing.com/th?id=OIP.XqGBZKSVcAqsEghNyEn1wAHaE8&w=306&h=204&c=8&rs=1&qlt=90&r=0&o=6&dpr=1.1&pid=3.1&rm=2.jpg';
+        },
+        navigateToStore(storeId) {
+            this.$router.push(`/shop/${storeId}`);
         }
     }
 }
 </script>
+
+
+<style scoped>
+.store-list {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.store-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    max-height: 250px;
+    /* Giới hạn chiều cao của hình ảnh */
+}
+
+.row.align-items-center {
+    display: flex;
+    align-items: center;
+}
+
+.btn-primary {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+</style>

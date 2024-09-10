@@ -11,35 +11,37 @@
                 <p class="tag">tag</p>
                 <p class="tag">tag</p>
             </div>
-            <div class="col-8">
+            <div class="col-8" v-if="products.length > 0">
                 <div class="row bg-white p-3 justify-content-evenly">
                     <div class="col-md-5" v-for="(Product, index) in displayedproducts" :key="Product.id">
                         <div class="card mb-4 product-card">
-                            <img :src="productPicture(Product.picture)" class="card-img-top shoplistcard" :alt="Product.name">
+                            <img :src="productPicture(Product.picture)" class="card-img-top shoplistcard"
+                                :alt="Product.name">
                             <div class="card-body">
                                 <h5 class="card-title">{{ Product.name }}</h5>
-                                <div class="card-cost d-flex justify-content-end">{{ formatCurrency(Product.cost) }}
-                                </div>
                                 <div class="card-cost d-flex justify-content-end">{{ formatCurrency(Product.cost) }}
                                 </div>
                                 <div class="card-buttons d-flex justify-content-evenly">
                                     <button class="btn btn-primary" @click="addToCart(Product._id)">Xem thêm</button>
                                     <button class="btn btn-secondary">Thêm vào giỏ</button>
-                                    <button class="btn btn-secondary" @click="editProduct(Product._id)">Chỉnh sửa</button>
+                                    <button class="btn btn-secondary" @click="editProduct(Product._id)">Chỉnh
+                                        sửa</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="col-8" v-else>
+                <p>Chưa có sản phẩm nào.</p>
+            </div>
         </div>
-        <div class="d-flex justify-content-center mb-4">
+        <div class="d-flex justify-content-center mb-4" v-if="products.length > 0">
             <button v-if="displayedproducts.length < products.length" @click="loadMore" class="btn btn-primary">Hiển thị
                 thêm</button>
         </div>
     </div>
 </template>
-
 <script>
 import ProductService from "@/services/product.service"; // Giả sử bạn có service này
 
@@ -60,8 +62,9 @@ export default {
     },
     async created() {
         await this.fetchProducts();
-        this.displayedproducts = this.products.slice(0, this.itemsToShow);
-        // console.log(this.displayedproducts);
+        if (this.products.length > 0) {
+            this.displayedproducts = this.products.slice(0, this.itemsToShow);
+        }
     },
     methods: {
         async fetchProducts() {
@@ -96,7 +99,7 @@ export default {
             this.$emit('edit-product', productId);
         },
         addToCart(productId) {
-            this.$router.push( `/product/${productId}`);
+            this.$router.push(`/product/${productId}`);
         },
     }
 }
