@@ -9,6 +9,7 @@ class ProductTypeService {
         const producttype = {
             productid: payload.productid,
             typeid: payload.typeid,
+            state: payload.state,
         };
 
         Object.keys(producttype).forEach(
