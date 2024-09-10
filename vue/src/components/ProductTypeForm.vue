@@ -70,6 +70,7 @@ export default {
             if (this.validateForm()) {
                 try {
                     await ProductTypeService.create(this.producttype);
+                    await this.$emit ('update');
                     alert("Product type saved successfully!");
                 } catch (error) {
                     console.error("Error saving product type:", error);

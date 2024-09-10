@@ -7,7 +7,6 @@
             </div>
             <div class="col-6 text-container m-4">
                 <h3>Tên sản phẩm {{ product.name }}
-                    <!-- <p>ID: {{ id }}</p> -->
                 </h3>
                 <p>Giá: {{ product.cost }}</p>
                 <p>Vật liệu: {{ product.material }}</p>
@@ -19,8 +18,11 @@
                     <span class="recommend">Tích cực 2222</span>
                 </p>
                 <p class="open">Danh mục
-                    <span v-for="type in types" :key="type.id">
-                        <button class="btn type-button">{{ type.name }}</button>
+                    <span v-for="type in types" :key="type.id" class="type-button-container">
+                        <button class="btn type-button">
+                            {{ type.name }}
+                            <span class="delete-button" @click.stop="deleteProductType(type.producttypeid)">x</span>
+                        </button>
                     </span>
                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                         data-bs-target="#productTypeModal">+</button>
@@ -49,7 +51,6 @@
                     <div class="tab-pane fade" id="nav-move" role="tabpanel" aria-labelledby="nav-move-tab">{{
                         product.delivery }}</div>
                 </div>
-                <!-- <ProductTypeForm v-if="showForm" :productId="id" /> -->
             </div>
         </div>
         <div class="modal fade" id="productTypeModal" tabindex="-1" aria-labelledby="productTypeModalLabel"
@@ -61,7 +62,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <ProductTypeForm :productId="id" />
+                        <ProductTypeForm :productId="id" @update="fetchProductTypes"/>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -119,10 +120,33 @@ export default {
         async fetchProductTypes() {
             try {
                 const productTypes = await ProductTypeService.findByProduct(this.id);
+                // console.log(productTypes);
+
+                // Lấy chi tiết từng loại sản phẩm
                 const typePromises = productTypes.map(pt => TypeService.get(pt.typeid));
-                this.types = await Promise.all(typePromises);
+                const types = await Promise.all(typePromises);
+                // console.log(types);
+
+                // Kết hợp producttypeid từ productTypes vào types
+                this.types = types.map((type, index) => ({
+                    ...type,
+                    producttypeid: productTypes[index]._id
+                }));
+                // console.log(this.types);
             } catch (error) {
                 console.error("Error fetching product types:", error);
+            }
+        },
+        async deleteProductType(id) {
+            // console.log(id);
+            try {
+                await ProductTypeService.delete(id);
+                this.types = this.types.filter(type => type.id !== id);
+                await this.fetchProductTypes();
+                alert("Product type remove successfully!");
+
+            } catch (error) {
+                console.error("Error deleting product type:", error);
             }
         },
     },
@@ -135,7 +159,8 @@ export default {
             console.error('Error fetching product:', error);
             this.error = error;
         }
-    }
+    },
+
 
 };
 </script>
@@ -175,15 +200,45 @@ export default {
     /* Màu nền nhẹ */
 }
 
+.type-button-container {
+    position: relative;
+    display: inline-block;
+    margin-right: 10px;
+}
+
 .type-button {
     background-color: #28a745;
     border-radius: 8px;
-    margin-right: 10px;
     color: white;
     border: none;
+    position: relative;
+    padding-right: 30px;
+    /* Để chừa chỗ cho nút xóa */
 }
 
 .type-button:hover {
     background-color: #218838;
+}
+
+.delete-button {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1;
+    /* Đảm bảo nút xóa nằm trên cùng */
+}
+
+.delete-button:hover {
+    background-color: darkred;
 }
 </style>
