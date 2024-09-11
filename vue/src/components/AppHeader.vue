@@ -11,13 +11,13 @@
                 <li class="nav-item active">
                     <router-link :to="{ name: 'home' }" class="nav-link">
                         Home
-                        
+
                     </router-link>
                 </li>
                 <li class="nav-item active">
                     <router-link :to="{ name: 'shop' }" class="nav-link">
                         Cửa hàng
-                        
+
                     </router-link>
                 </li>
                 <li class="nav-item active">
@@ -28,7 +28,16 @@
                 <li class="nav-item active">
                     <router-link :to="{ name: 'product' }" class="nav-link">
                         Sản phẩm
-                        
+                    </router-link>
+                </li>
+                <li class="nav-item active">
+                    <router-link :to="{ name: 'accounts' }" class="nav-link">
+                        Quản lý TK
+                    </router-link>
+                </li>
+                <li class="nav-item active">
+                    <router-link :to="{ name: 'branch' }" class="nav-link">
+                        Quản lý B
                     </router-link>
                 </li>
                 <li class="nav-item dropdown">
@@ -52,14 +61,14 @@
                     </button>
                 </div>
             </form>
-            <ul class="navbar-nav mr-auto" >
+            <ul class="navbar-nav mr-auto">
                 <li class="nav-item" v-if="!isLoggedIn">
                     <router-link :to="{ name: 'login' }" class="nav-link">
                         Login
-                        
+
                     </router-link>
                 </li>
-                <li class="nav-item"  v-if="isLoggedIn">
+                <li class="nav-item" v-if="isLoggedIn">
                     <router-link :to="{ name: 'account' }" class="nav-link">
                         Account
                     </router-link>
@@ -69,11 +78,11 @@
                 <li class="nav-item" v-if="!isLoggedIn">
                     <router-link :to="{ name: 'register' }" class="nav-link">
                         Register
-                        
+
                     </router-link>
                 </li>
                 <li class="nav-item">
-                    <router-link :to="{ name: 'register' }" class="nav-link"  v-if="isLoggedIn"  @click="logout">
+                    <router-link :to="{ name: 'register' }" class="nav-link" v-if="isLoggedIn" @click="logout">
                         <i class="fas fa-sign-out-alt"></i>
                     </router-link>
                 </li>

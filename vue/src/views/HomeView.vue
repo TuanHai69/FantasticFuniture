@@ -4,7 +4,6 @@
         <div class="container-fluid ">
             <div class="page row">
                 <div class="offset-1 col-md-4 fixed-col">
-                    <!-- Nội dung cột cố định -->
                     <h2>Fixed Column</h2>
                     <p>Đây là cột cố định không bị ảnh hưởng khi cuộn trang.</p>
                 </div>
