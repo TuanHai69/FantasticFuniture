@@ -22,7 +22,7 @@
                                 <div class="card-cost d-flex justify-content-end">{{ formatCurrency(Product.cost) }}
                                 </div>
                                 <div class="card-buttons d-flex justify-content-evenly">
-                                    <button class="btn btn-primary" @click="addToCart(Product._id)">Xem thêm</button>
+                                    <button class="btn btn-primary" @click="moveToProduct(Product._id)">Xem thêm</button>
                                     <button class="btn btn-secondary">Thêm vào giỏ</button>
                                     <button class="btn btn-secondary" @click="editProduct(Product._id)">Chỉnh
                                         sửa</button>
@@ -98,7 +98,7 @@ export default {
         editProduct(productId) {
             this.$emit('edit-product', productId);
         },
-        addToCart(productId) {
+        moveToProduct(productId) {
             this.$router.push(`/product/${productId}`);
         },
     }
