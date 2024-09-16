@@ -54,6 +54,7 @@ export default {
                 description: '',
                 userid: '',
                 storecount: 1,
+                state: '',
             },
             isEditing: false,
             isRegistering: false,

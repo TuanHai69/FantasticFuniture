@@ -14,6 +14,7 @@
                             <th>Description</th>
                             <th>User ID</th>
                             <th>Store Count</th>
+                            <th>State</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -25,7 +26,18 @@
                             <td>{{ branch.email }}</td>
                             <td>{{ branch.description }}</td>
                             <td>{{ branch.userid }}</td>
-                            <td>{{ branch.storecount }}</td>
+                            <td>
+                                {{ branch.storecount }}
+                                <button @click="viewBranch(branch)" class="btn btn-link">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button @click="updateState(branch, 'accept')"
+                                    :disabled="branch.state === 'accept'">Accept</button>
+                                <button @click="updateState(branch, 'unaccept')"
+                                    :disabled="branch.state === 'unaccept'">Unaccept</button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -35,7 +47,8 @@
 </template>
 
 <script>
-import BranchService from "@/services/branch.service"; // Đảm bảo đường dẫn đúng
+import BranchService from "@/services/branch.service";
+import AccountsService from "@/services/accounts.service"; // Đảm bảo đường dẫn đúng
 
 export default {
     name: 'BranchList',
@@ -55,10 +68,30 @@ export default {
             } catch (error) {
                 console.error('Error fetching branches:', error);
             }
+        },
+        async updateState(branch, newState) {
+            try {
+                // Cập nhật state của branch
+                branch.state = newState;
+                await BranchService.update(branch._id, { state: newState });
+
+                // Cập nhật role của account dựa trên state mới
+                const account = await AccountsService.get(branch.userid);
+                if (newState === 'accept') {
+                    account.role = 'storeowner';
+                } else if (newState === 'unaccept') {
+                    account.role = 'client';
+                }
+                await AccountsService.update(branch.userid, { role: account.role });
+            } catch (error) {
+                console.error('Error updating state:', error);
+            }
+        },
+        viewBranch(branch) {
+            this.$emit('view-branch', branch);
         }
     }
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

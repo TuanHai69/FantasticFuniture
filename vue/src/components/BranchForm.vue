@@ -91,10 +91,9 @@ export default {
                 try {
                     if (this.branch._id) {
                         await this.$emit('update-branch', this.branch);
-                        alert('Cập nhật thông tin thành công!');
                     } else {
+                        this.branch.state = "unaccept";
                         await this.$emit('create-branch', this.branch);
-                        alert('Tạo chi nhánh mới thành công!');
                     }
                 } catch (error) {
                     console.error('Error updating branch:', error);

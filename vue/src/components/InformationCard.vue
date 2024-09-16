@@ -27,14 +27,14 @@
                     <p>
                         <strong>Vai trò:</strong> {{ account.role }} || 
                         <button @click="$emit('register')" class="btn btn-primary">Đăng ký bán hàng</button>||
-                        <button v-if="branchData._id" @click="$emit('create-store')" class="btn btn-primary">Tạo cửa
+                        <button v-if="branchData._id && branchData.state != 'unaccept'" @click="$emit('create-store')" class="btn btn-primary">Tạo cửa
                             hàng</button>
                     </p>
 
                 </div>
 
             </div>
-            <div class="col-12" v-if="branchData._id">
+            <div class="col-12" v-if="branchData._id && branchData.state != 'unaccept'">
                 <StoreCard :branchId="branchData._id" />
             </div>
         </div>

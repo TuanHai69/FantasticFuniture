@@ -15,6 +15,7 @@ class BranchService {
             description: payload.description,
             userid: payload.userid,
             storecount: payload.storecount,
+            state: payload.state,
         };
 
         Object.keys(branch).forEach(

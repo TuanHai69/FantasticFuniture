@@ -4,7 +4,8 @@
         <div v-if="stores.length">
             <div v-for="store in stores" :key="store._id" class="store-item row align-items-center">
                 <div class="col-md-4 d-flex justify-content-center align-items-center">
-                    <img :src="storePicture(store.picture)" alt="Store Picture" class="img-fluid rounded mx-auto d-block" />
+                    <img :src="storePicture(store.picture)" alt="Store Picture"
+                        class="img-fluid rounded mx-auto d-block" />
                 </div>
                 <div class="col-md-8">
                     <h3>{{ store.name }}</h3>
@@ -21,7 +22,8 @@
                         </div>
                     </div>
                     <p><strong>Mô tả:</strong> {{ store.description }}</p>
-                    <button @click="navigateToStore(store._id)" class="btn btn-primary position-absolute top-0 end-0 m-3">
+                    <button @click="navigateToStore(store._id)"
+                        class="btn btn-primary position-absolute top-0 end-0 m-3">
                         Đến cửa hàng
                     </button>
                 </div>
@@ -55,9 +57,11 @@ export default {
         async fetchStores() {
             try {
                 this.stores = await StoreService.findByBranch(this.branchId);
+                if (this.stores.length === 0) {
+                    alert('Chưa có cửa hàng được tạo.');
+                }
             } catch (error) {
                 console.error('Error fetching stores:', error);
-                alert('Có lỗi xảy ra khi lấy danh sách cửa hàng.');
             }
         },
         storePicture(picture) {
@@ -95,7 +99,8 @@ export default {
     max-width: 100%;
     height: auto;
     margin-bottom: 10px;
-    max-height: 250px; /* Giới hạn chiều cao của hình ảnh */
+    max-height: 250px;
+    /* Giới hạn chiều cao của hình ảnh */
 }
 
 .row.align-items-center {
