@@ -33,7 +33,7 @@ export default {
     },
     async created() {
         try {
-            const data = await StoreService.getAll();
+            const data = await StoreService.findByState('show');
             this.categories = data;
             this.displayedCategories = this.categories.slice(0, this.itemsToShow);
         } catch (error) {

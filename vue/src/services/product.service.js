@@ -28,6 +28,9 @@ class ProductService {
     async findByStore(id) {
         return (await this.api.get(`/store/${id}`)).data;
     }
+    async findByState(state) {
+        return (await this.api.get(`/state/${state}`)).data;
+    }
 }
 
 export default new ProductService();

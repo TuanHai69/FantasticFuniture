@@ -57,8 +57,12 @@ class ProductService {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
     }
-
-    async update(id, payload){
+    async findByState(state) {
+        return await this.find({
+            state: { $regex: new RegExp(state), $options: "i" },
+        });
+    }
+    async update(id, payload) {
         const filter = {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         };

@@ -47,7 +47,7 @@ export default {
     methods: {
         async fetchProducts() {
             try {
-                const response = await ProductService.getAll();
+                const response = await ProductService.findByState('show');
                 this.products = response;
             } catch (error) {
                 console.log('Error fetching products:', error);

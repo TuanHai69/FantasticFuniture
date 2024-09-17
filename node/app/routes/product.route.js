@@ -14,6 +14,8 @@ router.route("/:id")
 
 router.route("/store/:id")
     .get(product.findByStore)
-
+    
+router.route("/state/:state")
+    .get(product.findByState)
 
 module.exports = router;

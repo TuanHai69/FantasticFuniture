@@ -72,6 +72,24 @@ exports.findByStore = async (req, res, next) => {
     }
     return res.send(documents);
 }
+exports.findByState = async (req, res, next) => {
+    let documents = [];
+
+    try {
+        const productService = new ProductService(MongoDB.client);
+        documents = await productService.findByState(req.params.state);
+        if (documents.length === 0) {
+            return next(new ApiError(404, "Can't find any product with this state"));
+        }
+    } catch (error) {
+        return next(
+            new ApiError(
+                500, `Error when retrieving products with state=${req.params.state}`
+            )
+        );
+    }
+    return res.send(documents);
+}
 
 exports.update = async (req, res, next) => {
     if (req.body && Object.keys(req.body).length === 0) {

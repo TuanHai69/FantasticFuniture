@@ -18,7 +18,12 @@
                         <div class="col-6">
                             <p><strong>Địa chỉ:</strong> {{ store.address }}</p>
                             <p><strong>Email:</strong> {{ store.email }}</p>
-                            <p><strong>Trạng thái:</strong> {{ store.state }}</p>
+                            <p><strong>Trạng thái:</strong>
+                                <button @click="updateState(store, 'show')" :disabled="store.state === 'show'"
+                                    class="btn btn-success">Show</button>
+                                <button @click="updateState(store, 'hide')" :disabled="store.state === 'hide'"
+                                    class="btn btn-danger">Hide</button>
+                            </p>
                         </div>
                     </div>
                     <p><strong>Mô tả:</strong> {{ store.description }}</p>
@@ -37,6 +42,7 @@
 
 <script>
 import StoreService from '@/services/store.service';
+import ProductService from '@/services/product.service';
 
 export default {
     props: {
@@ -74,6 +80,24 @@ export default {
         navigateToStore(storeId) {
             this.$router.push(`/shop/${storeId}`);
         },
+        async updateState(store, newState) {
+            try {
+                // Cập nhật trạng thái của cửa hàng
+                store.state = newState;
+                await StoreService.update(store._id, { state: newState });
+
+                // Tìm và cập nhật trạng thái của các sản phẩm liên quan
+                const products = await ProductService.findByStore(store._id);
+                if (products && products.length > 0) {
+                    for (const product of products) {
+                        product.state = newState;
+                        await ProductService.update(product._id, { state: newState });
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating state:', error);
+            }
+        }
     },
 };
 </script>
