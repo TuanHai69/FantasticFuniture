@@ -32,6 +32,10 @@ class StoreService {
     async findByBranch(id) {
         return (await this.api.get(`/branch/${id}`)).data;
     }
+
+    async findByState(state) {
+        return (await this.api.get(`/state/${state}`)).data;
+    }
 }
 
 export default new StoreService();

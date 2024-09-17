@@ -8,7 +8,7 @@
             <div class="col-6 text-container m-4">
                 <h3>Tên sản phẩm {{ product.name }}
                 </h3>
-                <p>Giá: {{ product.cost }}</p>
+
                 <p>Vật liệu: {{ product.material }}</p>
                 <p class="address">Kích thước: {{ product.size }}</p>
                 <p class="review">
@@ -28,6 +28,15 @@
                         data-bs-target="#productTypeModal">+</button>
                 </p>
                 <p class="phone">Số lượng: {{ product.count }}</p>
+                <p>Giá:
+                    <span v-if="product.discount">
+                        <s>{{ formatCurrency(product.cost) }}</s> -> {{ formatCurrency(product.cost - product.cost *
+                            product.discount / 100) }}
+                    </span>
+                    <span v-else>
+                        {{ formatCurrency(product.cost) }}
+                    </span>
+                </p>
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
                         <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab"
@@ -39,6 +48,8 @@
                             type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Bảo hành</button>
                         <button class="nav-link" id="nav-move-tab" data-bs-toggle="tab" data-bs-target="#nav-move"
                             type="button" role="tab" aria-controls="nav-move" aria-selected="false">Vận chuyển</button>
+                        <button class="nav-link" id="nav-manager-tab" data-bs-toggle="tab" data-bs-target="#nav-manager"
+                            type="button" role="tab" aria-controls="nav-manager" aria-selected="false">quản lý</button>
                     </div>
                 </nav>
                 <div class="tab-content" id="nav-tabContent">
@@ -46,10 +57,25 @@
                         {{ product.description }}</div>
                     <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">...
                     </div>
-                    <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">{{
-                        product.warranty }}</div>
-                    <div class="tab-pane fade" id="nav-move" role="tabpanel" aria-labelledby="nav-move-tab">{{
-                        product.delivery }}</div>
+                    <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+                        {{ product.warranty }}
+                    </div>
+                    <div class="tab-pane fade" id="nav-move" role="tabpanel" aria-labelledby="nav-move-tab">
+                        {{ product.delivery }}
+                    </div>
+                    <div class="tab-pane fade" id="nav-manager" role="tabpanel" aria-labelledby="nav-manager-tab">
+                        <button @click="updateState(product, 'show')" :disabled="product.state === 'show'"
+                            class="btn btn-success">
+                            Show
+                        </button>
+                        <button @click="updateState(product, 'hide')" :disabled="product.state === 'hide'"
+                            class="btn btn-danger">
+                            Hide
+                        </button>
+                        <button class="btn btn-secondary" @click="editProduct(product._id)">
+                            Chỉnh sửa
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -62,7 +88,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <ProductTypeForm :productId="id" @update="fetchProductTypes"/>
+                        <ProductTypeForm :productId="id" @update="fetchProductTypes" />
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -138,7 +164,6 @@ export default {
             }
         },
         async deleteProductType(id) {
-            // console.log(id);
             try {
                 await ProductTypeService.delete(id);
                 this.types = this.types.filter(type => type.id !== id);
@@ -147,6 +172,20 @@ export default {
 
             } catch (error) {
                 console.error("Error deleting product type:", error);
+            }
+        },
+        formatCurrency(value) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+        },
+        editProduct(productId) {
+            this.$emit('edit-product', productId);
+        },
+        async updateState(product, newState) {
+            try {
+                product.state = newState;
+                await ProductService.update(product._id, { state: newState });
+            } catch (error) {
+                console.error('Error updating state:', error);
             }
         },
     },

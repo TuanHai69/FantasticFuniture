@@ -7,8 +7,13 @@
                     <img :src="productPicture(Product.picture)" class="card-img-top shoplistcard" :alt="Product.name">
                     <div class="card-body">
                         <h5 class="card-title">{{ Product.name }}</h5>
-                        <div class="card-cost d-flex justify-content-end" v-if="Product.discount">
-                            <s>{{ formatCurrency(Product.cost) }}</s>
+                        <div class="card-cost d-flex justify-content-end" >
+                            <span v-if="Product.discount">
+                                <s>{{ formatCurrency(Product.cost) }}</s>
+                            </span>
+                            <span v-else>
+                                {{ formatCurrency(Product.cost) }}
+                            </span>
                         </div>
                         <div class="card-cost d-flex justify-content-end" v-if="Product.discount">
                             {{ formatCurrency(Product.cost - Product.cost * Product.discount / 100) }}

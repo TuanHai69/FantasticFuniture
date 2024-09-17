@@ -9,7 +9,7 @@
                             <ShopHeadCard :id="id" @edit-store="handleEditStore"
                                 @create-product="handleCreateProduct" />
                         </div>
-                        <ShopBodyCard :storeid="id"  @edit-product="handleEditProduct"/>
+                        <ShopBodyCard :storeid="id" :editstate="'show'"  @edit-product="handleEditProduct"/>
                     </div>
                     <StoreForm v-if="editingStoreId" :storeId="editingStoreId" @cancel="handleCancelEdit" />
                     <productForm v-else-if="creatingProduct" :storeid="id" @cancel="handleCancelCreate"

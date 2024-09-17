@@ -60,8 +60,8 @@
             <div class="form-group">
                 <label for="state">Trạng thái:</label>
                 <select id="state" v-model="product.state" class="form-control">
-                    <option value="Hoạt động">Hoạt động</option>
-                    <option value="Ẩn đi">Ẩn đi</option>
+                    <option value="show">Hiển thị</option>
+                    <option value="hide">Ẩn</option>
                 </select>
                 <span v-if="errors.state">{{ errors.state }}</span>
             </div>
@@ -140,7 +140,6 @@ export default {
             if (!this.product.description) this.errors.description = 'Mô tả là bắt buộc.';
             if (!this.product.warranty) this.errors.warranty = 'Bảo hành là bắt buộc.';
             if (!this.product.delivery) this.errors.delivery = 'Giao hàng là bắt buộc.';
-            if (!this.product.discount) this.errors.discount = 'Giảm giá là bắt buộc.';
             if (!this.product.storeid) this.errors.storeid = 'Store ID là bắt buộc.';
             if (!this.product.state) this.errors.state = 'Trạng thái là bắt buộc.';
             return Object.keys(this.errors).length === 0;

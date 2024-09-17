@@ -2,14 +2,18 @@
     <AppHeader />
     <div class="shopcardbg">
         <div class="container-fluid ">
-            <div class="page row">
+            <div class="page row" v-if="!editingProductId">
                 <div class="offset-1 col-md-10">
                     <div class="d-flex justify-content-center mt-3">
-                        <ProductHead :id=id />
+                        <ProductHead :id=id @edit-product="handleEditProduct" />
                     </div>
                 </div>
-                <ShopBodyCard :storeid="this.product.storeid" v-if="this.product.storeid"/>
+                <ShopBodyCard :storeid="this.product.storeid" :editstate="'hide'" v-if="this.product.storeid" />
                 <ProductCard />
+            </div>
+            <div class="page row" v-else-if="editingProductId">
+                <ProductForm :storeid="id" :productid="editingProductId" @cancel="handleCancelEditProduct"
+                    @update-product="handleUpdateProductSubmit" />
             </div>
         </div>
     </div>
@@ -21,6 +25,7 @@ import ProductHead from "@/components/ProductHead.vue";
 import ProductCard from "@/components/ProductCard.vue";
 import ShopBodyCard from "@/components/ShopBodyCard.vue";
 import ProductService from "@/services/product.service";
+import ProductForm from "@/components/ProductForm.vue";
 
 export default {
     props: {
@@ -32,6 +37,7 @@ export default {
     data() {
         return {
             product: {},
+            editingProductId: null,
         };
     },
     components: {
@@ -39,6 +45,7 @@ export default {
         ProductHead,
         ProductCard,
         ShopBodyCard,
+        ProductForm
     },
     mounted() {
         this.fetchProduct();
@@ -51,8 +58,24 @@ export default {
             } catch (error) {
                 console.error('Error fetching product:', error);
             }
-        }
-
+        },
+        handleEditProduct(productId) {
+            this.editingProductId = productId;
+        },
+        handleCancelEditProduct() {
+            this.editingProductId = null;
+        },
+        async handleUpdateProductSubmit(product) {
+            try {
+                await ProductService.update(product._id, product);
+                alert('Cập nhật thông tin sản phẩm thành công!');
+                this.editingProductId = null;
+                // Optionally, refresh the product list or perform other actions
+            } catch (error) {
+                console.error('Error updating product:', error);
+                alert('Có lỗi xảy ra khi cập nhật thông tin sản phẩm.');
+            }
+        },
     }
 
 };

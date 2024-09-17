@@ -24,8 +24,10 @@
                                 <div class="card-buttons d-flex justify-content-evenly">
                                     <button class="btn btn-primary" @click="moveToProduct(Product._id)">Xem thêm</button>
                                     <button class="btn btn-secondary">Thêm vào giỏ</button>
-                                    <button class="btn btn-secondary" @click="editProduct(Product._id)">Chỉnh
-                                        sửa</button>
+
+                                    <button v-if="editstate == 'show'" class="btn btn-secondary" @click="editProduct(Product._id)">Chỉnh
+                                        sửa
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -51,6 +53,10 @@ export default {
         storeid: {
             type: String,
             required: true
+        },
+        editstate: {
+            type: String,
+            required: true,
         }
     },
     data() {
