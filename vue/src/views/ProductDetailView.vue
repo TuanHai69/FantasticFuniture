@@ -47,6 +47,14 @@ export default {
         ShopBodyCard,
         ProductForm
     },
+    watch: {
+        id: {
+            handler(newId) {
+                this.fetchProduct(newId);
+            },
+            immediate: true
+        }
+    },
     mounted() {
         this.fetchProduct();
     },

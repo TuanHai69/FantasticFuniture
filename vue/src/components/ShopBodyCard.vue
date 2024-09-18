@@ -3,13 +3,11 @@
         <h2>products</h2>
         <div class="row m-3 d-flex justify-content-evenly">
             <div class="col-3 bg-white p-4 tag-container">
-                <p class="tag">tag</p>
-                <p class="tag">tag</p>
-                <p class="tag">tag</p>
-                <p class="tag">tag</p>
-                <p class="tag">tag</p>
-                <p class="tag">tag</p>
-                <p class="tag">tag</p>
+                <button v-for="type in types" :key="type._id" class="water-drop-button" @click="handleTypeClick(type)">
+                    {{ type.name }}
+                </button>
+
+
             </div>
             <div class="col-8" v-if="products.length > 0">
                 <div class="row bg-white p-3 justify-content-evenly">
@@ -22,10 +20,13 @@
                                 <div class="card-cost d-flex justify-content-end">{{ formatCurrency(Product.cost) }}
                                 </div>
                                 <div class="card-buttons d-flex justify-content-evenly">
-                                    <button class="btn btn-primary" @click="moveToProduct(Product._id)">Xem thêm</button>
+                                    <button class="btn btn-primary"
+                                        @click="moveToProduct(Product._id)">Xem
+                                        thêm</button>
                                     <button class="btn btn-secondary">Thêm vào giỏ</button>
 
-                                    <button v-if="editstate == 'show'" class="btn btn-secondary" @click="editProduct(Product._id)">Chỉnh
+                                    <button v-if="editstate == 'show'" class="btn btn-secondary"
+                                        @click="editProduct(Product._id)">Chỉnh
                                         sửa
                                     </button>
                                 </div>
@@ -45,8 +46,9 @@
     </div>
 </template>
 <script>
-import ProductService from "@/services/product.service"; // Giả sử bạn có service này
-
+import ProductService from "@/services/product.service";
+import ProductTypeService from "@/services/producttype.service";
+import TypeService from "@/services/type.service";
 export default {
     name: 'ProductList',
     props: {
@@ -63,13 +65,15 @@ export default {
         return {
             products: [],
             displayedproducts: [],
-            itemsToShow: 20
+            itemsToShow: 20,
+            types: []
         }
     },
-    async created() {
+    async mounted() {
         await this.fetchProducts();
         if (this.products.length > 0) {
             this.displayedproducts = this.products.slice(0, this.itemsToShow);
+            await this.fetchTypes();
         }
     },
     methods: {
@@ -83,6 +87,36 @@ export default {
             } catch (error) {
                 console.log('Error fetching products:', error);
             }
+        },
+        async fetchTypes() {
+            try {
+                const typeIds = new Set();
+                for (const product of this.products) {
+                    try {
+                        const productTypes = await ProductTypeService.findByProduct(product._id);
+
+                        if (productTypes && productTypes.length > 0) {
+                            productTypes.forEach(pt => typeIds.add(pt.typeid));
+                        }
+                    } catch (error) {
+                        if (error.response && error.response.status === 404) {
+                            // console.warn('Product types not found ');
+                        } else {
+                            console.error('Error fetching product types:', error);
+                        }
+                    }
+                }
+                const uniqueTypeIds = Array.from(typeIds);
+                for (const typeId of uniqueTypeIds) {
+                    const type = await TypeService.get(typeId);
+                    this.types.push(type);
+                }
+            } catch (error) {
+                console.error('Error fetching types:', error);
+            }
+        },
+        handleTypeClick(type) {
+            console.log('Type clicked:', type);
         },
         loadMore() {
             const nextItems = this.displayedproducts.length + 8;
@@ -110,3 +144,26 @@ export default {
     }
 }
 </script>
+<style scoped>
+.water-drop-button {
+    background-color: #1E90FF;
+    /* Dodger Blue */
+    color: white;
+    border: none;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    /* Water drop shape */
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.water-drop-button:hover {
+    transform: scale(1.05);
+}
+
+.water-drop-button:active {
+    transform: scale(0.95);
+}
+</style>

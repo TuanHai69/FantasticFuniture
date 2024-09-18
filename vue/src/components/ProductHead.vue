@@ -115,6 +115,14 @@ export default {
     components: {
         ProductTypeForm
     },
+    watch: {
+        id: {
+            handler(newId) {
+                this.fetchProduct();
+            },
+            immediate: true
+        }
+    },
     data() {
         return {
             showForm: false,
@@ -136,12 +144,29 @@ export default {
             types: []
         };
     },
+    async mounted() {
+        try {
+            await this.fetchProduct();
+            await this.fetchProductTypes();
+        } catch (error) {
+            console.error('Error fetching product:', error);
+            this.error = error;
+        }
+    },
     methods: {
         productPicture(picture) {
             if (picture) {
                 return `data:image/jpeg;base64,${picture}`;
             }
             return 'https://donggia.vn/wp-content/uploads/2019/11/thiet-ke-noi-that-phong-khach-chung-cu-dep-2020-12.jpg';
+        },
+        async fetchProduct() {
+            try {
+                const response = await ProductService.get(this.id);
+                this.product = response;
+            } catch (error) {
+                console.error('Error fetching product:', error);
+            }
         },
         async fetchProductTypes() {
             try {
@@ -189,16 +214,7 @@ export default {
             }
         },
     },
-    async mounted() {
-        try {
-            const response = await ProductService.get(this.id);
-            this.product = response;
-            await this.fetchProductTypes();
-        } catch (error) {
-            console.error('Error fetching product:', error);
-            this.error = error;
-        }
-    },
+
 
 
 };
