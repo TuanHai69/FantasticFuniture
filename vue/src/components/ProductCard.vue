@@ -1,25 +1,77 @@
 <template>
     <div class="container mt-4">
-        <h2>products</h2>
+        <h2>Products</h2>
+        <div class="accordion" id="filterAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Bộ lọc
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                    data-bs-parent="#filterAccordion">
+                    <div class="accordion-body">
+                        <div class="form-group">
+                            <label>Chọn loại sản phẩm</label>
+                            <div class="checkbox-grid">
+                                <div v-for="option in filterOptions" :key="option.value" class="form-check">
+                                    <input class="form-check-input" type="checkbox" :value="option.value"
+                                        v-model="selectedFilters" @change="logSelectedFilters">
+                                    <label class="form-check-label">{{ option.text }}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row m-3">
-            <div class="col-md-3" v-for="(Product, index) in displayedproducts" :key="Product.id">
+            <div v-if="filteredProducts.length > 0" class="col-md-3" v-for="(product, index) in filteredProducts"
+                :key="product.id">
                 <div class="card mb-4 product-card">
-                    <img :src="productPicture(Product.picture)" class="card-img-top shoplistcard" :alt="Product.name">
+                    <img :src="productPicture(product.picture)" class="card-img-top shoplistcard" :alt="product.name">
                     <div class="card-body">
-                        <h5 class="card-title">{{ Product.name }}</h5>
-                        <div class="card-cost d-flex justify-content-end" >
-                            <span v-if="Product.discount">
-                                <s>{{ formatCurrency(Product.cost) }}</s>
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <div class="card-cost d-flex justify-content-end">
+                            <span v-if="product.discount">
+                                <s>{{ formatCurrency(product.cost) }}</s>
                             </span>
                             <span v-else>
-                                {{ formatCurrency(Product.cost) }}
+                                {{ formatCurrency(product.cost) }}
                             </span>
                         </div>
-                        <div class="card-cost d-flex justify-content-end" v-if="Product.discount">
-                            {{ formatCurrency(Product.cost - Product.cost * Product.discount / 100) }}
+                        <div class="card-cost d-flex justify-content-end" v-if="product.discount">
+                            {{ formatCurrency(product.cost - product.cost * product.discount / 100) }}
                         </div>
-                        <div class="card-buttons d-flex justify-content-evenly ">
-                            <button class="btn btn-secondary" @click="moveToProduct(Product._id)">Xem thêm</button>
+                        <div class="card-buttons d-flex justify-content-evenly">
+                            <button class="btn btn-secondary" @click="moveToProduct(product._id)">Xem thêm</button>
+                            <button class="btn btn-primary">Thêm vào giỏ</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-else-if="selectedFilters.length > 0" class="col-12">
+                <p>Không có sản phẩm phù hợp với bộ lọc</p>
+            </div>
+            <div v-else class="col-md-3" v-for="(product, index) in displayedProducts" :key="product._id">
+                <div class="card mb-4 product-card">
+                    <img :src="productPicture(product.picture)" class="card-img-top shoplistcard" :alt="product.name">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <div class="card-cost d-flex justify-content-end">
+                            <span v-if="product.discount">
+                                <s>{{ formatCurrency(product.cost) }}</s>
+                            </span>
+                            <span v-else>
+                                {{ formatCurrency(product.cost) }}
+                            </span>
+                        </div>
+                        <div class="card-cost d-flex justify-content-end" v-if="product.discount">
+                            {{ formatCurrency(product.cost - product.cost * product.discount / 100) }}
+                        </div>
+                        <div class="card-buttons d-flex justify-content-evenly">
+                            <button class="btn btn-secondary" @click="moveToProduct(product._id)">Xem thêm</button>
                             <button class="btn btn-primary">Thêm vào giỏ</button>
                         </div>
                     </div>
@@ -27,27 +79,39 @@
             </div>
         </div>
         <div class="d-flex justify-content-center mb-4">
-            <button v-if="displayedproducts.length < products.length" @click="loadMore" class="btn btn-primary">Hiển thị
-                thêm</button>
+            <button v-if="displayedProducts.length < products.length && filteredProducts.length === 0" @click="loadMore"
+                class="btn btn-primary">Hiển thị thêm</button>
         </div>
+        <div v-if="loading" class="loading">Loading...</div>
+        <div v-if="error" class="error">{{ error }}</div>
     </div>
 </template>
 
 <script>
-import ProductService from "@/services/product.service"; // Giả sử bạn có service này
+import ProductService from "@/services/product.service";
+import TypeService from "@/services/type.service";
+import ProductTypeService from "@/services/producttype.service";
 
 export default {
     name: 'ProductList',
     data() {
         return {
             products: [],
-            displayedproducts: [],
-            itemsToShow: 20
-        }
+            displayedProducts: [],
+            filteredProducts: [],
+            itemsToShow: 20,
+            loading: false,
+            error: null,
+            selectedFilters: [],
+            filterOptions: [],
+        };
     },
     async created() {
+        this.loading = true;
         await this.fetchProducts();
-        this.displayedproducts = this.products.slice(0, this.itemsToShow);
+        await this.fetchTypes();
+        this.displayedProducts = this.products.slice(0, this.itemsToShow);
+        this.loading = false;
     },
     methods: {
         async fetchProducts() {
@@ -55,15 +119,28 @@ export default {
                 const response = await ProductService.findByState('show');
                 this.products = response;
             } catch (error) {
-                console.log('Error fetching products:', error);
+                this.error = 'Error fetching products';
+                console.error('Error fetching products:', error);
+            }
+        },
+        async fetchTypes() {
+            try {
+                const response = await TypeService.getAll();
+                this.filterOptions = response.map(type => ({
+                    value: type._id,
+                    text: type.name
+                }));
+            } catch (error) {
+                this.error = 'Error fetching types';
+                console.error('Error fetching types:', error);
             }
         },
         loadMore() {
-            const nextItems = this.displayedproducts.length + 8;
+            const nextItems = this.displayedProducts.length + 8;
             if (nextItems <= this.products.length) {
-                this.displayedproducts = this.products.slice(0, nextItems);
+                this.displayedProducts = this.products.slice(0, nextItems);
             } else {
-                this.displayedproducts = this.products;
+                this.displayedProducts = this.products;
             }
         },
         formatCurrency(value) {
@@ -78,6 +155,63 @@ export default {
         moveToProduct(productId) {
             this.$router.push(`/product/${productId}`);
         },
+        async logSelectedFilters() {
+            // console.log(this.selectedFilters);
+            if (this.selectedFilters.length === 0) {
+                this.filteredProducts = [];
+                return;
+            }
+            try {
+                const results = await Promise.all(
+                    this.selectedFilters.map(id => ProductTypeService.findByType(id))
+                );
+
+                // Tổng hợp các productid từ tất cả các result
+                const productIds = results.reduce((acc, result) => {
+                    result.forEach(item => {
+                        if (!acc[item.productid]) {
+                            acc[item.productid] = 0;
+                        }
+                        acc[item.productid]++;
+                    });
+                    return acc;
+                }, {});
+
+                // Lọc các productid xuất hiện trong tất cả các selectedFilters
+                const filteredProductIds = Object.keys(productIds).filter(
+                    id => productIds[id] === this.selectedFilters.length
+                );
+
+                // Lấy dữ liệu sản phẩm cho từng productid trong filteredProductIds
+                const products = await Promise.all(
+                    filteredProductIds.map(id => ProductService.get(id))
+                );
+
+                this.filteredProducts = products.filter(product => product.state !== 'hide');
+                // console.log(products);
+            } catch (error) {
+                console.error('Error fetching product types or products:', error);
+            }
+        }
     }
-}
+};
 </script>
+<style>
+.loading {
+    text-align: center;
+    font-size: 1.5em;
+    color: #007bff;
+}
+
+.error {
+    text-align: center;
+    font-size: 1.5em;
+    color: red;
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+</style>
