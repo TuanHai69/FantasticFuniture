@@ -20,8 +20,7 @@
                                 <div class="card-cost d-flex justify-content-end">{{ formatCurrency(Product.cost) }}
                                 </div>
                                 <div class="card-buttons d-flex justify-content-evenly">
-                                    <button class="btn btn-primary"
-                                        @click="moveToProduct(Product._id)">Xem
+                                    <button class="btn btn-primary" @click="moveToProduct(Product._id)">Xem
                                         thêm</button>
                                     <button class="btn btn-secondary">Thêm vào giỏ</button>
 
@@ -116,7 +115,7 @@ export default {
             }
         },
         handleTypeClick(type) {
-            console.log('Type clicked:', type);
+            this.$router.push({ name: 'products', params: { id: type._id } });
         },
         loadMore() {
             const nextItems = this.displayedproducts.length + 8;

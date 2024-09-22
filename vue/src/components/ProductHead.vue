@@ -19,7 +19,7 @@
                 </p>
                 <p class="open">Danh mục
                     <span v-for="type in types" :key="type.id" class="type-button-container">
-                        <button class="btn type-button">
+                        <button class="btn type-button" @click="navigateToProduct(type)">
                             {{ type.name }}
                             <span class="delete-button" @click.stop="deleteProductType(type.producttypeid)">x</span>
                         </button>
@@ -187,6 +187,9 @@ export default {
             } catch (error) {
                 console.error("Error fetching product types:", error);
             }
+        },
+        navigateToProduct(type) {
+            this.$router.push({ name: 'products', params: { id: type._id } });
         },
         async deleteProductType(id) {
             try {

@@ -7,7 +7,7 @@
                     <div class="d-flex justify-content-center mt-3">
                         <h2>Danh sách sản phẩm</h2>
                     </div>
-                    <ProductCard />
+                    <ProductCard :id="$route.params.id" />
                 </div>
             </div>
         </div>
@@ -21,6 +21,12 @@ export default {
     components: {
         AppHeader,
         ProductCard
+    },
+    props: {
+        id: {
+            type: String,
+            default: null
+        }
     },
 };
 </script>

@@ -17,7 +17,8 @@
                             <div class="checkbox-grid">
                                 <div v-for="option in filterOptions" :key="option.value" class="form-check">
                                     <input class="form-check-input" type="checkbox" :value="option.value"
-                                        v-model="selectedFilters" @change="logSelectedFilters">
+                                        v-model="selectedFilters" @change="logSelectedFilters"
+                                        >
                                     <label class="form-check-label">{{ option.text }}</label>
                                 </div>
                             </div>
@@ -94,6 +95,12 @@ import ProductTypeService from "@/services/producttype.service";
 
 export default {
     name: 'ProductList',
+    props: {
+        id: {
+            type: String,
+            default: null
+        }
+    },
     data() {
         return {
             products: [],
@@ -111,6 +118,12 @@ export default {
         await this.fetchProducts();
         await this.fetchTypes();
         this.displayedProducts = this.products.slice(0, this.itemsToShow);
+        
+
+        if (this.id) {
+            this.selectedFilters.push(this.id);
+            await this.logSelectedFilters();
+        }
         this.loading = false;
     },
     methods: {
@@ -156,7 +169,6 @@ export default {
             this.$router.push(`/product/${productId}`);
         },
         async logSelectedFilters() {
-            // console.log(this.selectedFilters);
             if (this.selectedFilters.length === 0) {
                 this.filteredProducts = [];
                 return;

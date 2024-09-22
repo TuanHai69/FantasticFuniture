@@ -26,7 +26,7 @@
                     </router-link>
                 </li> -->
                 <li class="nav-item active">
-                    <router-link :to="{ name: 'product' }" class="nav-link">
+                    <router-link :to="{ name: 'products' }" class="nav-link">
                         Sản phẩm
                     </router-link>
                 </li>
