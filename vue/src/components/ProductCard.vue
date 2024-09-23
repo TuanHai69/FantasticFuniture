@@ -17,8 +17,7 @@
                             <div class="checkbox-grid">
                                 <div v-for="option in filterOptions" :key="option.value" class="form-check">
                                     <input class="form-check-input" type="checkbox" :value="option.value"
-                                        v-model="selectedFilters" @change="logSelectedFilters"
-                                        >
+                                        v-model="selectedFilters" @change="logSelectedFilters">
                                     <label class="form-check-label">{{ option.text }}</label>
                                 </div>
                             </div>
@@ -47,7 +46,7 @@
                         </div>
                         <div class="card-buttons d-flex justify-content-evenly">
                             <button class="btn btn-secondary" @click="moveToProduct(product._id)">Xem thêm</button>
-                            <button class="btn btn-primary">Thêm vào giỏ</button>
+                            <button class="btn btn-primary" @click="addToCart(product)">Thêm vào giỏ</button>
                         </div>
                     </div>
                 </div>
@@ -73,7 +72,7 @@
                         </div>
                         <div class="card-buttons d-flex justify-content-evenly">
                             <button class="btn btn-secondary" @click="moveToProduct(product._id)">Xem thêm</button>
-                            <button class="btn btn-primary">Thêm vào giỏ</button>
+                            <button class="btn btn-primary" @click="addToCart(product)">Thêm vào giỏ</button>
                         </div>
                     </div>
                 </div>
@@ -92,6 +91,8 @@
 import ProductService from "@/services/product.service";
 import TypeService from "@/services/type.service";
 import ProductTypeService from "@/services/producttype.service";
+import CartService from "@/services/cart.service";
+import LocalStorageHelper from "@/services/local.service";
 
 export default {
     name: 'ProductList',
@@ -118,7 +119,7 @@ export default {
         await this.fetchProducts();
         await this.fetchTypes();
         this.displayedProducts = this.products.slice(0, this.itemsToShow);
-        
+
 
         if (this.id) {
             this.selectedFilters.push(this.id);
@@ -146,6 +147,48 @@ export default {
             } catch (error) {
                 this.error = 'Error fetching types';
                 console.error('Error fetching types:', error);
+            }
+        },
+        async addToCart(product) {
+            const userId = LocalStorageHelper.getItem('id');
+            if (!userId) {
+                console.error("User is not logged in");
+                return;
+            }
+            if (product.count <= 0) {
+                alert('Sản phẩm không đủ số lượng');
+                return;
+            }
+            try {
+                // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+                const existingCartItems = await CartService.findByUserIdAndStoreId(userId, product.storeid);
+                const existingCartItem = existingCartItems.find(item => item.productid === product._id);
+                let cart;
+                if (existingCartItem) {
+                    // Nếu sản phẩm đã có trong giỏ hàng, tăng số lượng
+                    cart = {
+                        ...existingCartItem,
+                        count: existingCartItem.count + 1
+                    };
+                    await CartService.update(existingCartItem._id, cart);
+                    alert(`Số lượng sản phẩm có trong giỏ hàng hiện tại là ${existingCartItem.count + 1}`);
+                } else {
+                    // Nếu sản phẩm chưa có trong giỏ hàng, tạo mới
+                    cart = {
+                        userid: userId,
+                        productid: product._id,
+                        count: 1,
+                        storeid: product.storeid,
+                        state: "1"
+                    };
+                    await CartService.create(cart);
+                    alert('Đã thêm sản phẩm vào giỏ hàng');
+
+                }
+                product.count -= 1;
+                await ProductService.update(product._id, { count: product.count });
+            } catch (error) {
+                console.error("Error adding product to cart:", error);
             }
         },
         loadMore() {

@@ -97,7 +97,7 @@ exports.findByUserIdAndStoreId = async (req, res, next) => {
         const cartService = new CartService(MongoDB.client);
         documents = await cartService.findByUserIdAndStoreId(req.params.userid, req.params.storeid);
         if (documents.length === 0) {
-            return next(new ApiError(404, "Can't find any carts for this user and store"));
+            return res.send([]);
         }
     } catch (error) {
         return next(

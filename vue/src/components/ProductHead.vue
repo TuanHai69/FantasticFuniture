@@ -27,15 +27,20 @@
                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                         data-bs-target="#productTypeModal">+</button>
                 </p>
-                <p class="phone">Số lượng: {{ product.count }}</p>
-                <p>Giá:
-                    <span v-if="product.discount">
+                <p class="phone">Số lượng: {{ product.count }} || Giá: <span v-if="product.discount">
                         <s>{{ formatCurrency(product.cost) }}</s> -> {{ formatCurrency(product.cost - product.cost *
                             product.discount / 100) }}
                     </span>
                     <span v-else>
                         {{ formatCurrency(product.cost) }}
                     </span>
+                </p>
+                <p class="quantity-container">
+                <div>
+                    <label for="quantity">Số lượng: </label>
+                    <input type="number" id="quantity" v-model.number="quantity" min="1" :max="product.count" />
+                </div>
+                <button class="btn btn-primary" @click="addToCart(product)">Thêm vào giỏ</button>
                 </p>
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -104,7 +109,8 @@ import ProductService from "@/services/product.service";
 import ProductTypeForm from "@/components/ProductTypeForm.vue";
 import ProductTypeService from "@/services/producttype.service";
 import TypeService from "@/services/type.service";
-
+import CartService from "@/services/cart.service";
+import LocalStorageHelper from "@/services/local.service";
 export default {
     props: {
         id: {
@@ -141,7 +147,8 @@ export default {
                 state: '',
             },
             error: {},
-            types: []
+            types: [],
+            quantity: 1,
         };
     },
     async mounted() {
@@ -188,6 +195,54 @@ export default {
                 console.error("Error fetching product types:", error);
             }
         },
+        async addToCart(product) {
+            const userId = LocalStorageHelper.getItem('id');
+            if (!userId) {
+                console.error("User is not logged in");
+                return;
+            }
+
+            if (this.quantity <= 0 || this.quantity > product.count) {
+                alert('Không đủ số lượng sản phẩm');
+                return;
+            }
+
+            try {
+                // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+                const existingCartItems = await CartService.findByUserIdAndStoreId(userId, product.storeid);
+                const existingCartItem = existingCartItems.find(item => item.productid === product._id);
+
+                let cart;
+                if (existingCartItem) {
+                    // Nếu sản phẩm đã có trong giỏ hàng, tăng số lượng
+                    cart = {
+                        ...existingCartItem,
+                        count: existingCartItem.count + this.quantity
+                    };
+                    await CartService.update(existingCartItem._id, cart);
+                    alert(`Số lượng sản phẩm có trong giỏ hàng hiện tại là ${existingCartItem.count + this.quantity}`);
+                } else {
+                    // Nếu sản phẩm chưa có trong giỏ hàng, tạo mới
+                    cart = {
+                        userid: userId,
+                        productid: product._id,
+                        count: this.quantity,
+                        storeid: product.storeid,
+                        state: "1",
+                    };
+                    await CartService.create(cart);
+                    alert(`Đã thêm ${this.quantity} sản phẩm vào giỏ hàng`);
+                }
+
+                // Cập nhật số lượng sản phẩm
+                product.count -= this.quantity;
+                await ProductService.update(product._id, { count: product.count });
+
+            } catch (error) {
+                console.error("Error adding product to cart:", error);
+            }
+        },
+
         navigateToProduct(type) {
             this.$router.push({ name: 'products', params: { id: type._id } });
         },
@@ -240,6 +295,16 @@ export default {
     flex-direction: column;
     justify-content: center;
 }
+
+.quantity-container {
+    display: flex;
+    align-items: center;
+}
+
+.quantity-container>div {
+    margin-right: 10px;
+}
+
 
 /* Thêm các style tùy chỉnh ở đây */
 .tab-pane {
