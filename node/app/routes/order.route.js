@@ -13,7 +13,7 @@ router.route("/:id")
     .delete(order.delete)
 
 router.route("/user/:id")
-    .get(order.findByuser)
+    .get(order.findByUser)
 
 router.route("/store/:id")
     .get(order.findByStore)

@@ -14,6 +14,9 @@ class OrderdetailService {
             picture: payload.picture,
             material: payload.material,
             size: payload.size,
+            warranty: payload.warranty,
+            payment: payload.payment,
+            address: payload.address,
             description: payload.description,
             state: payload.state,
         };

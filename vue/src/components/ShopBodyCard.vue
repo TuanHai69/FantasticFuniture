@@ -22,8 +22,7 @@
                                 <div class="card-buttons d-flex justify-content-evenly">
                                     <button class="btn btn-primary" @click="moveToProduct(Product._id)">Xem
                                         thêm</button>
-                                    <button class="btn btn-secondary">Thêm vào giỏ</button>
-
+                                    <button class="btn btn-secondary" @click="addToCart(Product)">Thêm vào giỏ</button>
                                     <button v-if="editstate == 'show'" class="btn btn-secondary"
                                         @click="editProduct(Product._id)">Chỉnh
                                         sửa
@@ -48,6 +47,9 @@
 import ProductService from "@/services/product.service";
 import ProductTypeService from "@/services/producttype.service";
 import TypeService from "@/services/type.service";
+import CartService from "@/services/cart.service";
+import LocalStorageHelper from "@/services/local.service";
+
 export default {
     name: 'ProductList',
     props: {
@@ -85,6 +87,49 @@ export default {
                 // console.log(this.products);
             } catch (error) {
                 console.log('Error fetching products:', error);
+            }
+        },
+        async addToCart(product) {
+            const userId = LocalStorageHelper.getItem('id');
+            if (!userId) {
+                console.error("User is not logged in");
+                return;
+            }
+            if (product.count <= 0) {
+                alert('Sản phẩm không đủ số lượng');
+                return;
+            }
+            try {
+                // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+                const existingCartItems = await CartService.findByUserIdAndStoreId(userId, product.storeid);
+                const existingCartItem = existingCartItems.find(item => item.productid === product._id);
+                let cart;
+                console.log(existingCartItem);
+                if (existingCartItem) {
+                    // Nếu sản phẩm đã có trong giỏ hàng, tăng số lượng
+                    cart = {
+                        ...existingCartItem,
+                        count: existingCartItem.count + 1
+                    };
+                    await CartService.update(existingCartItem._id, cart);
+                    alert(`Số lượng sản phẩm có trong giỏ hàng hiện tại là ${existingCartItem.count + 1}`);
+                } else {
+                    // Nếu sản phẩm chưa có trong giỏ hàng, tạo mới
+                    cart = {
+                        userid: userId,
+                        productid: product._id,
+                        count: 1,
+                        storeid: product.storeid,
+                        state: "1"
+                    };
+                    await CartService.create(cart);
+                    alert('Đã thêm sản phẩm vào giỏ hàng');
+
+                }
+                product.count -= 1;
+                await ProductService.update(product._id, { count: product.count });
+            } catch (error) {
+                console.error("Error adding product to cart:", error);
             }
         },
         async fetchTypes() {

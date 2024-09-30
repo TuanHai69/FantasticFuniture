@@ -35,7 +35,7 @@
                     </p>
                 </div>
                 <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
-                    <button @click="checkout(cart.id)" class="btn btn-primary">Thanh toán</button>
+                    <button @click="checkout(cart)" class="btn btn-primary">Thanh toán</button>
                 </div>
             </li>
         </ul>
@@ -85,9 +85,8 @@ export default {
         formatCurrency(value) {
             return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
         },
-        checkout(cartId) {
-            // Logic for checkout action
-            console.log(`Checkout cart with ID: ${cartId}`);
+        checkout(cart) {
+            this.$emit('checkout', cart);
         },
     },
 };
