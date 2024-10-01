@@ -45,6 +45,11 @@
                         cart
                     </router-link>
                 </li>
+                <li class="nav-item active">
+                    <router-link :to="{ name: 'coded' }" class="nav-link">
+                        code
+                    </router-link>
+                </li>
             </ul>
             <form class="form-inline my-2 my-lg-0 ml-auto ms-auto">
                 <div class="input-group search-group">
