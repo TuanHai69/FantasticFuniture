@@ -1,7 +1,6 @@
 <template>
     <div class="payment-body container">
         <div class="row">
-            <!-- Product Details -->
             <div class="col-md-6 d-flex flex-column align-items-center">
                 <h2>Product Details</h2>
                 <img :src="productPicture(cart.product.picture)" alt="Product Image" class="product-image img-fluid" />
@@ -11,16 +10,27 @@
                 <p><strong>Warranty:</strong> {{ cart.product.warranty }}</p>
 
             </div>
-            <!-- Payment Details -->
             <div class="col-md-6 d-flex flex-column align-items-center">
+
                 <h2>Payment Details</h2>
                 <div class="d-flex justify-content-evenly w-100">
                     <p><strong>Cost:</strong> {{ formatCurrency(calculateCost(cart.product.cost, cart.product.discount))
                         }}</p>
                     <p><strong>Count:</strong> {{ cart.count }}</p>
                 </div>
-                <p><strong>Sum:</strong> {{ formatCurrency(cart.count * calculateCost(cart.product.cost,
-                    cart.product.discount)) }}</p>
+                <div class="d-flex justify-content-evenly w-100">
+                    <p><strong>Sum:</strong> {{ formatCurrency(cart.count * calculateCost(cart.product.cost,
+                        cart.product.discount)) }}</p>
+                    <p v-if="discountPercent"><strong>Discount:</strong> {{ discountPercent }}%</p>
+                </div>
+                <p v-if="discountPercent"><strong>Total:</strong> {{ formatCurrency(calculateTotal(cart.count *
+                    calculateCost(cart.product.cost, cart.product.discount), discountPercent)) }}</p>
+                <form @submit.prevent="validateCode" class="d-flex justify-content-evenly w-100">
+                    <div class="form-group mr-2">
+                        <input v-model="code" type="text" class="form-control" id="code" placeholder="Enter code" />
+                    </div>
+                    <button type="submit" class="btn btn-secondary  ">Apply Code</button>
+                </form>
                 <div class="form-group w-100">
                     <label for="paymentMethod">Payment Method</label>
                     <select v-model="paymentMethod" class="form-control" id="paymentMethod">
@@ -39,10 +49,6 @@
                         placeholder="Enter phone number" />
                 </div>
                 <div class="form-group w-100">
-                    <label for="code">Code</label>
-                    <input v-model="code" type="text" class="form-control" id="code" placeholder="Enter code" />
-                </div>
-                <div class="form-group w-100">
                     <label for="description">Description</label>
                     <textarea v-model="description" class="form-control" id="description" rows="3"
                         placeholder="Enter description"></textarea>
@@ -57,6 +63,8 @@
 <script>
 import OrderService from '@/services/order.service';
 import LocalStorageHelper from '@/services/local.service';
+import CodedService from '@/services/coded.service';
+import CodeuseService from '@/services/codeuse.service';
 
 export default {
     props: {
@@ -73,6 +81,7 @@ export default {
             address: '',
             phonenumber: '',
             order: null,
+            discountPercent: null,
         };
     },
     async created() {
@@ -126,6 +135,41 @@ export default {
                 return (cost - (cost * discount / 100)).toFixed(2);
             }
             return cost;
+        },
+        calculateTotal(sum, discountPercent) {
+            return (sum * (1 - discountPercent / 100)).toFixed(2);
+        },
+        async validateCode() {
+            try {
+                if (!this.code) {
+                    this.discountPercent = null;
+                    return;
+                }
+                const codeData = await CodedService.findByCode(this.code);
+                if (!codeData) {
+                    alert('Mã không hợp lệ');
+                    return;
+                }
+
+                const userId = LocalStorageHelper.getItem('id');
+                const codeUses = await CodeuseService.findByUser(userId);
+                const codeUsed = codeUses.some(use => use.codeid === codeData._id);
+
+                if (codeUsed) {
+                    alert('Mã đã được sử dụng');
+                } else {
+                    // const newCodeUse = {
+                    //     userid: userId,
+                    //     codeid: codeData[0]._id,
+                    //     day: new Date().toISOString()
+                    // };
+                    // await CodeuseService.create(newCodeUse);
+                    this.discountPercent = codeData[0].percent;
+                }
+            } catch (error) {
+                console.error('Error validating code:', error);
+                alert('Có lỗi xảy ra khi kiểm tra mã');
+            }
         },
         confirmPayment() {
             console.log('Payment Method:', this.paymentMethod);

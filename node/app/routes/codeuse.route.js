@@ -13,7 +13,7 @@ router.route("/:id")
     .delete(codeuse.delete)
 
 router.route("/user/:id")
-    .get(codeuse.findByuser)
+    .get(codeuse.findByUser)
 
 router.route("/code/:id")
     .get(codeuse.findByCode)

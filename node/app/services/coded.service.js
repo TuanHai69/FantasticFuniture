@@ -35,17 +35,19 @@ class CodedService {
         const cursor = await this.Coded.find(filter);
         return await cursor.toArray();
     }
-    
+
     async findByCode(keyword) {
         return await this.find({
-            code: { $regex: new RegExp(keyword), $options: "i" },
+            code: keyword,
         });
     }
+
     async findByUser(keyword) {
         return await this.find({
-            userid: { $regex: new RegExp(keyword), $options: "i" },
+            userid: keyword,
         });
     }
+
     async findByState(keyword) {
         return await this.find({
             state: { $regex: new RegExp(keyword), $options: "i" },
@@ -57,7 +59,7 @@ class CodedService {
         });
     }
 
-    async update(id, payload){
+    async update(id, payload) {
         const filter = {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         };

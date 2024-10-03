@@ -30,66 +30,48 @@ exports.findAll = async (req, res, next) => {
             documents = await codeuseService.find({});
         }
     } catch (error) {
-        return next(
-            new ApiError(500, "error when take the data")
-        );
+        return next(new ApiError(500, "Error when retrieving the data"));
     }
-    return res.send(documents);
-}
+    return res.send(documents.length ? documents : []);
+};
 
 exports.findOne = async (req, res, next) => {
     try {
         const codeuseService = new CodeuseService(MongoDB.client);
         const document = await codeuseService.findById(req.params.id);
         if (!document) {
-            return next(new ApiError(404, "Can't find this codeuse"));
+            return res.send([]);
         }
         return res.send(document);
     } catch (error) {
-        return next(
-            new ApiError(
-                500, `Error when take codeuse with id=${req.params.id}`
-            )
-        );
+        return next(new ApiError(500, `Error when retrieving codeuse with id=${req.params.id}`));
     }
-}
+};
 
-exports.findByuser = async (req, res, next) => {
+exports.findByUser = async (req, res, next) => {
     let documents = [];
 
     try {
         const codeuseService = new CodeuseService(MongoDB.client);
         documents = await codeuseService.findByUser(req.params.id);
-        if (documents.length === 0) {
-            return next(new ApiError(404, "Can't find this codeuse"));
-        }
     } catch (error) {
-        return next(
-            new ApiError(
-                500, `Error when take codeuse with id=${req.params.id}`
-            )
-        );
+        return next(new ApiError(500, `Error when retrieving codeuse with user id=${req.params.id}`));
     }
-    return res.send(documents);
-}
+    return res.send(documents.length ? documents : []);
+};
+
 exports.findByCode = async (req, res, next) => {
     let documents = [];
 
     try {
         const codeuseService = new CodeuseService(MongoDB.client);
         documents = await codeuseService.findByCode(req.params.id);
-        if (documents.length === 0) {
-            return next(new ApiError(404, "Can't find this codeuse"));
-        }
     } catch (error) {
-        return next(
-            new ApiError(
-                500, `Error when take codeuse with id=${req.params.id}`
-            )
-        );
+        return next(new ApiError(500, `Error when retrieving codeuse with code=${req.params.id}`));
     }
-    return res.send(documents);
-}
+    return res.send(documents.length ? documents : []);
+};
+
 
 
 exports.update = async (req, res, next) => {
