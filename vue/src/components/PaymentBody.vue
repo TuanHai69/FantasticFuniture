@@ -34,8 +34,9 @@
                 <div class="form-group w-100">
                     <label for="paymentMethod">Payment Method</label>
                     <select v-model="paymentMethod" class="form-control" id="paymentMethod">
-                        <option value="bank_transfer">Bank Transfer</option>
                         <option value="cash_on_delivery">Cash on Delivery</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+
                     </select>
                 </div>
                 <div class="form-group w-100">
@@ -62,6 +63,7 @@
 
 <script>
 import OrderService from '@/services/order.service';
+import OrderDetailService from '@/services/orderdetail.service';
 import LocalStorageHelper from '@/services/local.service';
 import CodedService from '@/services/coded.service';
 import CodeuseService from '@/services/codeuse.service';
@@ -92,12 +94,22 @@ export default {
                 let orders = await OrderService.findByUserIdAndStoreId(userId, storeId);
                 if (orders.length === 0) {
                     await this.createOrder(userId, storeId);
+                    let orderss = await OrderService.findByUserIdAndStoreId(userId, storeId);
+                    const pendingOrder = orderss.find(order => order.state === 'Pending Confirmation');
+                    if (pendingOrder) {
+                        this.order = pendingOrder;
+                    }
                 } else {
                     const pendingOrder = orders.find(order => order.state === 'Pending Confirmation');
                     if (pendingOrder) {
                         this.order = pendingOrder;
                     } else {
                         await this.createOrder(userId, storeId);
+                        let orderss = await OrderService.findByUserIdAndStoreId(userId, storeId);
+                        const pendingOrder = orderss.find(order => order.state === 'Pending Confirmation');
+                        if (pendingOrder) {
+                            this.order = pendingOrder;
+                        }
                     }
                 }
             } catch (error) {
@@ -139,6 +151,9 @@ export default {
         calculateTotal(sum, discountPercent) {
             return (sum * (1 - discountPercent / 100)).toFixed(2);
         },
+        formatDate(date) {
+            return date.toISOString().split('T')[0];
+        },
         async validateCode() {
             try {
                 if (!this.code) {
@@ -171,13 +186,62 @@ export default {
                 alert('Có lỗi xảy ra khi kiểm tra mã');
             }
         },
-        confirmPayment() {
-            console.log('Payment Method:', this.paymentMethod);
-            console.log('Code:', this.code);
-            console.log('Description:', this.description);
-            console.log('Address:', this.address);
-            console.log('Phone Number:', this.phonenumber);
-        }
+        async confirmPayment() {
+            if (!this.address || !this.phonenumber) {
+                alert('Vui lòng nhập địa chỉ và số điện thoại');
+                return;
+            }
+
+            try {
+                let cost;
+                console.log(cost);
+                if (this.discountPercent) {
+                    cost = this.calculateTotal(this.cart.count *
+                        this.calculateCost(this.cart.product.cost, this.cart.product.discount), this.discountPercent);
+                    console.log(cost);
+                    const userId = LocalStorageHelper.getItem('id');
+                    const codeData = await CodedService.findByCode(this.code);
+                    const newCodeUse = {
+                        userid: userId,
+                        codeid: codeData[0]._id,
+                        day: this.formatDate(new Date())
+                    };
+                    await CodeuseService.create(newCodeUse);
+                } else {
+                    cost = this.cart.count * this.calculateCost(this.cart.product.cost, this.cart.product.discount);
+                }
+
+                const orderDetail = {
+                    orderid: this.order._id,
+                    name: this.cart.product.name,
+                    cost: cost,
+                    count: this.cart.count,
+                    picture: this.cart.product.picture,
+                    material: this.cart.product.material,
+                    size: this.cart.product.size,
+                    warranty: this.cart.product.warranty,
+                    payment: this.paymentMethod,
+                    address: this.address,
+                    description: this.description,
+                    state: 'Chờ xác nhận'
+                };
+                console.log(orderDetail);
+                await OrderDetailService.create(orderDetail);
+
+                const updatedOrder = {
+                    state: 'Pending Confirmation',
+                    date: this.formatDate(new Date()),
+                    price: cost
+                };
+
+                await OrderService.update(this.order._id, updatedOrder);
+
+                alert('Đơn hàng đã được xác nhận');
+            } catch (error) {
+                console.error('Error confirming payment:', error);
+                alert('Có lỗi xảy ra khi xác nhận đơn hàng');
+            }
+        },
     }
 };
 </script>

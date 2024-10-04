@@ -7,7 +7,8 @@
                     <img :src="productPicture(cart.product.picture)" alt="Product Image"
                         class="product-image img-fluid" />
                 </div>
-                <div class="col-12 col-md-3 mb-3 mb-md-0">
+                <div class="col-12 col-md-4 mb-3 mb-md-0">
+                    <p><strong>Name:</strong> {{ cart.product.name }}</p>
                     <p><strong>Material:</strong> {{ cart.product.material }}</p>
                     <p><strong>Size:</strong> {{ cart.product.size }}</p>
                     <p><strong>Warranty:</strong> {{ cart.product.warranty }}</p>
@@ -34,7 +35,7 @@
                         }}
                     </p>
                 </div>
-                <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
+                <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
                     <button @click="checkout(cart)" class="btn btn-primary">Thanh toán</button>
                 </div>
             </li>
