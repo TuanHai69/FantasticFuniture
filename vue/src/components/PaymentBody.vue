@@ -67,6 +67,7 @@ import OrderDetailService from '@/services/orderdetail.service';
 import LocalStorageHelper from '@/services/local.service';
 import CodedService from '@/services/coded.service';
 import CodeuseService from '@/services/codeuse.service';
+import CartService from '@/services/cart.service';
 
 export default {
     props: {
@@ -161,24 +162,19 @@ export default {
                     return;
                 }
                 const codeData = await CodedService.findByCode(this.code);
-                if (!codeData) {
+                if (!codeData[0]) {
                     alert('Mã không hợp lệ');
                     return;
                 }
 
                 const userId = LocalStorageHelper.getItem('id');
                 const codeUses = await CodeuseService.findByUser(userId);
-                const codeUsed = codeUses.some(use => use.codeid === codeData._id);
+                const codeUsed = codeUses.some(use => use.codeid === codeData[0]._id);
 
                 if (codeUsed) {
                     alert('Mã đã được sử dụng');
                 } else {
-                    // const newCodeUse = {
-                    //     userid: userId,
-                    //     codeid: codeData[0]._id,
-                    //     day: new Date().toISOString()
-                    // };
-                    // await CodeuseService.create(newCodeUse);
+
                     this.discountPercent = codeData[0].percent;
                 }
             } catch (error) {
@@ -194,11 +190,9 @@ export default {
 
             try {
                 let cost;
-                console.log(cost);
                 if (this.discountPercent) {
                     cost = this.calculateTotal(this.cart.count *
                         this.calculateCost(this.cart.product.cost, this.cart.product.discount), this.discountPercent);
-                    console.log(cost);
                     const userId = LocalStorageHelper.getItem('id');
                     const codeData = await CodedService.findByCode(this.code);
                     const newCodeUse = {
@@ -235,8 +229,12 @@ export default {
                 };
 
                 await OrderService.update(this.order._id, updatedOrder);
-
+                // Xóa giỏ hàng sau khi xác nhận đơn hàng
+                await CartService.delete(this.cart._id);
                 alert('Đơn hàng đã được xác nhận');
+                // Chuyển trang từ PaymentBody thành CartList
+                this.$emit('checkout-complete');
+
             } catch (error) {
                 console.error('Error confirming payment:', error);
                 alert('Có lỗi xảy ra khi xác nhận đơn hàng');

@@ -3,7 +3,7 @@
     <hr>
     <div>
         <CartList v-if="!showPayment" @checkout="handleCheckout" />
-        <PaymentBody v-else :cart="selectedCart" />
+        <PaymentBody v-else :cart="selectedCart" @checkout-complete="handleCheckoutComplete" />
     </div>
 </template>
 
@@ -28,7 +28,11 @@ export default {
         handleCheckout(cart) {
             this.selectedCart = cart;
             this.showPayment = true;
-        }
+        },
+        handleCheckoutComplete() {
+            this.selectedCart = null;
+            this.showPayment = false;
+        },
     }
 };
 </script>
