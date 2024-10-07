@@ -23,6 +23,9 @@
                         <button class="btn btn-outline-success btn-sm " @click="editCoded(coded)">
                             <i class="fas fa-pencil-alt"></i>
                         </button>
+                        <button class="btn btn-outline-danger btn-sm" @click="confirmDelete(coded)">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </td>
                 </tr>
             </tbody>
@@ -32,6 +35,7 @@
 
 <script>
 import CodedService from '@/services/coded.service';
+import CodeuseService from '@/services/codeuse.service';
 
 export default {
     data() {
@@ -52,6 +56,28 @@ export default {
         },
         editCoded(coded) {
             this.$emit('edit-coded', coded);
+        },
+        async deleteCoded(coded) {
+            try {
+                // Xóa tất cả các codeuse có codeid bằng _id của coded
+                const codeuses = await CodeuseService.findByCode(coded._id);
+                for (const codeuse of codeuses) {
+                    await CodeuseService.delete(codeuse._id);
+                }
+                // Xóa coded
+                await CodedService.delete(coded._id);
+                // Làm mới lại danh sách coded
+                this.fetchCodedList();
+                alert('Coded and related codeuses deleted successfully!');
+            } catch (error) {
+                console.error('Error deleting coded:', error);
+                alert('Failed to delete coded.');
+            }
+        },
+        confirmDelete(coded) {
+            if (window.confirm('Bạn có muốn xóa code này không?')) {
+                this.deleteCoded(coded);
+            }
         },
     },
 };

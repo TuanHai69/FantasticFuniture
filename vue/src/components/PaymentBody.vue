@@ -2,6 +2,9 @@
     <div class="payment-body container">
         <div class="row">
             <div class="col-md-6 d-flex flex-column align-items-center">
+                <div class="d-flex justify-content-between w-100 align-items-center">
+                    <button @click="goBack" class="btn btn-danger m-2">Quay lại</button>
+                </div>
                 <h2>Product Details</h2>
                 <img :src="productPicture(cart.product.picture)" alt="Product Image" class="product-image img-fluid" />
                 <p><strong>Name:</strong> {{ cart.product.name }}</p>
@@ -239,6 +242,9 @@ export default {
                 console.error('Error confirming payment:', error);
                 alert('Có lỗi xảy ra khi xác nhận đơn hàng');
             }
+        },
+        goBack() {
+            this.$emit('checkout-complete');
         },
     }
 };
