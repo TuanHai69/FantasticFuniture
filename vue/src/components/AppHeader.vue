@@ -32,12 +32,17 @@
                 </li>
                 <li class="nav-item active">
                     <router-link :to="{ name: 'accounts' }" class="nav-link">
-                        Quản lý TK
+                        TK
                     </router-link>
                 </li>
                 <li class="nav-item active">
                     <router-link :to="{ name: 'branch' }" class="nav-link">
-                        Quản lý B
+                        B
+                    </router-link>
+                </li>
+                <li class="nav-item active">
+                    <router-link :to="{ name: 'order' }" class="nav-link">
+                        order
                     </router-link>
                 </li>
                 <li class="nav-item active">

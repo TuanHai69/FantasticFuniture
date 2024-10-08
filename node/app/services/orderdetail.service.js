@@ -16,6 +16,7 @@ class OrderdetailService {
             size: payload.size,
             warranty: payload.warranty,
             payment: payload.payment,
+            phonenumber: payload.phonenumber,
             address: payload.address,
             description: payload.description,
             state: payload.state,
