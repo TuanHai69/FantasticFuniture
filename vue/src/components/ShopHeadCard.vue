@@ -22,6 +22,7 @@
                     <div class="col-3">
                         <button @click="editStore" class="btn btn-secondary bg-primary">Chỉnh sửa</button>
                         <button @click="createProduct" class="btn btn-secondary bg-success mt-2">Tạo sản phẩm</button>
+                        <button @click="viewCart" class="btn btn-secondary bg-info mt-2">Giỏ hàng</button>
                     </div>
                 </div>
             </div>
@@ -76,7 +77,10 @@ export default {
         },
         createProduct() {
             this.$emit('create-product');
-        }
+        },
+        viewCart() {
+            this.$emit('view-cart');
+        },
     }
 };
 </script>

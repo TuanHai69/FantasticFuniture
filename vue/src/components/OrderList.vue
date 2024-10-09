@@ -10,7 +10,16 @@
                             {{ order.price ? formatCurrency(order.price) : 'Chưa thanh toán' }}
                         </p>
                         <p><strong>Date:</strong> {{ order.date }}</p>
-                        <p><strong>State:</strong> {{  order.state }}</p>
+
+                        <p><strong>State:</strong> {{ order.state }} || 
+                            <button v-if="showConfirmButton(order)" class="btn btn-success ml-2"
+                                @click="updateOrderState(order._id, 'prepare for delivery')">Confirm</button>
+                            <button v-if="showDeliveryButton(order)" class="btn btn-warning ml-2"
+                                @click="updateOrderState(order._id, 'Shipping')">Delivery</button>
+                            <button v-if="showReceivedButton(order)" class="btn btn-info ml-2"
+                                @click="updateOrderState(order._id, 'Received')">Received</button>
+                        </p>
+
                     </div>
                     <div class="col-md-5" v-if="stores[order.storeid]">
                         <p><strong>Store name:</strong> {{ stores[order.storeid].name }}</p>
@@ -28,7 +37,7 @@
                     <ul class="list-unstyled">
                         <li v-for="detail in orderDetails[order._id]" :key="detail._id"
                             class="order-detail-item row mb-3 p-3 rounded shadow-sm">
-                            <div class="col-12 col-md-3 mb-3 mb-md-0  d-flex justify-content-center">
+                            <div class="col-12 col-md-2 mb-3 mb-md-0  d-flex justify-content-center">
                                 <img :src="productPicture(detail.picture)" alt="Product Image"
                                     class="product-image img-fluid" />
                             </div>
@@ -39,8 +48,12 @@
                                 <p><strong>Warranty:</strong> {{ detail.warranty }}</p>
 
                             </div>
-                            <div class="col-12 col-md-3 mb-3 mb-md-0">
+                            <div class="col-12 col-md-4 mb-3 mb-md-0">
                                 <p><strong>Phonenumber:</strong> {{ detail.phonenumber }}</p>
+                                <p><strong>Payment:</strong>
+                                    <span v-if="detail.payment === 'bank_transfer'">STK</span>
+                                    <span v-else>{{ detail.payment }}</span>
+                                </p>
                                 <p class="address"><strong>Delivery address:</strong> {{ detail.address }}</p>
 
                             </div>
@@ -64,7 +77,15 @@ import LocalStorageHelper from '@/services/local.service';
 import OrderService from '@/services/order.service';
 import OrderDetailService from '@/services/orderdetail.service';
 import StoreService from '@/services/store.service';
+import AccountsService from "@/services/accounts.service";
+
 export default {
+    props: {
+        storeid: {
+            type: String,
+            default: null,
+        },
+    },
     data() {
         return {
             orders: [],
@@ -75,17 +96,29 @@ export default {
     },
     async created() {
         await this.fetchOrders();
+        await this.checkrole();
     },
     methods: {
+        async checkrole() {
+            const temp = LocalStorageHelper.getItem('id');
+            const response = await AccountsService.get(temp);
+            LocalStorageHelper.clear();
+            LocalStorageHelper.setItem('id', response._id);
+            LocalStorageHelper.setItem('role', response.role);
+        },
         async fetchOrders() {
-            const userId = LocalStorageHelper.getItem('id');
-            if (userId) {
-                try {
-                    this.orders = await OrderService.findByUser(userId);
-                    await this.fetchStores();
-                } catch (error) {
-                    console.error('Error fetching orders:', error);
+            try {
+                if (this.storeid) {
+                    this.orders = await OrderService.findByStore(this.storeid);
+                } else {
+                    const userId = LocalStorageHelper.getItem('id');
+                    if (userId) {
+                        this.orders = await OrderService.findByUser(userId);
+                    }
                 }
+                await this.fetchStores();
+            } catch (error) {
+                console.error('Error fetching orders:', error);
             }
         },
         async fetchStores() {
@@ -130,6 +163,28 @@ export default {
             }
             return 'https://th.bing.com/th?id=OIP.XqGBZKSVcAqsEghNyEn1wAHaE8&w=306&h=204&c=8&rs=1&qlt=90&r=0&o=6&dpr=1.1&pid=3.1&rm=2.jpg';
         },
+        async updateOrderState(orderId, newState) {
+            try {
+                await OrderService.update(orderId, { state: newState });
+                alert(`Order state updated to ${newState}`);
+                await this.fetchOrders(); // Refresh orders to reflect the updated state
+            } catch (error) {
+                console.error('Error updating order state:', error);
+                alert('Có lỗi xảy ra khi cập nhật trạng thái đơn hàng.');
+            }
+        },
+        showConfirmButton(order) {
+            const role = LocalStorageHelper.getItem('role');
+            return role === 'storeowner' && order.state === 'Pending Confirmation';
+        },
+        showDeliveryButton(order) {
+            const role = LocalStorageHelper.getItem('role');
+            return role === 'storeowner' && order.state === 'prepare for delivery';
+        },
+        showReceivedButton(order) {
+            const userId = LocalStorageHelper.getItem('id');
+            return order.state === 'Shipping' && order.userid === userId;
+        },
     },
 };
 </script>
@@ -166,13 +221,13 @@ export default {
 }
 
 .description {
-    max-height: 60px;
+    max-height: 80px;
     /* Adjust this value as needed */
     overflow-y: auto;
 }
 
 .address {
-    max-height: 100px;
+    max-height: 80px;
     /* Adjust this value as needed */
     overflow-y: auto;
 }

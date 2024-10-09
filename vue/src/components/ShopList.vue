@@ -1,9 +1,10 @@
 <template>
-  <div class="container mt-4">
+  <div class="container mt-4 fixed-col">
     <h2>Categories</h2>
-    <div class="row m-3">
+    <hr>
+    <div class="row m-3 ">
       <div class="col-md-4" v-for="(category, index) in displayedCategories" :key="category.id">
-        <div class="card mb-4" @click="navigateToStore(category._id)">
+        <div class="card mb-4 booode" @click="navigateToStore(category._id)">
           <img :src="storePicture(category.picture)" class="card-img-top shoplistcard" :alt="category.name">
           <div class="card-body">
             <h5 class="card-title">{{ category.name }}</h5>
@@ -64,3 +65,17 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.fixed-col {
+    background-color: rgba(245, 245, 245, 0.8); 
+    border: 2px solid #000000;
+    padding: 10px;
+    border-radius: 10px;
+}
+.booode {
+  border: 2px solid #000000;
+  padding: 10px;
+  border-radius: 10px;
+}
+</style>

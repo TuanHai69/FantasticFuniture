@@ -4,14 +4,19 @@
         <div class="container-fluid">
             <div class="page row">
                 <div class="offset-1 col-md-10">
-                    <div v-if="!editingStoreId && !creatingProduct && !editingProductId">
+                    <div v-if="!editingStoreId && !creatingProduct && !editingProductId && !viewingCart">
                         <div class="d-flex justify-content-center mt-3" v-if="id">
-                            <ShopHeadCard :id="id" @edit-store="handleEditStore"
-                                @create-product="handleCreateProduct" />
+                            <ShopHeadCard :id="id" @edit-store="handleEditStore" @create-product="handleCreateProduct"
+                                @view-cart="handleViewCart" />
                         </div>
-                        <ShopBodyCard :storeid="id" :editstate="'show'"  @edit-product="handleEditProduct"/>
+                        <ShopBodyCard :storeid="id" :editstate="'show'" @edit-product="handleEditProduct" />
                     </div>
                     <StoreForm v-if="editingStoreId" :storeId="editingStoreId" @cancel="handleCancelEdit" />
+                    <div v-else-if="viewingCart" class="m-3">
+                        <h2>Danh sách đơn hàng</h2>
+                        <hr>
+                        <OrderList :storeid="id" />
+                    </div>
                     <productForm v-else-if="creatingProduct" :storeid="id" @cancel="handleCancelCreate"
                         @create-product="handleCreateProductSubmit" />
                     <productForm v-else-if="editingProductId" :storeid="id" :productid="editingProductId"
@@ -27,9 +32,9 @@ import AppHeader from "@/components/AppHeader.vue";
 import ShopHeadCard from "@/components/ShopHeadCard.vue";
 import ShopBodyCard from "@/components/ShopBodyCard.vue";
 import StoreForm from "@/components/StoreForm.vue";
-import productForm from "@/components/ProductForm.vue"; 
-import ProductService from "@/services/product.service"; 
-
+import productForm from "@/components/ProductForm.vue";
+import ProductService from "@/services/product.service";
+import OrderList from "@/components/OrderList.vue";
 export default {
     props: {
         id: {
@@ -43,12 +48,14 @@ export default {
         ShopBodyCard,
         StoreForm,
         productForm,
+        OrderList,
     },
     data() {
         return {
             editingStoreId: null,
             creatingProduct: false,
             editingProductId: null,
+            viewingCart: false,
         };
     },
     methods: {
@@ -69,6 +76,9 @@ export default {
         },
         handleCancelEditProduct() {
             this.editingProductId = null;
+        },
+        handleViewCart() {
+            this.viewingCart = true;
         },
         async handleCreateProductSubmit(product) {
             try {

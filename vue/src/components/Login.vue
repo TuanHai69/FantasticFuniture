@@ -56,10 +56,7 @@ export default {
                         // Successful login
                         LocalStorageHelper.setItem('id', response._id);
                         LocalStorageHelper.setItem('role', response.role);
-                        const ro = LocalStorageHelper.getItem('role');
-                        const hi = LocalStorageHelper.getItem('id');
-                        console.log(hi +"|| " + ro);
-                        
+
                         alert("Login successful! Press OK to continue.");
                         this.$router.push('/home'); // Redirect to the dashboard or desired page
                     } else {

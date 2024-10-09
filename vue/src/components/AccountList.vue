@@ -34,8 +34,7 @@
 </template>
 
 <script>
-import AccountsService from "@/services/accounts.service"; // Đảm bảo đường dẫn đúng
-
+import AccountsService from "@/services/accounts.service"; 
 export default {
     name: 'AccountList',
     data() {

@@ -93,6 +93,7 @@ export default {
                 } else if (newState === 'unaccept') {
                     account.role = 'client';
                 }
+                
                 await AccountsService.update(branch.userid, { role: account.role });
             } catch (error) {
                 console.error('Error updating state:', error);

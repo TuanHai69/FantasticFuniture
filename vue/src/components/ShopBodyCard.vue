@@ -6,8 +6,6 @@
                 <button v-for="type in types" :key="type._id" class="water-drop-button" @click="handleTypeClick(type)">
                     {{ type.name }}
                 </button>
-
-
             </div>
             <div class="col-8" v-if="products.length > 0">
                 <div class="row bg-white p-3 justify-content-evenly">
