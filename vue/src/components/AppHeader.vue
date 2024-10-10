@@ -1,6 +1,6 @@
 <template>
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-        <a class="navbar-brand" href="#">Cửa hàng nội thất B-House</a>
+        <a class="navbar-brand" href="#">Cửa hàng nội thất F-f</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -20,37 +20,37 @@
 
                     </router-link>
                 </li>
-                <!-- <li class="nav-item active">
-                    <router-link :to="{ name: 'type' }" class="nav-link">
-                        Type
-                    </router-link>
-                </li> -->
                 <li class="nav-item active">
                     <router-link :to="{ name: 'products' }" class="nav-link">
                         Sản phẩm
                     </router-link>
                 </li>
-                <li class="nav-item active">
-                    <router-link :to="{ name: 'accounts' }" class="nav-link">
-                        TK
+                <li class="nav-item active" v-if="role === 'admin' || role === 'storeowner'">
+                    <router-link :to="{ name: 'type' }" class="nav-link">
+                        Type
                     </router-link>
                 </li>
-                <li class="nav-item active">
+                <li class="nav-item active" v-if="role === 'admin'">
+                    <router-link :to="{ name: 'accounts' }" class="nav-link">
+                        <i class="fas fa-user"></i>
+                    </router-link>
+                </li>
+                <li class="nav-item active" v-if="role === 'admin'">
                     <router-link :to="{ name: 'branch' }" class="nav-link">
-                        B
+                        <i class="fas fa-store"></i>
                     </router-link>
                 </li>
                 <li class="nav-item active">
                     <router-link :to="{ name: 'order' }" class="nav-link">
-                        order
+                        <i class="fas fa-shopping-bag"></i>
                     </router-link>
                 </li>
                 <li class="nav-item active">
                     <router-link :to="{ name: 'cart' }" class="nav-link">
-                        cart
+                        <i class="fas fa-shopping-cart"></i>
                     </router-link>
                 </li>
-                <li class="nav-item active">
+                <li class="nav-item active" v-if="role === 'admin'">
                     <router-link :to="{ name: 'coded' }" class="nav-link">
                         code
                     </router-link>
@@ -73,7 +73,7 @@
                 </li>
                 <li class="nav-item" v-if="isLoggedIn">
                     <router-link :to="{ name: 'account' }" class="nav-link">
-                        Account
+                        <i class="fas fa-user"></i>
                     </router-link>
                 </li>
             </ul>

@@ -1,4 +1,6 @@
 <template>
+    <AppHeader />
+    <hr>
     <div class="type-view container">
         <div class="row">
             <div class="col-md-4">
@@ -16,12 +18,14 @@
 import TypeForm from '@/components/TypeForm.vue';
 import TypeList from '@/components/TypeList.vue';
 import TypeService from '@/services/type.service';
+import AppHeader from "@/components/AppHeader.vue";
 
 export default {
     name: 'TypeView',
     components: {
         TypeForm,
         TypeList,
+        AppHeader,
     },
     data() {
         return {
@@ -57,7 +61,7 @@ export default {
                 this.fetchTypes();
             } catch (error) {
                 console.error('Error updating type:', error);
-                alert('Có lỗi xảy ra khi cập nhật thông tin type.'); 
+                alert('Có lỗi xảy ra khi cập nhật thông tin type.');
             }
         },
         handleSelectType(typeId) {

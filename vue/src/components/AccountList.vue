@@ -26,7 +26,17 @@
                     <td>{{ account.address }}</td>
                     <td>{{ account.phonenumber }}</td>
                     <td>{{ account.email }}</td>
-                    <td>{{ account.role }}</td>
+                    <td>
+                        <template v-if="account.role === 'storeowner'">
+                            {{ account.role }}
+                        </template>
+                        <template v-else>
+                            <select v-model="account.role" @change="updateRole(account._id, account.role)">
+                                <option value="admin">Admin</option>
+                                <option value="client">Client</option>
+                            </select>
+                        </template>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -34,7 +44,7 @@
 </template>
 
 <script>
-import AccountsService from "@/services/accounts.service"; 
+import AccountsService from "@/services/accounts.service";
 export default {
     name: 'AccountList',
     data() {
@@ -59,7 +69,15 @@ export default {
                 return `data:image/jpeg;base64,${picture}`;
             }
             return 'https://via.placeholder.com/50';
-        }
+        },
+        async updateRole(id, role) {
+            try {
+                await AccountsService.update(id, { role });
+                alert('Cập nhật thành công quyền của tài khoản');
+            } catch (error) {
+                console.error('Error updating role:', error);
+            }
+        },
     }
 }
 </script>
