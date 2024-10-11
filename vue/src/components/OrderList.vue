@@ -11,7 +11,7 @@
                         </p>
                         <p><strong>Date:</strong> {{ order.date }}</p>
 
-                        <p><strong>State:</strong> {{ order.state }} || 
+                        <p><strong>State:</strong> {{ order.state }} ||
                             <button v-if="showConfirmButton(order)" class="btn btn-success ml-2"
                                 @click="updateOrderState(order._id, 'prepare for delivery')">Confirm</button>
                             <button v-if="showDeliveryButton(order)" class="btn btn-warning ml-2"
@@ -62,7 +62,6 @@
                                 <p><strong>Sum:</strong> {{ formatCurrency(detail.cost) }}</p>
                                 <p class="description"><strong>Description:</strong> {{ detail.description }}</p>
                             </div>
-
                         </li>
                     </ul>
                 </div>

@@ -4,10 +4,11 @@
         <div class="container-fluid">
             <div class="page row">
                 <div class="offset-1 col-md-10">
-                    <div v-if="!editingStoreId && !creatingProduct && !editingProductId && !viewingCart">
+                    <div
+                        v-if="!editingStoreId && !creatingProduct && !editingProductId && !viewingCart && !viewingRevenue">
                         <div class="d-flex justify-content-center mt-3" v-if="id">
                             <ShopHeadCard :id="id" @edit-store="handleEditStore" @create-product="handleCreateProduct"
-                                @view-cart="handleViewCart" />
+                                @view-cart="handleViewCart" @view-revenue="handleViewRevenue" />
                         </div>
                         <ShopBodyCard :storeid="id" :editstate="'show'" @edit-product="handleEditProduct" />
                     </div>
@@ -16,6 +17,11 @@
                         <h2>Danh sách đơn hàng</h2>
                         <hr>
                         <OrderList :storeid="id" />
+                    </div>
+                    <div v-else-if="viewingRevenue" class="m-3">
+                        <h2>Doanh thu</h2>
+                        <hr>
+                        <RevenueCard :storeid="id" />
                     </div>
                     <productForm v-else-if="creatingProduct" :storeid="id" @cancel="handleCancelCreate"
                         @create-product="handleCreateProductSubmit" />
@@ -35,6 +41,8 @@ import StoreForm from "@/components/StoreForm.vue";
 import productForm from "@/components/ProductForm.vue";
 import ProductService from "@/services/product.service";
 import OrderList from "@/components/OrderList.vue";
+import RevenueCard from "@/components/RevenueCard.vue";
+
 export default {
     props: {
         id: {
@@ -49,6 +57,7 @@ export default {
         StoreForm,
         productForm,
         OrderList,
+        RevenueCard,
     },
     data() {
         return {
@@ -56,6 +65,7 @@ export default {
             creatingProduct: false,
             editingProductId: null,
             viewingCart: false,
+            viewingRevenue: false,
         };
     },
     methods: {
@@ -79,6 +89,11 @@ export default {
         },
         handleViewCart() {
             this.viewingCart = true;
+            this.viewingRevenue = false;
+        },
+        handleViewRevenue() {
+            this.viewingRevenue = true;
+            this.viewingCart = false;
         },
         async handleCreateProductSubmit(product) {
             try {

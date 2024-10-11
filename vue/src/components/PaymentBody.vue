@@ -127,7 +127,8 @@ export default {
                 userid: userId,
                 storeid: storeId,
                 date: new Date().toISOString(),
-                state: 'Pending Confirmation'
+                state: 'Pending Confirmation',
+                price: 0,
             };
             try {
                 await OrderService.create(newOrder);
@@ -224,11 +225,12 @@ export default {
                 };
                 console.log(orderDetail);
                 await OrderDetailService.create(orderDetail);
-
+                console.log(this.order.price);
+                console.log(cost);
                 const updatedOrder = {
                     state: 'Pending Confirmation',
                     date: this.formatDate(new Date()),
-                    price: cost
+                    price: this.order.price + cost
                 };
 
                 await OrderService.update(this.order._id, updatedOrder);

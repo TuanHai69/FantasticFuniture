@@ -22,7 +22,8 @@
                     <div class="col-3">
                         <button @click="editStore" class="btn btn-secondary bg-primary">Chỉnh sửa</button>
                         <button @click="createProduct" class="btn btn-secondary bg-success mt-2">Tạo sản phẩm</button>
-                        <button @click="viewCart" class="btn btn-secondary bg-info mt-2">Giỏ hàng</button>
+                        <button @click="viewCart" class="btn btn-secondary bg-info mt-2">Đơn hàng</button>
+                        <button @click="viewRevenue" class="btn btn-secondary bg-warning mt-2">Doanh thu</button>
                     </div>
                 </div>
             </div>
@@ -36,7 +37,7 @@
 </template>
 
 <script>
-import StoreService from '@/services/store.service'; // Giả sử bạn có service này
+import StoreService from '@/services/store.service';
 
 export default {
     props: {
@@ -80,6 +81,9 @@ export default {
         },
         viewCart() {
             this.$emit('view-cart');
+        },
+        viewRevenue() {
+            this.$emit('view-revenue');
         },
     }
 };
