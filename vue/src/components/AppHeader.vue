@@ -53,6 +53,11 @@
                         code
                     </router-link>
                 </li>
+                <li class="nav-item active" v-if="role === 'admin'">
+                    <router-link :to="{ name: 'revenue' }" class="nav-link">
+                        revenue
+                    </router-link>
+                </li>
             </ul>
             <form class="form-inline my-2 my-lg-0 ml-auto ms-auto">
                 <div class="input-group search-group">

@@ -84,6 +84,12 @@ const routes = [
         props: true // Truyền các biến trong $route.params vào làm props
     },
     {
+        path: "/revenue", // Thêm dynamic segment :id
+        name: "revenue",
+        component: () => import("@/views/AdminRevenueView.vue"),
+        props: true // Truyền các biến trong $route.params vào làm props
+    },
+    {
         path: "/type", // Thêm dynamic segment :id
         name: "type",
         component: () => import("@/views/TypeView.vue"),
