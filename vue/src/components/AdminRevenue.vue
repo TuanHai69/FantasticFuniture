@@ -1,20 +1,47 @@
 <template>
     <div class="admin-revenue p-3">
         <h2>Admin Revenue</h2>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="overall-stats p-3 border rounded bg-light">
+                    <h3>Overall Statistics</h3>
+                    <p><strong>Total Revenue:</strong> {{ formatCurrency(totalRevenue) }}</p>
+                    <p><strong>Highest Revenue Order:</strong> {{ highestRevenueOrder ? highestRevenueOrder.storeName +
+                        ' (' + formatCurrency(highestRevenueOrder.price) + ')' : 'Chưa có đơn hàng trong yêu cầu' }}</p>
+                    <p><strong>Highest Revenue Store:</strong> {{ highestRevenueStore ? highestRevenueStore.name + ' ('
+                        + formatCurrency(highestRevenueStore.revenue) + ')' : 'Chưa có đơn hàng trong yêu cầu' }}</p>
+                    <p><strong>Highest Item Count:</strong>
+                        {{ highestRevenueOrder ? highestRevenueOrder.storeName +
+                            '(' + highestItemCount + ')' : 'Chưa có đơn hàng trong yêu cầu' }}</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="date-filters p-3 border rounded bg-light">
+                    <div class="form-group me-3">
+                        <label for="startDate" class="form-label"><strong>Start Date:</strong></label>
+                        <input type="date" id="startDate" v-model="startDate" class="form-control">
+                    </div>
+                    <div class="form-group me-3">
+                        <label for="endDate" class="form-label"><strong>End Date:</strong></label>
+                        <input type="date" id="endDate" v-model="endDate" class="form-control">
+                    </div>
+                    <div class="button-group d-flex">
+                        <button @click="confirmDateRange" class="btn btn-primary me-2">Confirm</button>
+                        <button @click="resetDateRange" class="btn btn-secondary">Reset</button>
+                    </div>
+                    <div v-if="isInvalidDateRange" class="alert alert-danger mt-3">
+                        Start date cannot be greater than end date, and end date cannot be less than start date.
+                    </div>
+                    <div v-if="dateRangeConfirmed" class="alert alert-success mt-3">
+                        Orders found between {{ startDate }} and {{ endDate }}.
+                    </div>
+                </div>
+            </div>
+        </div>
         <div v-if="isLoading" class="loading">
             Loading data...
         </div>
         <div v-else>
-            <div class="overall-stats mb-4 p-3 border rounded bg-light">
-                <h3>Overall Statistics</h3>
-                <p><strong>Total Revenue:</strong> {{ formatCurrency(totalRevenue) }}</p>
-                <p><strong>Highest Revenue Order:</strong> {{ highestRevenueOrder ?
-                    highestRevenueOrder.name + ': ' + formatCurrency(highestRevenueOrder.price) : 'N/A' }}</p>
-                <p><strong>Highest Revenue Store:</strong>
-                    {{ highestRevenueStore ? highestRevenueStore.name + ' (' +
-                        formatCurrency(highestRevenueStore.revenue) + ')' : 'N/A' }}</p>
-                <p><strong>Highest Item Count:</strong> {{ highestItemCountStore + ': ' + highestItemCount }}</p>
-            </div>
             <div v-for="store in stores" :key="store._id" class="store-section mb-4">
                 <div class="card">
                     <div class="card-body">
@@ -22,12 +49,22 @@
                         <p><strong>Address:</strong> {{ store.address }}</p>
                         <p><strong>Phone number:</strong> {{ store.phonenumber }}</p>
                         <p><strong>Email:</strong> {{ store.email }}</p>
-                        <p><strong>Total Revenue:</strong> {{ formatCurrency(store.revenue || 0) }}</p>
+                        <p><strong>Total Revenue:</strong>
+                            {{ (dateRangeConfirmed
+                                ? (filteredStoreRevenues[store._id] != null && filteredStoreRevenues[store._id] !== ''
+                                    ? formatCurrency(filteredStoreRevenues[store._id])
+                                    : 'Chưa có đơn hàng')
+                                : (storeRevenues[store._id] != null && storeRevenues[store._id] !== ''
+                                    ? formatCurrency(storeRevenues[store._id])
+                                    : 'Chưa có đơn hàng')) }}
+                        </p>
                         <button @click="toggleStoreOrders(store._id)" class="btn btn-primary">
                             {{ expandedStoreId === store._id ? 'Hide Orders' : 'Show Orders' }}
                         </button>
-                        <div v-if="expandedStoreId === store._id && storeOrders[store._id]">
-                            <div v-for="order in storeOrders[store._id]" :key="order._id" class="order-card card mt-3">
+                        <div
+                            v-if="expandedStoreId === store._id && (dateRangeConfirmed ? filteredStoreOrders[store._id] : storeOrders[store._id])">
+                            <div v-for="order in (dateRangeConfirmed ? filteredStoreOrders[store._id] : storeOrders[store._id])"
+                                :key="order._id" class="order-card card mt-3">
                                 <div class="card-body">
                                     <div class="order-summary row">
                                         <div class="col-md-5">
@@ -89,6 +126,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </template>
@@ -105,6 +143,7 @@ export default {
             stores: [],
             storeOrders: {},
             orderDetails: {},
+            filteredStoreOrders: {},
             expandedStoreId: null,
             expandedOrderId: null,
             isLoading: true,
@@ -112,7 +151,13 @@ export default {
             highestRevenueOrder: null,
             highestRevenueStore: null,
             highestItemCount: 0,
-            highestItemCountStore: null,
+            startDate: '',
+            endDate: '',
+            dateRangeConfirmed: false,
+            isInvalidDateRange: false,
+            storeRevenues: {},
+            filteredStoreRevenues: {},
+
         };
     },
     async mounted() {
@@ -120,6 +165,14 @@ export default {
         await this.fetchAllOrdersAndDetails();
         this.isLoading = false;
         this.calculateOverallStatistics();
+    },
+    computed: {
+        isInvalidDateRange1() {
+            if (this.startDate && this.endDate) {
+                return new Date(this.startDate) > new Date(this.endDate);
+            }
+            return false;
+        }
     },
     methods: {
         async fetchStores() {
@@ -166,44 +219,59 @@ export default {
                 this.expandedOrderId = orderId;
             }
         },
-        calculateStoreRevenue(storeId) {
-            const orders = this.storeOrders[storeId] || [];
-            let storeRevenue = 0;
-            let highestOrderRevenue = 0;
-            let totalItemCount = 0;
-
-            for (const order of orders) {
-                storeRevenue += order.price || 0;
-                if (order.price > highestOrderRevenue) {
-                    highestOrderRevenue = order.price;
-                }
-                const details = this.orderDetails[order._id] || [];
-                for (const detail of details) {
-                    totalItemCount += detail.count;
-                }
-            }
-
-            this.stores = this.stores.map(store =>
-                store._id === storeId ? { ...store, revenue: storeRevenue, itemCount: totalItemCount } : store
-            );
-            this.totalRevenue += storeRevenue;
-
-            if (!this.highestRevenueOrder || highestOrderRevenue > this.highestRevenueOrder.price) {
-                this.highestRevenueOrder = orders.find(order => order.price === highestOrderRevenue);
-                this.highestRevenueOrder.name = this.stores.find(store => store._id === storeId).name
-            }
-            if (!this.highestRevenueStore || storeRevenue > this.highestRevenueStore.revenue) {
-                this.highestRevenueStore = this.stores.find(store => store.revenue === storeRevenue);
-            }
-            if (totalItemCount > this.highestItemCount) {
-                this.highestItemCount = totalItemCount;
-                this.highestItemCountStore = this.stores.find(store => store._id === storeId).name
-            }
-        },
         calculateOverallStatistics() {
-            this.stores.forEach(store => {
-                this.calculateStoreRevenue(store._id);
+            let totalRevenue = 0;
+            let highestRevenueOrder = null;
+            let highestRevenueStore = null;
+            let highestItemCount = 0;
+
+            const stores = this.dateRangeConfirmed ? this.getStoresWithFilteredOrders() : this.stores;
+
+            stores.forEach(store => {
+                let storeRevenue = 0;
+                let highestOrderRevenue = 0;
+                let totalItemCount = 0;
+
+                const orders = this.dateRangeConfirmed ? this.filteredStoreOrders[store._id] : this.storeOrders[store._id];
+                orders.forEach(order => {
+                    storeRevenue += order.price || 0;
+                    if (order.price > highestOrderRevenue) {
+                        highestOrderRevenue = order.price;
+                        highestRevenueOrder = { ...order, storeName: store.name };
+                    }
+                    const details = this.orderDetails[order._id] || [];
+                    details.forEach(detail => {
+                        totalItemCount += detail.count;
+                    });
+                });
+
+
+                if (this.dateRangeConfirmed) {
+                    this.filteredStoreRevenues[store._id] = storeRevenue;  // Update filtered revenues
+                } else {
+                    this.storeRevenues[store._id] = storeRevenue;  // Update regular revenues
+                }
+
+                if (!highestRevenueStore || storeRevenue > highestRevenueStore.revenue) {
+                    highestRevenueStore = { ...store, revenue: storeRevenue };
+                }
+                if (totalItemCount > highestItemCount) {
+                    highestItemCount = totalItemCount;
+                }
+
+                store.revenue = storeRevenue;
+                store.itemCount = totalItemCount;
+                totalRevenue += storeRevenue;
             });
+
+            this.totalRevenue = totalRevenue;
+            this.highestRevenueOrder = highestRevenueOrder;
+            this.highestRevenueStore = highestRevenueStore;
+            this.highestItemCount = highestItemCount;
+        },
+
+        getStoresWithFilteredOrders() {
+            return this.stores.filter(store => this.filteredStoreOrders[store._id]);
         },
         formatCurrency(value) {
             return new Intl.NumberFormat('en-US', {
@@ -216,7 +284,38 @@ export default {
                 return `data:image/jpeg;base64,${picture}`;
             }
             return 'https://th.bing.com/th?id=OIP.XqGBZKSVcAqsEghNyEn1wAHaE8&w=306&h=204&c=8&rs=1&qlt=90&r=0&o=6&dpr=1.1&pid=3.1&rm=2.jpg';
-        }
+        },
+        confirmDateRange() {
+            if (this.isInvalidDateRange) return;
+
+            this.dateRangeConfirmed = true;
+            this.filteredStoreOrders = {};
+
+            this.stores.forEach(store => {
+                const filteredOrders = this.storeOrders[store._id].filter(order => this.isDateInRange(order.date));
+                if (filteredOrders.length) {
+                    this.filteredStoreOrders[store._id] = filteredOrders;
+                }
+            });
+
+            this.calculateOverallStatistics();
+        },
+
+        resetDateRange() {
+            this.startDate = '';
+            this.endDate = '';
+            this.dateRangeConfirmed = false;
+            this.filteredStoreOrders = this.storeOrders
+            this.isInvalidDateRange = false;
+            this.calculateOverallStatistics();
+        },
+        isDateInRange(date) {
+            const orderDate = new Date(date);
+            const start = new Date(this.startDate);
+            const end = new Date(this.endDate);
+            return orderDate >= start && orderDate <= end;
+        },
+
     }
 };
 </script>
@@ -267,5 +366,19 @@ export default {
 .address {
     max-height: 80px;
     overflow-y: auto;
+}
+
+.row>.col-md-6 {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
 }
 </style>
