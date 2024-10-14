@@ -13,7 +13,7 @@ router.route("/:id")
     .delete(comment.delete)
 
 router.route("/user/:id")
-    .get(comment.findByuser)
+    .get(comment.findByUser)
 
 router.route("/product/:id")
     .get(comment.findByProduct)

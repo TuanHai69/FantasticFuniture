@@ -12,7 +12,6 @@ router.route("/:id")
     .put(docgia.update)
     .delete(docgia.delete);
 
-// Route mới để xử lý đăng nhập
 router.route("/login")
     .post(docgia.findByEmailAndPassword);
 

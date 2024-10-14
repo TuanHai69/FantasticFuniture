@@ -17,7 +17,6 @@ router.route("/user/:id")
 
 router.route("/branch/:id")
     .get(store.findByBranch)
-// Thêm route mới cho findByState
 router.route("/state/:state")
     .get(store.findByState)
     

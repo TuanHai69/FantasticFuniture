@@ -11,7 +11,6 @@
                 <p><strong>Material:</strong> {{ cart.product.material }}</p>
                 <p><strong>Size:</strong> {{ cart.product.size }}</p>
                 <p><strong>Warranty:</strong> {{ cart.product.warranty }}</p>
-
             </div>
             <div class="col-md-6 d-flex flex-column align-items-center">
 
@@ -71,6 +70,7 @@ import LocalStorageHelper from '@/services/local.service';
 import CodedService from '@/services/coded.service';
 import CodeuseService from '@/services/codeuse.service';
 import CartService from '@/services/cart.service';
+import CommentService from '@/services/comment.service';
 
 export default {
     props: {
@@ -191,7 +191,6 @@ export default {
                 alert('Vui lòng nhập địa chỉ và số điện thoại');
                 return;
             }
-
             try {
                 let cost;
                 if (this.discountPercent) {
@@ -223,10 +222,7 @@ export default {
                     description: this.description,
                     state: 'Chờ xác nhận'
                 };
-                console.log(orderDetail);
                 await OrderDetailService.create(orderDetail);
-                console.log(this.order.price);
-                console.log(cost);
                 const updatedOrder = {
                     state: 'Pending Confirmation',
                     date: this.formatDate(new Date()),
@@ -234,10 +230,33 @@ export default {
                 };
 
                 await OrderService.update(this.order._id, updatedOrder);
-                // Xóa giỏ hàng sau khi xác nhận đơn hàng
                 await CartService.delete(this.cart._id);
                 alert('Đơn hàng đã được xác nhận');
-                // Chuyển trang từ PaymentBody thành CartList
+
+                const userId = LocalStorageHelper.getItem('id');
+                const userComments = await CommentService.findByUser(userId);
+                if (userComments.length === 0) {
+                    const newComment = {
+                        userid: userId,
+                        productid: this.cart.product._id,
+                        rate: "",
+                        comment: "",
+                        state: ""
+                    };
+                    await CommentService.create(newComment);
+                } else {
+                    const hasCommented = userComments.some(comment => comment.productid === this.cart.product._id);
+                    if (!hasCommented) {
+                        const newComment = {
+                            userid: userId,
+                            productid: this.cart.product._id,
+                            rate: "",
+                            comment: "",
+                            state: ""
+                        };
+                        await CommentService.create(newComment);
+                    }
+                }
                 this.$emit('checkout-complete');
 
             } catch (error) {

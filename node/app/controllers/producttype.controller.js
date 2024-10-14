@@ -20,7 +20,6 @@ exports.create = async (req, res, next) => {
 
 exports.findAll = async (req, res, next) => {
     let documents = [];
-
     try {
         const producttypeService = new ProductTypeService(MongoDB.client);
         const { productid } = req.query;
@@ -30,66 +29,46 @@ exports.findAll = async (req, res, next) => {
             documents = await producttypeService.find({});
         }
     } catch (error) {
-        return next(
-            new ApiError(500, "error when take the data")
-        );
+        return next(new ApiError(500, "Error when fetching data"));
     }
-    return res.send(documents);
-}
+    return res.send(documents.length ? documents : []);
+};
 
 exports.findOne = async (req, res, next) => {
     try {
         const producttypeService = new ProductTypeService(MongoDB.client);
         const document = await producttypeService.findById(req.params.id);
         if (!document) {
-            return next(new ApiError(404, "Can't find this producttype"));
+            return res.send({});
         }
         return res.send(document);
     } catch (error) {
-        return next(
-            new ApiError(
-                500, `Error when take producttype with id=${req.params.id}`
-            )
-        );
+        return next(new ApiError(500, `Error when fetching producttype with id=${req.params.id}`));
     }
-}
+};
 
 exports.findByType = async (req, res, next) => {
     let documents = [];
-
     try {
         const producttypeService = new ProductTypeService(MongoDB.client);
         documents = await producttypeService.findByType(req.params.id);
-        if (documents.length === 0) {
-            return next(new ApiError(404, "Can't find this producttype"));
-        }
     } catch (error) {
-        return next(
-            new ApiError(
-                500, `Error when take producttype with id=${req.params.id}`
-            )
-        );
+        return next(new ApiError(500, `Error when fetching producttype with id=${req.params.id}`));
     }
-    return res.send(documents);
-}
+    return res.send(documents.length ? documents : []);
+};
+
 exports.findByProduct = async (req, res, next) => {
     let documents = [];
-
     try {
         const producttypeService = new ProductTypeService(MongoDB.client);
         documents = await producttypeService.findByProduct(req.params.id);
-        if (documents.length === 0) {
-            return next(new ApiError(404, "Can't find this producttype"));
-        }
     } catch (error) {
-        return next(
-            new ApiError(
-                500, `Error when take producttype with id=${req.params.id}`
-            )
-        );
+        return next(new ApiError(500, `Error when fetching producttype with id=${req.params.id}`));
     }
-    return res.send(documents);
-}
+    return res.send(documents.length ? documents : []);
+};
+
 
 exports.update = async (req, res, next) => {
     if (req.body && Object.keys(req.body).length === 0) {

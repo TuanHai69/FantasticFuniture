@@ -20,7 +20,6 @@ exports.create = async (req, res, next) => {
 
 exports.findAll = async (req, res, next) => {
     let documents = [];
-
     try {
         const cartService = new CartService(MongoDB.client);
         const { productid } = req.query;
@@ -30,84 +29,57 @@ exports.findAll = async (req, res, next) => {
             documents = await cartService.find({});
         }
     } catch (error) {
-        return next(
-            new ApiError(500, "error when take the data")
-        );
+        return next(new ApiError(500, "Error when fetching data"));
     }
-    return res.send(documents);
-}
+    return res.send(documents.length ? documents : []);
+};
 
 exports.findOne = async (req, res, next) => {
     try {
         const cartService = new CartService(MongoDB.client);
         const document = await cartService.findById(req.params.id);
         if (!document) {
-            return next(new ApiError(404, "Can't find this cart"));
+            return res.send({});
         }
         return res.send(document);
     } catch (error) {
-        return next(
-            new ApiError(
-                500, `Error when take cart with id=${req.params.id}`
-            )
-        );
+        return next(new ApiError(500, `Error when fetching cart with id=${req.params.id}`));
     }
-}
+};
 
 exports.findByuser = async (req, res, next) => {
     let documents = [];
-
     try {
         const cartService = new CartService(MongoDB.client);
         documents = await cartService.findByUser(req.params.id);
-        if (documents.length === 0) {
-            return next(new ApiError(404, "Can't find this cart"));
-        }
     } catch (error) {
-        return next(
-            new ApiError(
-                500, `Error when take cart with id=${req.params.id}`
-            )
-        );
+        return next(new ApiError(500, `Error when fetching cart for user with id=${req.params.id}`));
     }
-    return res.send(documents);
-}
+    return res.send(documents.length ? documents : []);
+};
+
 exports.findByStore = async (req, res, next) => {
     let documents = [];
-
     try {
         const cartService = new CartService(MongoDB.client);
         documents = await cartService.findByStore(req.params.id);
-        if (documents.length === 0) {
-            return next(new ApiError(404, "Can't find this cart"));
-        }
     } catch (error) {
-        return next(
-            new ApiError(
-                500, `Error when take cart with id=${req.params.id}`
-            )
-        );
+        return next(new ApiError(500, `Error when fetching cart for store with id=${req.params.id}`));
     }
-    return res.send(documents);
-}
+    return res.send(documents.length ? documents : []);
+};
+
 exports.findByUserIdAndStoreId = async (req, res, next) => {
     let documents = [];
-
     try {
         const cartService = new CartService(MongoDB.client);
         documents = await cartService.findByUserIdAndStoreId(req.params.userid, req.params.storeid);
-        if (documents.length === 0) {
-            return res.send([]);
-        }
     } catch (error) {
-        return next(
-            new ApiError(
-                500, `Error when retrieving carts for user id=${req.params.userid} and store id=${req.params.storeid}`
-            )
-        );
+        return next(new ApiError(500, `Error when retrieving carts for user id=${req.params.userid} and store id=${req.params.storeid}`));
     }
-    return res.send(documents);
-}
+    return res.send(documents.length ? documents : []);
+};
+
 
 
 exports.update = async (req, res, next) => {

@@ -20,7 +20,6 @@ exports.create = async (req, res, next) => {
 
 exports.findAll = async (req, res, next) => {
     let documents = [];
-
     try {
         const commentstoreService = new CommentstoreService(MongoDB.client);
         const { storeid } = req.query;
@@ -30,66 +29,52 @@ exports.findAll = async (req, res, next) => {
             documents = await commentstoreService.find({});
         }
     } catch (error) {
-        return next(
-            new ApiError(500, "error when take the data")
-        );
+        return next(new ApiError(500, "Error when fetching data"));
     }
-    return res.send(documents);
-}
+    return res.send(documents.length ? documents : []);
+};
 
 exports.findOne = async (req, res, next) => {
     try {
         const commentstoreService = new CommentstoreService(MongoDB.client);
         const document = await commentstoreService.findById(req.params.id);
         if (!document) {
-            return next(new ApiError(404, "Can't find this commentstore"));
+            return res.send({});
         }
         return res.send(document);
     } catch (error) {
         return next(
-            new ApiError(
-                500, `Error when take commentstore with id=${req.params.id}`
-            )
+            new ApiError(500, `Error when fetching commentstore with id=${req.params.id}`)
         );
     }
-}
+};
 
 exports.findByuser = async (req, res, next) => {
     let documents = [];
-
     try {
         const commentstoreService = new CommentstoreService(MongoDB.client);
         documents = await commentstoreService.findByUser(req.params.id);
-        if (documents.length === 0) {
-            return next(new ApiError(404, "Can't find this commentstore"));
-        }
     } catch (error) {
         return next(
-            new ApiError(
-                500, `Error when take commentstore with id=${req.params.id}`
-            )
+            new ApiError(500, `Error when fetching commentstore for user with id=${req.params.id}`)
         );
     }
-    return res.send(documents);
-}
+    return res.send(documents.length ? documents : []);
+};
+
 exports.findByStore = async (req, res, next) => {
     let documents = [];
-
     try {
         const commentstoreService = new CommentstoreService(MongoDB.client);
         documents = await commentstoreService.findByStore(req.params.id);
-        if (documents.length === 0) {
-            return next(new ApiError(404, "Can't find this commentstore"));
-        }
     } catch (error) {
         return next(
-            new ApiError(
-                500, `Error when take commentstore with id=${req.params.id}`
-            )
+            new ApiError(500, `Error when fetching commentstore for store with id=${req.params.id}`)
         );
     }
-    return res.send(documents);
-}
+    return res.send(documents.length ? documents : []);
+};
+
 
 
 exports.update = async (req, res, next) => {

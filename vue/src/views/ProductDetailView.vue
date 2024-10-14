@@ -7,7 +7,9 @@
                     <div class="d-flex justify-content-center mt-3">
                         <ProductHead :id=id @edit-product="handleEditProduct" />
                     </div>
+                    <CommandProductCard v-if="this.product.storeid" :productid="id" :storeid="this.product.storeid"  />
                 </div>
+
                 <ShopBodyCard :storeid="this.product.storeid" :editstate="'hide'" v-if="this.product.storeid" />
                 <ProductCard />
             </div>
@@ -26,7 +28,7 @@ import ProductCard from "@/components/ProductCard.vue";
 import ShopBodyCard from "@/components/ShopBodyCard.vue";
 import ProductService from "@/services/product.service";
 import ProductForm from "@/components/ProductForm.vue";
-
+import CommandProductCard from "@/components/CommandProductCard.vue";
 export default {
     props: {
         id: {
@@ -45,7 +47,8 @@ export default {
         ProductHead,
         ProductCard,
         ShopBodyCard,
-        ProductForm
+        ProductForm,
+        CommandProductCard,
     },
     watch: {
         id: {

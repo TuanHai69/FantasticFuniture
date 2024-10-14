@@ -10,7 +10,9 @@
                             <ShopHeadCard :id="id" @edit-store="handleEditStore" @create-product="handleCreateProduct"
                                 @view-cart="handleViewCart" @view-revenue="handleViewRevenue" />
                         </div>
+                        <CommandStoreCard :storeid="id" />
                         <ShopBodyCard :storeid="id" :editstate="'show'" @edit-product="handleEditProduct" />
+
                     </div>
                     <StoreForm v-if="editingStoreId" :storeId="editingStoreId" @cancel="handleCancelEdit" />
                     <div v-else-if="viewingCart" class="m-3">
@@ -42,6 +44,7 @@ import productForm from "@/components/ProductForm.vue";
 import ProductService from "@/services/product.service";
 import OrderList from "@/components/OrderList.vue";
 import RevenueCard from "@/components/RevenueCard.vue";
+import CommandStoreCard from "@/components/CommandStoreCard.vue";
 
 export default {
     props: {
@@ -58,6 +61,7 @@ export default {
         productForm,
         OrderList,
         RevenueCard,
+        CommandStoreCard,
     },
     data() {
         return {
