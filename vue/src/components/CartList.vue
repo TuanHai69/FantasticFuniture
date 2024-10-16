@@ -1,23 +1,23 @@
 <template>
     <div class="container">
-        <h1>Cart List</h1>
+        <h1>Giỏ hàng</h1>
         <ul v-if="carts.length" class="list-unstyled">
             <li v-for="cart in carts" :key="cart.id" class="cart-item row mb-3 p-3  rounded shadow-sm">
                 <div class="col-12 col-md-3 mb-3 mb-md-0">
                     <img :src="productPicture(cart.product.picture)" alt="Product Image"
                         class="product-image img-fluid" />
                 </div>
-                <div class="col-12 col-md-4 mb-3 mb-md-0">
-                    <p><strong>Name:</strong> {{ cart.product.name }}</p>
-                    <p><strong>Material:</strong> {{ cart.product.material }}</p>
-                    <p><strong>Size:</strong> {{ cart.product.size }}</p>
-                    <p><strong>Warranty:</strong> {{ cart.product.warranty }}</p>
-                    <p><strong>Description:</strong> {{ cart.product.description }}</p>
+                <div class="col-12 col-md-5 mb-3 mb-md-0">
+                    <p><strong>Tên sản phẩm:</strong> {{ cart.product.name }}</p>
+                    <p><strong>Vật liệu:</strong> {{ cart.product.material }}</p>
+                    <p><strong>Kích thước:</strong> {{ cart.product.size }}</p>
+                    <p><strong>Bảo hành:</strong> {{ cart.product.warranty }}</p>
+                    <p><strong>Mô tả:</strong> {{ cart.product.description }}</p>
                 </div>
-                <div class="col-12 col-md-3 mb-3 mb-md-0">
-                    <p><strong>Count:</strong> {{ cart.count }}</p>
+                <div class="col-12 col-md-2 mb-3 mb-md-0">
+                    <p><strong>Số lượng:</strong> {{ cart.count }}</p>
                     <p>
-                        <strong>Cost:</strong>
+                        <strong>Giá:</strong>
                         {{
                             formatCurrency(
                                 calculateCost(cart.product.cost,
@@ -26,7 +26,7 @@
                             )
                         }}
                     </p>
-                    <p><strong>Sum:</strong>
+                    <p><strong>Tổng:</strong>
                         {{
                             formatCurrency(
                                 cart.count * calculateCost(cart.product.cost,

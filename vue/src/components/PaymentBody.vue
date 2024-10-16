@@ -5,59 +5,58 @@
                 <div class="d-flex justify-content-between w-100 align-items-center">
                     <button @click="goBack" class="btn btn-danger m-2">Quay lại</button>
                 </div>
-                <h2>Product Details</h2>
+                <h2>Chi tiết sản phẩm</h2>
                 <img :src="productPicture(cart.product.picture)" alt="Product Image" class="product-image img-fluid" />
-                <p><strong>Name:</strong> {{ cart.product.name }}</p>
-                <p><strong>Material:</strong> {{ cart.product.material }}</p>
-                <p><strong>Size:</strong> {{ cart.product.size }}</p>
-                <p><strong>Warranty:</strong> {{ cart.product.warranty }}</p>
+                <p><strong>Tên:</strong> {{ cart.product.name }}</p>
+                <p><strong>Vật liệu:</strong> {{ cart.product.material }}</p>
+                <p><strong>Kích thước:</strong> {{ cart.product.size }}</p>
+                <p><strong>Bảo hành:</strong> {{ cart.product.warranty }}</p>
             </div>
             <div class="col-md-6 d-flex flex-column align-items-center">
 
-                <h2>Payment Details</h2>
+                <h2>Chi tiết thanh toán</h2>
                 <div class="d-flex justify-content-evenly w-100">
-                    <p><strong>Cost:</strong> {{ formatCurrency(calculateCost(cart.product.cost, cart.product.discount))
+                    <p><strong>Giá:</strong> {{ formatCurrency(calculateCost(cart.product.cost, cart.product.discount))
                         }}</p>
-                    <p><strong>Count:</strong> {{ cart.count }}</p>
+                    <p><strong>Số lượng:</strong> {{ cart.count }}</p>
                 </div>
                 <div class="d-flex justify-content-evenly w-100">
-                    <p><strong>Sum:</strong> {{ formatCurrency(cart.count * calculateCost(cart.product.cost,
+                    <p><strong>Tổng sản phẩm:</strong> {{ formatCurrency(cart.count * calculateCost(cart.product.cost,
                         cart.product.discount)) }}</p>
-                    <p v-if="discountPercent"><strong>Discount:</strong> {{ discountPercent }}%</p>
+                    <p v-if="discountPercent"><strong>Giảm:</strong> {{ discountPercent }}%</p>
                 </div>
-                <p v-if="discountPercent"><strong>Total:</strong> {{ formatCurrency(calculateTotal(cart.count *
+                <p v-if="discountPercent"><strong>Tổng giá:</strong> {{ formatCurrency(calculateTotal(cart.count *
                     calculateCost(cart.product.cost, cart.product.discount), discountPercent)) }}</p>
                 <form @submit.prevent="validateCode" class="d-flex justify-content-evenly w-100">
                     <div class="form-group mr-2">
-                        <input v-model="code" type="text" class="form-control" id="code" placeholder="Enter code" />
+                        <input v-model="code" type="text" class="form-control" id="code" placeholder="Nhập mã giảm giá" />
                     </div>
-                    <button type="submit" class="btn btn-secondary  ">Apply Code</button>
+                    <button type="submit" class="btn btn-secondary  ">Xác nhận mã</button>
                 </form>
                 <div class="form-group w-100">
-                    <label for="paymentMethod">Payment Method</label>
+                    <label for="paymentMethod">Phương thức thanh toán</label>
                     <select v-model="paymentMethod" class="form-control" id="paymentMethod">
-                        <option value="cash_on_delivery">Cash on Delivery</option>
-                        <option value="bank_transfer">Bank Transfer</option>
-
+                        <option value="Trả khi nhận hàng">Trả khi nhận hàng</option>
+                        <option value="Chuyển khoảng">Chuyển khoảng</option>
                     </select>
                 </div>
                 <div class="form-group w-100">
-                    <label for="address">Address</label>
+                    <label for="address">Địa chỉ giao hàng</label>
                     <input v-model="address" type="text" class="form-control" id="address"
-                        placeholder="Enter address" />
+                        placeholder="Nhập vào địa chỉ giao hàng" />
                 </div>
                 <div class="form-group w-100">
-                    <label for="phonenumber">Phone Number</label>
+                    <label for="phonenumber">Số điện thoại người nhận</label>
                     <input v-model="phonenumber" type="text" class="form-control" id="phonenumber"
-                        placeholder="Enter phone number" />
+                        placeholder="Nhập vào số điện thoại" />
                 </div>
                 <div class="form-group w-100">
-                    <label for="description">Description</label>
+                    <label for="description">Mô tả</label>
                     <textarea v-model="description" class="form-control" id="description" rows="3"
-                        placeholder="Enter description"></textarea>
+                        placeholder="Nhập vào mô tả"></textarea>
                 </div>
 
-                <button @click="confirmPayment" class="btn btn-primary m-4">Confirm</button>
+                <button @click="confirmPayment" class="btn btn-primary m-4">Xác nhận</button>
             </div>
         </div>
     </div>
@@ -81,7 +80,7 @@ export default {
     },
     data() {
         return {
-            paymentMethod: 'bank_transfer',
+            paymentMethod: 'Trả khi nhận hàng',
             code: '',
             description: '',
             address: '',

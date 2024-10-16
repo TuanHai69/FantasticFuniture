@@ -21,10 +21,10 @@
                     <span v-for="type in types" :key="type.id" class="type-button-container">
                         <button class="btn type-button" @click="navigateToProduct(type)">
                             {{ type.name }}
-                            <span class="delete-button" @click.stop="deleteProductType(type.producttypeid)">x</span>
+                            <span v-if="isStoreOwner" class="delete-button" @click.stop="deleteProductType(type.producttypeid)">x</span>
                         </button>
                     </span>
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                    <button v-if="isStoreOwner" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                         data-bs-target="#productTypeModal">+</button>
                 </p>
                 <p class="phone">Số lượng: {{ product.count }} || Giá: <span v-if="product.discount">
@@ -47,28 +47,24 @@
                         <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab"
                             data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
                             aria-selected="true">Mô tả</button>
-                        <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile"
-                            type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Đánh giá</button>
                         <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact"
                             type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Bảo hành</button>
                         <button class="nav-link" id="nav-move-tab" data-bs-toggle="tab" data-bs-target="#nav-move"
                             type="button" role="tab" aria-controls="nav-move" aria-selected="false">Vận chuyển</button>
-                        <button class="nav-link" id="nav-manager-tab" data-bs-toggle="tab" data-bs-target="#nav-manager"
+                        <button v-if="isStoreOwner" class="nav-link" id="nav-manager-tab" data-bs-toggle="tab" data-bs-target="#nav-manager"
                             type="button" role="tab" aria-controls="nav-manager" aria-selected="false">quản lý</button>
                     </div>
                 </nav>
                 <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                         {{ product.description }}</div>
-                    <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">...
-                    </div>
                     <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
                         {{ product.warranty }}
                     </div>
                     <div class="tab-pane fade" id="nav-move" role="tabpanel" aria-labelledby="nav-move-tab">
                         {{ product.delivery }}
                     </div>
-                    <div class="tab-pane fade" id="nav-manager" role="tabpanel" aria-labelledby="nav-manager-tab">
+                    <div v-if="isStoreOwner" class="tab-pane fade" id="nav-manager" role="tabpanel" aria-labelledby="nav-manager-tab">
                         <button @click="updateState(product, 'show')" :disabled="product.state === 'show'"
                             class="btn btn-success">
                             Show
@@ -111,6 +107,8 @@ import ProductTypeService from "@/services/producttype.service";
 import TypeService from "@/services/type.service";
 import CartService from "@/services/cart.service";
 import LocalStorageHelper from "@/services/local.service";
+import StoreService from '@/services/store.service';
+
 export default {
     props: {
         id: {
@@ -131,6 +129,9 @@ export default {
     },
     data() {
         return {
+            isStoreOwner: false,
+            userId: LocalStorageHelper.getItem('id'),
+            userRole: LocalStorageHelper.getItem('role'),
             showForm: false,
             product: {
                 name: '',
@@ -155,6 +156,7 @@ export default {
         try {
             await this.fetchProduct();
             await this.fetchProductTypes();
+            await this.checkPermission();
         } catch (error) {
             console.error('Error fetching product:', error);
             this.error = error;
@@ -166,6 +168,14 @@ export default {
                 return `data:image/jpeg;base64,${picture}`;
             }
             return 'https://donggia.vn/wp-content/uploads/2019/11/thiet-ke-noi-that-phong-khach-chung-cu-dep-2020-12.jpg';
+        },
+        async checkPermission() {
+            try {
+                const store = await StoreService.get(this.product.storeid);
+                this.isStoreOwner = store.userid === this.userId || this.userRole === 'admin';
+            } catch (error) {
+                console.error('Error checking permission:', error);
+            }
         },
         async fetchProduct() {
             try {

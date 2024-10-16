@@ -77,7 +77,7 @@
                                 <div class="col-12 col-md-4 mb-3 mb-md-0">
                                     <p><strong>Phonenumber:</strong> {{ detail.phonenumber }}</p>
                                     <p><strong>Payment:</strong>
-                                        <span v-if="detail.payment === 'bank_transfer'">STK</span>
+                                        <span v-if="detail.payment === 'Chuyển khoảng'">STK</span>
                                         <span v-else>{{ detail.payment }}</span>
                                     </p>
                                     <p class="address"><strong>Delivery address:</strong> {{ detail.address }}</p>
@@ -146,7 +146,7 @@
                                 <div class="col-12 col-md-4 mb-3 mb-md-0">
                                     <p><strong>Phonenumber:</strong> {{ detail.phonenumber }}</p>
                                     <p><strong>Payment:</strong> <span
-                                            v-if="detail.payment === 'bank_transfer'">STK</span> <span v-else>{{
+                                            v-if="detail.payment === 'Chuyển khoảng'">STK</span> <span v-else>{{
                                                 detail.payment }}</span></p>
                                     <p class="address"><strong>Delivery address:</strong> {{ detail.address }}</p>
                                 </div>

@@ -38,12 +38,12 @@
                         <i class="fas fa-store"></i>
                     </router-link>
                 </li>
-                <li class="nav-item active">
+                <li class="nav-item active"  v-if="isLoggedIn">
                     <router-link :to="{ name: 'order' }" class="nav-link">
                         <i class="fas fa-shopping-bag"></i>
                     </router-link>
                 </li>
-                <li class="nav-item active">
+                <li class="nav-item active" v-if="isLoggedIn">
                     <router-link :to="{ name: 'cart' }" class="nav-link">
                         <i class="fas fa-shopping-cart"></i>
                     </router-link>
