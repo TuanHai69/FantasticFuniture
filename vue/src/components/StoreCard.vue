@@ -66,6 +66,7 @@ export default {
                 if (this.stores.length === 0) {
                     alert('Chưa có cửa hàng được tạo.');
                 }
+                this.$emit('store-count', this.stores.length);  
             } catch (error) {
                 console.error('Error fetching stores:', error);
             }

@@ -1,9 +1,9 @@
 <template>
     <div class="update-branch-form">
-        <h2>{{ branch._id ? 'Cập nhật thông tin chi nhánh' : 'Tạo chi nhánh mới' }}</h2>
+        <h2>{{ branch._id ? 'Cập nhật thông tin chuỗi cửa hàng' : 'Tạo chuỗi cửa hàng mới' }}</h2>
         <form @submit.prevent="handleSubmit">
             <div class="form-group">
-                <label for="name">Tên chi nhánh:</label>
+                <label for="name">Tên chuỗi cửa hàng:</label>
                 <input type="text" id="name" v-model="branch.name" class="form-control" />
                 <span v-if="errors.name">{{ errors.name }}</span>
             </div>
@@ -39,7 +39,8 @@
             </div>
             <div class="form-group">
                 <label for="storecount">Số lượng cửa hàng:</label>
-                <input type="number" id="storecount" v-model="branch.storecount" class="form-control" />
+                <input type="number" id="storecount" v-model="branch.storecount" class="form-control"
+                    :disabled="!branch._id" />
                 <span v-if="errors.storecount">{{ errors.storecount }}</span>
             </div>
             <div class=" container">
@@ -52,8 +53,6 @@
                     </div>
                 </div>
             </div>
-
-
         </form>
     </div>
 </template>

@@ -2,19 +2,19 @@
     <div class="container mt-4">
         <div class="card mb-3">
             <div class="card-body">
-                <h5 class="card-title">{{ branch.name }}</h5>
+                <h5 class="card-title">Tên chuỗi cửa hàng: {{ branch.name }}</h5>
                 <table class="table table-bordered">
                     <tbody>
                         <tr>
-                            <th>Birthday</th>
+                            <th>Ngày thành lập</th>
                             <td>{{ branch.birthday }}</td>
                         </tr>
                         <tr>
-                            <th>Address</th>
+                            <th>Địa chỉ</th>
                             <td>{{ branch.address }}</td>
                         </tr>
                         <tr>
-                            <th>Phone Number</th>
+                            <th>Số điện thoại</th>
                             <td>{{ branch.phonenumber }}</td>
                         </tr>
                         <tr>
@@ -22,7 +22,7 @@
                             <td>{{ branch.email }}</td>
                         </tr>
                         <tr>
-                            <th>Description</th>
+                            <th>Mô tả</th>
                             <td>{{ branch.description }}</td>
                         </tr>
                         <tr>
@@ -30,11 +30,11 @@
                             <td>{{ branch.userid }}</td>
                         </tr>
                         <tr>
-                            <th>Store Count</th>
+                            <th>Số lượng cửa hàng</th>
                             <td>{{ branch.storecount }}</td>
                         </tr>
                         <tr>
-                            <th>State</th>
+                            <th>Trạng thái</th>
                             <td>{{ branch.state }}</td>
                         </tr>
                     </tbody>

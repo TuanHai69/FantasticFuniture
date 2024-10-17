@@ -41,21 +41,6 @@
                 <input type="text" id="opentime" v-model="store.opentime" class="form-control" />
                 <span v-if="errors.opentime">{{ errors.opentime }}</span>
             </div>
-            <div class="form-group">
-                <label for="userid">ID người dùng:</label>
-                <input type="text" id="userid" v-model="store.userid" class="form-control" readonly />
-                <span v-if="errors.userid">{{ errors.userid }}</span>
-            </div>
-            <div class="form-group">
-                <label for="branchid">ID chi nhánh:</label>
-                <input type="text" id="branchid" v-model="store.branchid" class="form-control" readonly />
-                <span v-if="errors.branchid">{{ errors.branchid }}</span>
-            </div>
-            <div class="form-group">
-                <label for="state">Trạng thái:</label>
-                <input type="text" id="state" v-model="store.state" class="form-control" readonly />
-                <span v-if="errors.state">{{ errors.state }}</span>
-            </div>
             <div class="container">
                 <div class="row justify-content-evenly">
                     <div class="col-4">

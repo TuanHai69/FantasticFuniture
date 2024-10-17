@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-4 fixed-col">
-    <h2>Categories</h2>
+    <h2>Danh sách cửa hàng</h2>
     <hr>
     <div class="row m-3 ">
       <div class="col-md-4" v-for="(category, index) in displayedCategories" :key="category.id">

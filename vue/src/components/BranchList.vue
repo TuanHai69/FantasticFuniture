@@ -1,20 +1,19 @@
 <template>
     <div class="container mt-4">
-        <h2>Branch List</h2>
+        <h2>Danh sách chuỗi cửa hàng</h2>
         <div class="row">
             <div class="col-md-12">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Birthday</th>
-                            <th>Address</th>
-                            <th>Phone Number</th>
+                            <th>Tên chuỗi</th>
+                            <th>Ngày thành lập</th>
+                            <th>Địa chỉ</th>
+                            <th>Số điện thoại</th>
                             <th>Email</th>
-                            <th>Description</th>
-                            <th>User ID</th>
-                            <th>Store Count</th>
-                            <th>State</th>
+                            <th>User</th>
+                            <th>SL</th>
+                            <th>Trạng thái</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -24,8 +23,7 @@
                             <td>{{ branch.address }}</td>
                             <td>{{ branch.phonenumber }}</td>
                             <td>{{ branch.email }}</td>
-                            <td>{{ branch.description }}</td>
-                            <td>{{ branch.userid }}</td>
+                            <td>{{ branch.userName }}</td>
                             <td>
                                 {{ branch.storecount }}
                                 <button @click="viewBranch(branch)" class="btn btn-link">
@@ -65,6 +63,12 @@ export default {
             try {
                 const response = await BranchService.getAll();
                 this.branches = response;
+
+                await Promise.all(this.branches.map(async branch => {
+                    const account = await AccountsService.get(branch.userid);
+                    branch.userName = account.username;
+                }));
+
             } catch (error) {
                 console.error('Error fetching branches:', error);
             }

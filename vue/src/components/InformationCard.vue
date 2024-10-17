@@ -25,9 +25,11 @@
                     <p><strong>Số điện thoại:</strong> {{ account.phonenumber }}</p>
                     <p><strong>Email:</strong> {{ account.email }}</p>
                     <p>
-                        <strong>Vai trò:</strong> {{ account.role }} || 
+                        <strong>Vai trò:</strong> {{ account.role }} ||
                         <button @click="$emit('register')" class="btn btn-primary">Đăng ký bán hàng</button>||
-                        <button v-if="branchData._id && branchData.state != 'unaccept'" @click="$emit('create-store')" class="btn btn-primary">Tạo cửa
+                        <button
+                            v-if="branchData._id && branchData.state != 'unaccept' && branchData.storecount > storeCount"
+                            @click="$emit('create-store')" class="btn btn-primary">Tạo cửa
                             hàng</button>
                     </p>
 
@@ -35,7 +37,7 @@
 
             </div>
             <div class="col-12" v-if="branchData._id && branchData.state != 'unaccept'">
-                <StoreCard :branchId="branchData._id" />
+                <StoreCard :branchId="branchData._id"  @store-count="updateStoreCount" />
             </div>
         </div>
     </div>
@@ -51,6 +53,16 @@ export default {
     props: {
         account: Object, // Nhận thông tin tài khoản từ parent component
         branchData: Object, // Nhận thông tin chi nhánh từ parent component
+    },
+    data() {
+        return {
+            storeCount: 0,
+        };
+    },
+    methods: {
+        updateStoreCount(count) {
+            this.storeCount = count;
+        },
     },
     computed: {
         accountPicture() {
