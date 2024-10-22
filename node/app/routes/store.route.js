@@ -17,6 +17,7 @@ router.route("/user/:id")
 
 router.route("/branch/:id")
     .get(store.findByBranch)
+    
 router.route("/state/:state")
     .get(store.findByState)
     
