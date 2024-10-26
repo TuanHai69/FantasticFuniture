@@ -70,7 +70,7 @@
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item" v-if="!isLoggedIn">
                     <router-link :to="{ name: 'login' }" class="nav-link">
-                        Login
+                        Đăng nhập
 
                     </router-link>
                 </li>
@@ -83,7 +83,7 @@
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item" v-if="!isLoggedIn">
                     <router-link :to="{ name: 'register' }" class="nav-link">
-                        Register
+                        Đăng ký
 
                     </router-link>
                 </li>

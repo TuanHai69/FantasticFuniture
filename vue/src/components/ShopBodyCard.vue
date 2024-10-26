@@ -21,7 +21,7 @@
                                     <button class="btn btn-primary" @click="moveToProduct(Product._id)">Xem
                                         thêm</button>
                                     <button class="btn btn-secondary" @click="addToCart(Product)">Thêm vào giỏ</button>
-                                    <button v-if="editstate == 'show'" class="btn btn-secondary"
+                                    <button v-if="editstate == 'show' && isStoreOwner" class="btn btn-secondary"
                                         @click="editProduct(Product._id)">Chỉnh
                                         sửa
                                     </button>
@@ -47,6 +47,7 @@ import ProductTypeService from "@/services/producttype.service";
 import TypeService from "@/services/type.service";
 import CartService from "@/services/cart.service";
 import LocalStorageHelper from "@/services/local.service";
+import StoreService from '@/services/store.service';
 
 export default {
     name: 'ProductList',
@@ -65,7 +66,10 @@ export default {
             products: [],
             displayedproducts: [],
             itemsToShow: 20,
-            types: []
+            types: [],
+            isStoreOwner: false,
+            userId: LocalStorageHelper.getItem('id'),
+            userRole: LocalStorageHelper.getItem('role'),
         }
     },
     async mounted() {
@@ -74,6 +78,7 @@ export default {
             this.displayedproducts = this.products.slice(0, this.itemsToShow);
             await this.fetchTypes();
         }
+        await this.checkReportPermission();
     },
     methods: {
         async fetchProducts() {
@@ -87,10 +92,18 @@ export default {
                 console.log('Error fetching products:', error);
             }
         },
+        async checkReportPermission() {
+            try {
+                const store = await StoreService.get(this.storeid);
+                this.isStoreOwner = store.userid === this.userId;
+            } catch (error) {
+                console.error('Error checking report permission:', error);
+            }
+        },
         async addToCart(product) {
             const userId = LocalStorageHelper.getItem('id');
             if (!userId) {
-                console.error("User is not logged in");
+                alert(`Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng`);
                 return;
             }
             if (product.count <= 0) {

@@ -4,19 +4,25 @@ const AccountsService = require("../services/accounts.service");
 
 exports.create = async (req, res, next) => {
     if (!req.body?.username || !req.body?.password) {
-        return next(new ApiError(400, "username and password are empty"))
+        return next(new ApiError(400, "username and password are empty"));
     }
 
     try {
         const accountsService = new AccountsService(MongoDB.client);
         const document = await accountsService.create(req.body);
-        return res.send(document);
+        return res.status(200).send({
+            message: "Đăng ký tài khoản thành công",
+            account: document
+        });
     } catch (error) {
-        return next(
-            new ApiError(500, "error when create account")
-        );
+        if (error.message === 'Username or email already exists') {
+            return next(new ApiError(400, error.message));
+        }
+        return next(new ApiError(500, "error when create account"));
     }
-}
+};
+
+
 
 exports.findAll = async (req, res, next) => {
     let documents = [];
@@ -26,7 +32,7 @@ exports.findAll = async (req, res, next) => {
         const { name } = req.query;
         if (name) {
             documents = await accountsService.findByName(name);
-        }else {
+        } else {
             documents = await accountsService.find({});
         }
     } catch (error) {
@@ -75,7 +81,7 @@ exports.checkLogin = async (req, res, next) => {
 }
 
 exports.update = async (req, res, next) => {
-    if(req.body && Object.keys(req.body).length === 0) {
+    if (req.body && Object.keys(req.body).length === 0) {
         return next(new ApiError(400, "Data update can't be empty"));
     }
 
@@ -85,7 +91,7 @@ exports.update = async (req, res, next) => {
         if (!document) {
             return next(new ApiError(404, "Account not found"));
         }
-        return res.send({ message: "Account update successfully"});
+        return res.send({ message: "Account update successfully" });
     } catch (error) {
         return next(
             new ApiError(500, `Error happen when update account has id=${req.params.id}`)
@@ -97,10 +103,10 @@ exports.delete = async (req, res, next) => {
     try {
         const accountsService = new AccountsService(MongoDB.client);
         const document = await accountsService.delete(req.params.id);
-        if(!document) {
+        if (!document) {
             return next(new ApiError(404, "Can't find the acccount"));
         }
-        return res.send({ message: "Account were deleted"});
+        return res.send({ message: "Account were deleted" });
     } catch (error) {
         return next(
             new ApiError(

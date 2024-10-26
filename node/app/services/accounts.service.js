@@ -27,8 +27,18 @@ class AccountsService {
 
     async create(payload) {
         const account = this.extractAccountsData(payload);
+
+        // Check if username or email already exists
+        const existingAccount = await this.Account.findOne({
+            $or: [{ username: account.username }, { email: account.email }]
+        });
+
+        if (existingAccount) {
+            throw new Error('Username or email already exists');
+        }
+
         const result = await this.Account.findOneAndUpdate(
-            account,
+            { username: account.username, email: account.email },
             { $set: account },
             { returnDocument: "after", upsert: true }
         );
@@ -58,11 +68,11 @@ class AccountsService {
             ],
             // password: password
         };
-    
+
         const account = await this.Account.findOne(filter);
         return account;
     }
-    async update(id, payload){
+    async update(id, payload) {
         const filter = {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         };

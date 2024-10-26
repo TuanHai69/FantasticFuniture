@@ -152,7 +152,7 @@ export default {
         async addToCart(product) {
             const userId = LocalStorageHelper.getItem('id');
             if (!userId) {
-                console.error("User is not logged in");
+                alert(`Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng`);
                 return;
             }
             if (product.count <= 0) {

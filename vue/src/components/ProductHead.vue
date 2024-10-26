@@ -73,7 +73,7 @@
                             class="btn btn-danger">
                             Hide
                         </button>
-                        <button class="btn btn-secondary" @click="editProduct(product._id)">
+                        <button v-if="isStoreOwner && userRole!= 'admin'" class="btn btn-secondary" @click="editProduct(product._id)">
                             Chỉnh sửa
                         </button>
                     </div>
@@ -208,7 +208,7 @@ export default {
         async addToCart(product) {
             const userId = LocalStorageHelper.getItem('id');
             if (!userId) {
-                console.error("User is not logged in");
+                alert(`Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng`);
                 return;
             }
 

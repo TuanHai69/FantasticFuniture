@@ -1,6 +1,6 @@
 <template>
     <div class="container mt-4">
-        <h2>Categories</h2>
+        <h2>Danh sách</h2>
         <div class="row m-3">
             <div class="col-md-3" v-for="(category, index) in displayedCategories" :key="category.id">
                 <div class="card mb-4" @click="navigateToStore(category._id)">

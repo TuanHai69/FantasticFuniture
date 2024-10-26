@@ -6,24 +6,30 @@
             </div>
             <div class="col-6 text-container m-4">
                 <div class="row">
-                    <div class="col-9">
-                        <p>Chi nhánh: {{ store.branchid }}</p>
+                    <div class="col-10">
                         <h3>{{ store.name }}</h3>
                         <p class="address">Địa chỉ: {{ store.address }}</p>
-                        <p class="review">
-                            Đánh giá:
-                            <span class="negative">Tiêu cực 2222</span> /
-                            <span class="positive">Bình thường 2222</span> /
-                            <span class="recommend">Tích cực 3333</span>
+                        <p class="review"> Đánh giá:
+                        <div>
+                            <span class="recommend">{{ positiveReviews }}</span> /
+                            <span class="positive">{{ neutralReviews }}</span> /
+                        </div>
+                        <div>
+                            <span class="negative">{{ negativeReviews }}</span>
+                        </div>
                         </p>
                         <p class="open">Mở cửa: {{ store.opentime }}</p>
                         <p class="phone">Số điện thoại: {{ store.phonenumber }}</p>
                     </div>
-                    <div class="col-3">
-                        <button @click="editStore" class="btn btn-secondary bg-primary">Chỉnh sửa</button>
-                        <button @click="createProduct" class="btn btn-secondary bg-success mt-2">Tạo sản phẩm</button>
-                        <button @click="viewCart" class="btn btn-secondary bg-info mt-2">Đơn hàng</button>
-                        <button @click="viewRevenue" class="btn btn-secondary bg-warning mt-2">Doanh thu</button>
+                    <div class="col-2" v-if="isStoreOwner">
+                        <button v-if="isStoreOwner" @click="editStore" class="btn btn-secondary bg-primary">Chỉnh
+                            sửa</button>
+                        <button v-if="isStoreOwner" @click="createProduct" class="btn btn-secondary bg-success mt-2">Tạo
+                            sản phẩm</button>
+                        <button v-if="isStoreOwner" @click="viewCart" class="btn btn-secondary bg-info mt-2">Đơn
+                            hàng</button>
+                        <button v-if="isStoreOwner" @click="viewRevenue" class="btn btn-secondary bg-warning mt-2">Doanh
+                            thu</button>
                     </div>
                 </div>
             </div>
@@ -38,6 +44,8 @@
 
 <script>
 import StoreService from '@/services/store.service';
+import LocalStorageHelper from '@/services/local.service';
+import CommentstoreService from '@/services/commentstore.service';
 
 export default {
     props: {
@@ -49,22 +57,65 @@ export default {
     data() {
         return {
             store: {},
-            loading: true // Biến trạng thái để kiểm soát việc hiển thị
+            loading: true,
+            isStoreOwner: false,
+            userId: LocalStorageHelper.getItem('id'),
+            userRole: LocalStorageHelper.getItem('role'),
+            negativeReviews: '',
+            neutralReviews: '',
+            positiveReviews: '',
         };
     },
     async mounted() {
         await this.fetchStoreData();
+        await this.checkReportPermission();
     },
     methods: {
         async fetchStoreData() {
             try {
                 this.store = await StoreService.get(this.id);
+                const comments = await CommentstoreService.findByStore(this.id);
+                this.countReviews(comments);
                 this.loading = false;
             } catch (error) {
                 console.error('Error fetching store data:', error);
                 alert('Có lỗi xảy ra khi lấy thông tin cửa hàng.');
                 this.loading = false;
                 this.$router.push(`/home`);
+            }
+        },
+        countReviews(comments) {
+            let negativeCount = 0;
+            let neutralCount = 0;
+            let positiveCount = 0;
+
+            comments.forEach(comment => {
+                if (comment.rate === 'Tiêu cực') {
+                    negativeCount++;
+                } else if (comment.rate === 'Bình thường') {
+                    neutralCount++;
+                } else if (comment.rate === 'Tích cực') {
+                    positiveCount++;
+                }
+            });
+            this.negativeReviews = negativeCount > 0 ? `${this.formatCount(negativeCount)} đánh giá tiêu cực` : 'Chưa có đánh giá Tiêu cực';
+            this.neutralReviews = neutralCount > 0 ? `${this.formatCount(neutralCount)} đánh giá bình thường` : 'Chưa có đánh giá Bình thường';
+            this.positiveReviews = positiveCount > 0 ? `${this.formatCount(positiveCount)} đánh giá tích cực` : 'Chưa có đánh giá Tích cực';
+        },
+        formatCount(count) {
+            if (count >= 1000000) {
+                return `${Math.floor(count / 1000000)} triệu`;
+            } else if (count >= 1000) {
+                return `${Math.floor(count / 1000)}k`;
+            }
+            return count;
+        },
+        async checkReportPermission() {
+            try {
+                const store = await StoreService.get(this.store._id);
+                this.isStoreOwner = store.userid === this.userId;
+            } catch (error) {
+                console.error('Error checking report permission:', error);
             }
         },
         storePicture(picture) {

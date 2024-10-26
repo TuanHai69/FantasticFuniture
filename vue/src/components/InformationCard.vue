@@ -4,11 +4,8 @@
             <div class="col-md-6 account-details">
                 <h2 class="text-center">Thông tin tài khoản</h2>
                 <div>
-
                     <img :src="accountPicture" alt="Avatar" class="img-fluid rounded-circle mx-auto d-block" />
-
                 </div>
-
             </div>
             <div class="col-md-6">
                 <div class="account-details">
@@ -26,13 +23,12 @@
                     <p><strong>Email:</strong> {{ account.email }}</p>
                     <p>
                         <strong>Vai trò:</strong> {{ account.role }} ||
-                        <button @click="$emit('register')" class="btn btn-primary">Đăng ký bán hàng</button>||
+                        <button v-if="account.role != 'admin'" @click="$emit('register')" class="btn btn-primary">Đăng ký bán hàng</button>||
                         <button
                             v-if="branchData._id && branchData.state != 'unaccept' && branchData.storecount > storeCount"
                             @click="$emit('create-store')" class="btn btn-primary">Tạo cửa
                             hàng</button>
                     </p>
-
                 </div>
 
             </div>
