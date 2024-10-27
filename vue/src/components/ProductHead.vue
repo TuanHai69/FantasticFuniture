@@ -11,17 +11,27 @@
 
                 <p>Vật liệu: {{ product.material }}</p>
                 <p class="address">Kích thước: {{ product.size }}</p>
-                <p class="review">
+                <p class="review"
+                    v-if="positiveReviews != 'Chưa có đánh giá Tích cực' && negativeReviews != 'Chưa có đánh giá Tiêu cực' && neutralReviews != 'Chưa có đánh giá Bình thường'">
                     Đánh giá:
-                    <span class="negative">Tiêu cực 2222</span> /
-                    <span class="positive">Bình thường 2222</span> /
-                    <span class="recommend">Tích cực 2222</span>
+                <div>
+                    <span class="recommend">{{ positiveReviews }}</span>
+                    <span v-if="neutralReviews != 'Chưa có đánh giá Bình thường'" class="positive">/ {{ neutralReviews
+                        }} /</span>
+                </div>
+                <div>
+                    <span class="negative">{{ negativeReviews }}</span>
+                </div>
+                </p>
+                <p class="review" v-else> Đánh giá:
+                    Chưa có đánh giá nào
                 </p>
                 <p class="open">Danh mục
                     <span v-for="type in types" :key="type.id" class="type-button-container">
                         <button class="btn type-button" @click="navigateToProduct(type)">
                             {{ type.name }}
-                            <span v-if="isStoreOwner" class="delete-button" @click.stop="deleteProductType(type.producttypeid)">x</span>
+                            <span v-if="isStoreOwner" class="delete-button"
+                                @click.stop="deleteProductType(type.producttypeid)">x</span>
                         </button>
                     </span>
                     <button v-if="isStoreOwner" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
@@ -51,8 +61,9 @@
                             type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Bảo hành</button>
                         <button class="nav-link" id="nav-move-tab" data-bs-toggle="tab" data-bs-target="#nav-move"
                             type="button" role="tab" aria-controls="nav-move" aria-selected="false">Vận chuyển</button>
-                        <button v-if="isStoreOwner" class="nav-link" id="nav-manager-tab" data-bs-toggle="tab" data-bs-target="#nav-manager"
-                            type="button" role="tab" aria-controls="nav-manager" aria-selected="false">quản lý</button>
+                        <button v-if="isStoreOwner" class="nav-link" id="nav-manager-tab" data-bs-toggle="tab"
+                            data-bs-target="#nav-manager" type="button" role="tab" aria-controls="nav-manager"
+                            aria-selected="false">quản lý</button>
                     </div>
                 </nav>
                 <div class="tab-content" id="nav-tabContent">
@@ -64,7 +75,8 @@
                     <div class="tab-pane fade" id="nav-move" role="tabpanel" aria-labelledby="nav-move-tab">
                         {{ product.delivery }}
                     </div>
-                    <div v-if="isStoreOwner" class="tab-pane fade" id="nav-manager" role="tabpanel" aria-labelledby="nav-manager-tab">
+                    <div v-if="isStoreOwner" class="tab-pane fade" id="nav-manager" role="tabpanel"
+                        aria-labelledby="nav-manager-tab">
                         <button @click="updateState(product, 'show')" :disabled="product.state === 'show'"
                             class="btn btn-success">
                             Show
@@ -73,7 +85,8 @@
                             class="btn btn-danger">
                             Hide
                         </button>
-                        <button v-if="isStoreOwner && userRole!= 'admin'" class="btn btn-secondary" @click="editProduct(product._id)">
+                        <button v-if="isStoreOwner && userRole != 'admin'" class="btn btn-secondary"
+                            @click="editProduct(product._id)">
                             Chỉnh sửa
                         </button>
                     </div>
@@ -108,6 +121,7 @@ import TypeService from "@/services/type.service";
 import CartService from "@/services/cart.service";
 import LocalStorageHelper from "@/services/local.service";
 import StoreService from '@/services/store.service';
+import CommentService from "@/services/comment.service";
 
 export default {
     props: {
@@ -150,6 +164,9 @@ export default {
             error: {},
             types: [],
             quantity: 1,
+            negativeReviews: '',
+            neutralReviews: '',
+            positiveReviews: '',
         };
     },
     async mounted() {
@@ -180,10 +197,41 @@ export default {
         async fetchProduct() {
             try {
                 const response = await ProductService.get(this.id);
+                const comments = await CommentService.findByProduct(this.id);
+                this.countReviews(comments);
                 this.product = response;
             } catch (error) {
                 console.error('Error fetching product:', error);
             }
+        },
+        countReviews(comments) {
+            let negativeCount = 0;
+            let neutralCount = 0;
+            let positiveCount = 0;
+
+            comments.forEach(comment => {
+                if (comment.rate === 'Tiêu cực') {
+                    negativeCount++;
+                } else if (comment.rate === 'Bình thường') {
+                    neutralCount++;
+                } else if (comment.rate === 'Tích cực') {
+                    positiveCount++;
+                }
+            });
+            // negativeCount += 999000000;
+            // neutralCount += 999000000;
+            // positiveCount += 998000000;
+            this.negativeReviews = negativeCount > 0 ? `${this.formatCount(negativeCount)} đánh giá tiêu cực` : 'Chưa có đánh giá Tiêu cực';
+            this.neutralReviews = neutralCount > 0 ? `${this.formatCount(neutralCount)} đánh giá bình thường` : 'Chưa có đánh giá Bình thường';
+            this.positiveReviews = positiveCount > 0 ? `${this.formatCount(positiveCount)} đánh giá tích cực` : 'Chưa có đánh giá Tích cực';
+        },
+        formatCount(count) {
+            if (count >= 1000000) {
+                return `${Math.floor(count / 1000000)} triệu`;
+            } else if (count >= 1000) {
+                return `${Math.floor(count / 1000)}k`;
+            }
+            return count;
         },
         async fetchProductTypes() {
             try {
