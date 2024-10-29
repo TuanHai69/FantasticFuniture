@@ -7,7 +7,7 @@
                     <div class="d-flex justify-content-center mt-3">
                         <h2>Danh sách sản phẩm</h2>
                     </div>
-                    <ProductCard :id="$route.params.id" />
+                    <ProductCard :id="$route.params.id" :searchQuery="$route.query.search" />
                 </div>
             </div>
         </div>

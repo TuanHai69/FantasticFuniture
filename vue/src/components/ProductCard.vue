@@ -88,6 +88,7 @@
 </template>
 
 <script>
+
 import ProductService from "@/services/product.service";
 import TypeService from "@/services/type.service";
 import ProductTypeService from "@/services/producttype.service";
@@ -100,6 +101,10 @@ export default {
         id: {
             type: String,
             default: null
+        },
+        searchQuery: {
+            type: String,
+            default: ''
         }
     },
     data() {
@@ -112,7 +117,7 @@ export default {
             error: null,
             selectedFilters: [],
             filterOptions: [],
-        };
+        }
     },
     async created() {
         this.loading = true;
@@ -120,18 +125,23 @@ export default {
         await this.fetchTypes();
         this.displayedProducts = this.products.slice(0, this.itemsToShow);
 
-
         if (this.id) {
             this.selectedFilters.push(this.id);
             await this.logSelectedFilters();
         }
         this.loading = false;
     },
+    watch: {
+        searchQuery(newQuery) {
+            this.filterProducts(newQuery);
+        }
+    },
     methods: {
         async fetchProducts() {
             try {
                 const response = await ProductService.findByState('show');
                 this.products = response;
+                this.filterProducts(this.searchQuery); // Filter products based on the initial search query
             } catch (error) {
                 this.error = 'Error fetching products';
                 console.error('Error fetching products:', error);
@@ -247,10 +257,22 @@ export default {
             } catch (error) {
                 console.error('Error fetching product types or products:', error);
             }
+        },
+        filterProducts(query) {
+            if (!query) {
+                this.filteredProducts = this.products;
+                return;
+            }
+            const lowerCaseQuery = query.toLowerCase();
+            this.filteredProducts = this.products.filter(product =>
+                product.name.toLowerCase().includes(lowerCaseQuery)
+            );
         }
     }
 };
 </script>
+
+
 <style>
 .loading {
     text-align: center;

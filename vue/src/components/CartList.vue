@@ -35,8 +35,11 @@
                         }}
                     </p>
                 </div>
-                <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
+                <div class="col-12 col-md-2 d-flex align-items-center justify-content-evenly">
                     <button @click="checkout(cart)" class="btn btn-primary">Thanh toán</button>
+                    <button @click="deleteCartItem(cart)" class="btn btn-danger ml-2 bg-danger">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </div>
             </li>
         </ul>
@@ -88,6 +91,24 @@ export default {
         },
         checkout(cart) {
             this.$emit('checkout', cart);
+        },
+        async deleteCartItem(cart) {
+            const confirmed = confirm('Bạn có muốn xóa sản phẩm này khỏi giỏ hàng hay không?');
+            if (confirmed) {
+                try {
+                    // Fetch the product details
+                    const product = await ProductService.get(cart.productid);
+                    // Update the product count
+                    product.count += cart.count;
+                    await ProductService.update(cart.productid, { count: product.count });
+                    // Delete the cart item
+                    await CartService.delete(cart._id);
+                    // Remove the cart item from the local list
+                    this.carts = this.carts.filter(c => c._id !== cart._id);
+                } catch (error) {
+                    console.error('Error deleting cart item:', error);
+                }
+            }
         },
     },
 };

@@ -38,7 +38,7 @@
                         <i class="fas fa-store"></i>
                     </router-link>
                 </li>
-                <li class="nav-item active"  v-if="isLoggedIn">
+                <li class="nav-item active" v-if="isLoggedIn">
                     <router-link :to="{ name: 'order' }" class="nav-link">
                         <i class="fas fa-shopping-bag"></i>
                     </router-link>
@@ -59,9 +59,10 @@
                     </router-link>
                 </li>
             </ul>
-            <form class="form-inline my-2 my-lg-0 ml-auto ms-auto">
+            <form class="form-inline my-2 my-lg-0 ml-auto ms-auto" @submit.prevent="handleSearch">
                 <div class="input-group search-group">
-                    <input class="form-control search-input" type="search" placeholder="Search" aria-label="Search">
+                    <input v-model="searchQuery" class="form-control search-input" type="search" placeholder="Search"
+                        aria-label="Search">
                     <button class="btn btn-outline-success search-button" type="submit">
                         <i class="fas fa-search"></i>
                     </button>
@@ -125,6 +126,9 @@ export default {
             LocalStorageHelper.clear();
             this.isLoggedIn = false;
             this.$router.push({ name: "home" });
+        },
+        handleSearch() {
+            this.$router.push({ name: 'products', query: { search: this.searchQuery } });
         },
     },
 };
