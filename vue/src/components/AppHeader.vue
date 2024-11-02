@@ -106,7 +106,8 @@ export default {
         return {
             isLoggedIn: false,
             userId: LocalStorageHelper.getItem('id'),
-            role: ''
+            role: '',
+            searchQuery: '',
         };
     },
     created() {

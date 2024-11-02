@@ -10,13 +10,9 @@
                         <h3>{{ store.name }}</h3>
                         <p class="address">Địa chỉ: {{ store.address }}</p>
                         <p class="review"> Đánh giá:
-                        <div>
-                            <span class="recommend">{{ positiveReviews }}</span> /
-                            <span class="positive">{{ neutralReviews }}</span> /
-                        </div>
-                        <div>
-                            <span class="negative">{{ negativeReviews }}</span>
-                        </div>
+                            <span v-for="(star, index) in getStarIcons(averageRating)" :key="index"
+                                :class="star"></span>
+                            <span>({{ averageRating }})</span>
                         </p>
                         <p class="open">Mở cửa: {{ store.opentime }}</p>
                         <p class="phone">Số điện thoại: {{ store.phonenumber }}</p>
@@ -61,9 +57,6 @@ export default {
             isStoreOwner: false,
             userId: LocalStorageHelper.getItem('id'),
             userRole: LocalStorageHelper.getItem('role'),
-            negativeReviews: '',
-            neutralReviews: '',
-            positiveReviews: '',
         };
     },
     async mounted() {
@@ -75,7 +68,7 @@ export default {
             try {
                 this.store = await StoreService.get(this.id);
                 const comments = await CommentstoreService.findByStore(this.id);
-                this.countReviews(comments);
+                this.calculateAverageRating(comments);
                 this.loading = false;
             } catch (error) {
                 console.error('Error fetching store data:', error);
@@ -84,31 +77,15 @@ export default {
                 this.$router.push(`/home`);
             }
         },
-        countReviews(comments) {
-            let negativeCount = 0;
-            let neutralCount = 0;
-            let positiveCount = 0;
+        calculateAverageRating(comments) {
+            let totalRating = 0;
+            let ratingCount = comments.length;
 
             comments.forEach(comment => {
-                if (comment.rate === 'Tiêu cực') {
-                    negativeCount++;
-                } else if (comment.rate === 'Bình thường') {
-                    neutralCount++;
-                } else if (comment.rate === 'Tích cực') {
-                    positiveCount++;
-                }
+                totalRating += parseInt(comment.rate, 10);
             });
-            this.negativeReviews = negativeCount > 0 ? `${this.formatCount(negativeCount)} đánh giá tiêu cực` : 'Chưa có đánh giá Tiêu cực';
-            this.neutralReviews = neutralCount > 0 ? `${this.formatCount(neutralCount)} đánh giá bình thường` : 'Chưa có đánh giá Bình thường';
-            this.positiveReviews = positiveCount > 0 ? `${this.formatCount(positiveCount)} đánh giá tích cực` : 'Chưa có đánh giá Tích cực';
-        },
-        formatCount(count) {
-            if (count >= 1000000) {
-                return `${Math.floor(count / 1000000)} triệu`;
-            } else if (count >= 1000) {
-                return `${Math.floor(count / 1000)}k`;
-            }
-            return count;
+
+            this.averageRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : 0;
         },
         async checkReportPermission() {
             try {
@@ -136,6 +113,22 @@ export default {
         viewRevenue() {
             this.$emit('view-revenue');
         },
+        getStarIcons(rate) {
+            const fullStars = Math.floor(rate);
+            const halfStar = rate % 1 !== 0;
+            const stars = [];
+
+            for (let i = 1; i <= 5; i++) {
+                if (i <= fullStars) {
+                    stars.push('fas fa-star');
+                } else if (i === fullStars + 1 && halfStar) {
+                    stars.push('fas fa-star-half-alt');
+                } else {
+                    stars.push('far fa-star');
+                }
+            }
+            return stars;
+        }
     }
 };
 </script>
@@ -144,6 +137,13 @@ export default {
 .image-container {
     max-height: 250px;
     overflow: hidden;
+}
+
+.fa-star,
+.fa-star-half-alt,
+.far.fa-star {
+    color: #ffd700;
+    font-size: 1.2em;
 }
 
 .large-image {

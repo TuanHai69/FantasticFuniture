@@ -13,15 +13,9 @@
                     <div class="form-group mb-3">
                         <label><strong>Rate:</strong></label>
                         <div>
-                            <label class="me-3">
-                                <input type="radio" value="Tiêu cực" v-model="rate" required> Tiêu cực
-                            </label>
-                            <label class="me-3">
-                                <input type="radio" value="Bình thường" v-model="rate" required> Bình thường
-                            </label>
-                            <label>
-                                <input type="radio" value="Tích cực" v-model="rate" required> Tích cực
-                            </label>
+                            <span v-for="star in 5" :key="star" class="me-2">
+                                <i :class="['fa-star', rate >= star ? 'fas' : 'far']" @click="rate = star"></i>
+                            </span>
                         </div>
                     </div>
                     <div class="form-group mb-3">
@@ -30,6 +24,8 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
+
+
             </div>
             <hr>
             <div v-if="visibleComments.length === 0" class="no-comments">
@@ -39,7 +35,7 @@
                 <div v-for="comment in visibleComments" :key="comment._id" class="comment-card mb-3 p-2 border rounded">
                     <div class="row mb-2 p-3">
                         <div class="col-2">
-                            <div class="">
+                            <div class="text-center">
                                 <img :src="productPicture(comment.userPicture)" alt="User Picture"
                                     class="user-picture img-fluid rounded-circle">
                             </div>
@@ -47,7 +43,10 @@
                         <div class="col-2">
                             <p><strong>{{ comment.userName }}</strong></p>
                             <hr>
-                            <p>Rate: {{ comment.rate }}</p>
+                            <p>
+                                <span v-for="(star, index) in getStarIcons(comment.rate)" :key="index"
+                                    :class="star"></span>
+                            </p>
                         </div>
                         <div class="col-7 comment-content border rounded">
                             <p>{{ comment.commentstore }}</p>
@@ -164,7 +163,13 @@ export default {
                 console.error('Error reporting comment:', error);
             }
         },
-
+        getStarIcons(rate) {
+            const stars = [];
+            for (let i = 1; i <= 5; i++) {
+                stars.push(i <= rate ? 'fas fa-star' : 'far fa-star');
+            }
+            return stars;
+        },
         async fetchComments() {
             try {
                 const comments = await CommentStoreService.findByStore(this.storeid);
@@ -220,6 +225,12 @@ export default {
     overflow-y: auto;
 }
 
+.fa-star {
+    cursor: pointer;
+    font-size: 1.5em;
+    color: #ffd700;
+}
+
 .comment-card {
     border: 1px solid #ddd;
 }
@@ -227,6 +238,7 @@ export default {
 .user-picture {
     max-width: 100%;
     height: auto;
+    max-height: 120px;
 }
 
 .loading {

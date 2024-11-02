@@ -11,20 +11,9 @@
 
                 <p>Vật liệu: {{ product.material }}</p>
                 <p class="address">Kích thước: {{ product.size }}</p>
-                <p class="review"
-                    v-if="positiveReviews != 'Chưa có đánh giá Tích cực' && negativeReviews != 'Chưa có đánh giá Tiêu cực' && neutralReviews != 'Chưa có đánh giá Bình thường'">
-                    Đánh giá:
-                <div>
-                    <span class="recommend">{{ positiveReviews }}</span>
-                    <span v-if="neutralReviews != 'Chưa có đánh giá Bình thường'" class="positive">/ {{ neutralReviews
-                        }} /</span>
-                </div>
-                <div>
-                    <span class="negative">{{ negativeReviews }}</span>
-                </div>
-                </p>
-                <p class="review" v-else> Đánh giá:
-                    Chưa có đánh giá nào
+                <p class="review"> Đánh giá:
+                    <span v-for="(star, index) in getStarIcons(averageRating)" :key="index" :class="star"></span>
+                    <span>({{ averageRating }})</span>
                 </p>
                 <p class="open">Danh mục
                     <span v-for="type in types" :key="type.id" class="type-button-container">
@@ -164,9 +153,7 @@ export default {
             error: {},
             types: [],
             quantity: 1,
-            negativeReviews: '',
-            neutralReviews: '',
-            positiveReviews: '',
+            averageRating: 0,
         };
     },
     async mounted() {
@@ -198,40 +185,21 @@ export default {
             try {
                 const response = await ProductService.get(this.id);
                 const comments = await CommentService.findByProduct(this.id);
-                this.countReviews(comments);
+                this.calculateAverageRating(comments);
                 this.product = response;
             } catch (error) {
                 console.error('Error fetching product:', error);
             }
         },
-        countReviews(comments) {
-            let negativeCount = 0;
-            let neutralCount = 0;
-            let positiveCount = 0;
+        calculateAverageRating(comments) {
+            let totalRating = 0;
+            let ratingCount = comments.length;
 
             comments.forEach(comment => {
-                if (comment.rate === 'Tiêu cực') {
-                    negativeCount++;
-                } else if (comment.rate === 'Bình thường') {
-                    neutralCount++;
-                } else if (comment.rate === 'Tích cực') {
-                    positiveCount++;
-                }
+                totalRating += parseInt(comment.rate, 10);
             });
-            // negativeCount += 999000000;
-            // neutralCount += 999000000;
-            // positiveCount += 998000000;
-            this.negativeReviews = negativeCount > 0 ? `${this.formatCount(negativeCount)} đánh giá tiêu cực` : 'Chưa có đánh giá Tiêu cực';
-            this.neutralReviews = neutralCount > 0 ? `${this.formatCount(neutralCount)} đánh giá bình thường` : 'Chưa có đánh giá Bình thường';
-            this.positiveReviews = positiveCount > 0 ? `${this.formatCount(positiveCount)} đánh giá tích cực` : 'Chưa có đánh giá Tích cực';
-        },
-        formatCount(count) {
-            if (count >= 1000000) {
-                return `${Math.floor(count / 1000000)} triệu`;
-            } else if (count >= 1000) {
-                return `${Math.floor(count / 1000)}k`;
-            }
-            return count;
+
+            this.averageRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : 0;
         },
         async fetchProductTypes() {
             try {
@@ -329,6 +297,22 @@ export default {
                 console.error('Error updating state:', error);
             }
         },
+        getStarIcons(rate) {
+            const fullStars = Math.floor(rate);
+            const halfStar = rate % 1 !== 0;
+            const stars = [];
+
+            for (let i = 1; i <= 5; i++) {
+                if (i <= fullStars) {
+                    stars.push('fas fa-star');
+                } else if (i === fullStars + 1 && halfStar) {
+                    stars.push('fas fa-star-half-alt');
+                } else {
+                    stars.push('far fa-star');
+                }
+            }
+            return stars;
+        },
     },
 
 
@@ -337,6 +321,13 @@ export default {
 </script>
 
 <style scoped>
+.fa-star,
+.fa-star-half-alt,
+.far.fa-star {
+    color: #ffd700;
+    font-size: 1.2em;
+}
+
 .image-container {
     display: flex;
     align-items: center;
