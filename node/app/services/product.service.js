@@ -8,14 +8,12 @@ class ProductService {
     extractProductData(payload) {
         const product = {
             name: payload.name,
-            cost: payload.cost,
             picture: payload.picture,
             material: payload.material,
             size: payload.size,
             description: payload.description,
             warranty: payload.warranty,
             delivery: payload.delivery,
-            discount: payload.discount,
             storeid: payload.storeid,
             state: payload.state,
             count: payload.count,

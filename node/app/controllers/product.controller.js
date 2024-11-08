@@ -3,7 +3,7 @@ const ApiError = require("../api-error");
 const ProductService = require("../services/product.service");
 
 exports.create = async (req, res, next) => {
-    if (!req.body?.name || !req.body?.cost || !req.body?.material || !req.body?.storeid) {
+    if (!req.body?.name  || !req.body?.material || !req.body?.storeid) {
         return next(new ApiError(400, "name or cost or material are empty"))
     }
 

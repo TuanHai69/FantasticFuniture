@@ -10,6 +10,7 @@ class PriceService {
             daystart: payload.daystart,
             dayend: payload.dayend,
             price: payload.price,
+            discount: payload.discount,
             productid: payload.productid,
         };
 

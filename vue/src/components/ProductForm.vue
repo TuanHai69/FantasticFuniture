@@ -8,11 +8,6 @@
                 <span v-if="errors.name">{{ errors.name }}</span>
             </div>
             <div class="form-group">
-                <label for="cost">Giá:</label>
-                <input type="number" id="cost" v-model="product.cost" class="form-control" />
-                <span v-if="errors.cost">{{ errors.cost }}</span>
-            </div>
-            <div class="form-group">
                 <label for="count">Số lượng:</label>
                 <input type="number" id="count" v-model="product.count" class="form-control" />
                 <span v-if="errors.count">{{ errors.count }}</span>
@@ -46,11 +41,6 @@
                 <label for="delivery">Giao hàng:</label>
                 <input type="text" id="delivery" v-model="product.delivery" class="form-control" />
                 <span v-if="errors.delivery">{{ errors.delivery }}</span>
-            </div>
-            <div class="form-group">
-                <label for="discount">Giảm giá:</label>
-                <input type="number" id="discount" v-model="product.discount" class="form-control" />
-                <span v-if="errors.discount">{{ errors.discount }}</span>
             </div>
             <div class="form-group">
                 <label for="storeid">Store ID:</label>
@@ -98,14 +88,12 @@ export default {
         return {
             product: {
                 name: '',
-                cost: '',
                 picture: '',
                 material: '',
                 size: '',
                 description: '',
                 warranty: '',
                 delivery: '',
-                discount: '',
                 count: '',
                 storeid: '',
                 state: 'Hoạt động',
@@ -132,7 +120,6 @@ export default {
         validateForm() {
             this.errors = {};
             if (!this.product.name) this.errors.name = 'Tên sản phẩm là bắt buộc.';
-            if (!this.product.cost) this.errors.cost = 'Giá là bắt buộc.';
             if (!this.product.count) this.errors.count = 'Giá là bắt buộc.';
             if (!this.product.picture) this.errors.picture = 'Hình ảnh là bắt buộc.';
             if (!this.product.material) this.errors.material = 'Chất liệu là bắt buộc.';
@@ -149,9 +136,9 @@ export default {
                 this.isLoading = true;
                 try {
                     if (this.product._id) {
-                        await this.$emit('update-product', this.product);
+                        this.$emit('update-product', this.product);
                     } else {
-                        await this.$emit('create-product', this.product);
+                        this.$emit('create-product', this.product);
                     }
                 } catch (error) {
                     console.error('Error updating product:', error);
@@ -187,7 +174,6 @@ export default {
         resetForm() {
             this.product = {
                 name: '',
-                cost: '',
                 picture: '',
                 material: '',
                 size: '',
@@ -195,7 +181,6 @@ export default {
                 warranty: '',
                 delivery: '',
                 count: '',
-                discount: '',
                 storeid: this.storeid,
                 state: 'Hoạt động',
             };
