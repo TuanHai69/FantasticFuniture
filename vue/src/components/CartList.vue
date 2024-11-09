@@ -2,7 +2,7 @@
     <div class="container">
         <h1>Giỏ hàng</h1>
         <ul v-if="carts.length" class="list-unstyled">
-            <li v-for="cart in carts" :key="cart.id" class="cart-item row mb-3 p-3  rounded shadow-sm">
+            <li v-for="cart in carts" :key="cart.id" class="cart-item row mb-3 p-3 rounded shadow-sm">
                 <div class="col-12 col-md-3 mb-3 mb-md-0">
                     <img :src="productPicture(cart.product.picture)" alt="Product Image"
                         class="product-image img-fluid" />
@@ -18,21 +18,10 @@
                     <p><strong>Số lượng:</strong> {{ cart.count }}</p>
                     <p>
                         <strong>Giá:</strong>
-                        {{
-                            formatCurrency(
-                                calculateCost(cart.product.cost,
-                                    cart.product.discount
-                                )
-                            )
-                        }}
+                        {{ formatCurrency(calculateCost(cart.price, cart.discount)) }}
                     </p>
                     <p><strong>Tổng:</strong>
-                        {{
-                            formatCurrency(
-                                cart.count * calculateCost(cart.product.cost,
-                                    cart.product.discount)
-                            )
-                        }}
+                        {{ formatCurrency(cart.count * calculateCost(cart.price, cart.discount)) }}
                     </p>
                 </div>
                 <div class="col-12 col-md-2 d-flex align-items-center justify-content-evenly">
@@ -47,9 +36,11 @@
     </div>
 </template>
 
+
 <script>
 import CartService from '@/services/cart.service';
 import ProductService from '@/services/product.service';
+import PriceService from '@/services/price.service';
 import LocalStorageHelper from '@/services/local.service';
 
 export default {
@@ -65,6 +56,14 @@ export default {
                 const carts = await CartService.findByUser(userId);
                 for (const cart of carts) {
                     const product = await ProductService.get(cart.productid);
+                    const priceData = await PriceService.findByProductWithNoEndDate(cart.productid);
+                    if (priceData.length > 0) {
+                        cart.price = priceData[0].price;
+                        cart.discount = priceData[0].discount;
+                    } else {
+                        cart.price = null;
+                        cart.discount = null;
+                    }
                     cart.product = product;
                 }
                 this.carts = carts;
@@ -80,11 +79,11 @@ export default {
             }
             return 'https://th.bing.com/th?id=OIP.XqGBZKSVcAqsEghNyEn1wAHaE8&w=306&h=204&c=8&rs=1&qlt=90&r=0&o=6&dpr=1.1&pid=3.1&rm=2.jpg';
         },
-        calculateCost(cost, discount) {
+        calculateCost(price, discount) {
             if (discount) {
-                return (cost - (cost * discount / 100)).toFixed(2);
+                return (price - (price * discount / 100)).toFixed(2);
             }
-            return cost;
+            return price;
         },
         formatCurrency(value) {
             return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
@@ -114,13 +113,13 @@ export default {
 };
 </script>
 
+
 <style scoped>
 .cart-item {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     background-color: whitesmoke;
-    /* Light grey background */
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 5px;

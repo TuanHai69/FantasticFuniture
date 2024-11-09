@@ -12,6 +12,7 @@ class CartService {
             count: payload.count,
             note: payload.note,
             discount: payload.discount,
+            day: payload.day,
             storeid: payload.storeid,
             state: payload.state,
         };

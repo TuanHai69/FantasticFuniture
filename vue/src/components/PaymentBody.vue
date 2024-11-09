@@ -13,25 +13,24 @@
                 <p><strong>Bảo hành:</strong> {{ cart.product.warranty }}</p>
             </div>
             <div class="col-md-6 d-flex flex-column align-items-center">
-
                 <h2>Chi tiết thanh toán</h2>
                 <div class="d-flex justify-content-evenly w-100">
-                    <p><strong>Giá:</strong> {{ formatCurrency(calculateCost(cart.product.cost, cart.product.discount))
-                        }}</p>
+                    <p><strong>Giá:</strong> {{ formatCurrency(calculateCost(cart.price, cart.discount)) }}</p>
                     <p><strong>Số lượng:</strong> {{ cart.count }}</p>
                 </div>
                 <div class="d-flex justify-content-evenly w-100">
-                    <p><strong>Tổng sản phẩm:</strong> {{ formatCurrency(cart.count * calculateCost(cart.product.cost,
-                        cart.product.discount)) }}</p>
+                    <p><strong>Tổng sản phẩm:</strong> {{ formatCurrency(cart.count * calculateCost(cart.price,
+                        cart.discount)) }}</p>
                     <p v-if="discountPercent"><strong>Giảm:</strong> {{ discountPercent }}%</p>
                 </div>
                 <p v-if="discountPercent"><strong>Tổng giá:</strong> {{ formatCurrency(calculateTotal(cart.count *
-                    calculateCost(cart.product.cost, cart.product.discount), discountPercent)) }}</p>
+                    calculateCost(cart.price, cart.discount), discountPercent)) }}</p>
                 <form @submit.prevent="validateCode" class="d-flex justify-content-evenly w-100">
                     <div class="form-group mr-2">
-                        <input v-model="code" type="text" class="form-control" id="code" placeholder="Nhập mã giảm giá" />
+                        <input v-model="code" type="text" class="form-control" id="code"
+                            placeholder="Nhập mã giảm giá" />
                     </div>
-                    <button type="submit" class="btn btn-secondary  ">Xác nhận mã</button>
+                    <button type="submit" class="btn btn-secondary">Xác nhận mã</button>
                 </form>
                 <div class="form-group w-100">
                     <label for="paymentMethod">Phương thức thanh toán</label>
@@ -55,12 +54,12 @@
                     <textarea v-model="description" class="form-control" id="description" rows="3"
                         placeholder="Nhập vào mô tả"></textarea>
                 </div>
-
                 <button @click="confirmPayment" class="btn btn-primary m-4">Xác nhận</button>
             </div>
         </div>
     </div>
 </template>
+
 
 <script>
 import OrderService from '@/services/order.service';
@@ -70,6 +69,7 @@ import CodedService from '@/services/coded.service';
 import CodeuseService from '@/services/codeuse.service';
 import CartService from '@/services/cart.service';
 import CommentService from '@/services/comment.service';
+import PriceService from '@/services/price.service';
 
 export default {
     props: {
@@ -115,6 +115,7 @@ export default {
                         }
                     }
                 }
+                await this.fetchPrice();
             } catch (error) {
                 console.error('Error fetching or creating order:', error);
             }
@@ -137,6 +138,20 @@ export default {
                 console.error('Error creating order:', error);
             }
         },
+        async fetchPrice() {
+            try {
+                const priceData = await PriceService.findByProductWithNoEndDate(this.cart.product._id);
+                if (priceData.length > 0) {
+                    this.cart.price = priceData[0].price;
+                    this.cart.discount = priceData[0].discount;
+                } else {
+                    this.cart.price = null;
+                    this.cart.discount = null;
+                }
+            } catch (error) {
+                console.error('Error fetching price:', error);
+            }
+        },
         productPicture(picture) {
             if (picture) {
                 return `data:image/jpeg;base64,${picture}`;
@@ -146,11 +161,11 @@ export default {
         formatCurrency(value) {
             return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
         },
-        calculateCost(cost, discount) {
+        calculateCost(price, discount) {
             if (discount) {
-                return (cost - (cost * discount / 100)).toFixed(2);
+                return (price - (price * discount / 100)).toFixed(2);
             }
-            return cost;
+            return price;
         },
         calculateTotal(sum, discountPercent) {
             return (sum * (1 - discountPercent / 100)).toFixed(2);
@@ -177,7 +192,6 @@ export default {
                 if (codeUsed) {
                     alert('Mã đã được sử dụng');
                 } else {
-
                     this.discountPercent = codeData[0].percent;
                 }
             } catch (error) {
@@ -193,8 +207,7 @@ export default {
             try {
                 let cost;
                 if (this.discountPercent) {
-                    cost = this.calculateTotal(this.cart.count *
-                        this.calculateCost(this.cart.product.cost, this.cart.product.discount), this.discountPercent);
+                    cost = this.calculateTotal(this.cart.count * this.calculateCost(this.cart.price, this.cart.discount), this.discountPercent);
                     const userId = LocalStorageHelper.getItem('id');
                     const codeData = await CodedService.findByCode(this.code);
                     const newCodeUse = {
@@ -204,7 +217,7 @@ export default {
                     };
                     await CodeuseService.create(newCodeUse);
                 } else {
-                    cost = this.cart.count * this.calculateCost(this.cart.product.cost, this.cart.product.discount);
+                    cost = this.cart.count * this.calculateCost(this.cart.price, this.cart.discount);
                 }
 
                 const orderDetail = {
@@ -269,6 +282,8 @@ export default {
     }
 };
 </script>
+
+
 <style scoped>
 .payment-body {
     padding: 20px;
