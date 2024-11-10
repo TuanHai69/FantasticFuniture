@@ -2,7 +2,8 @@
     <div class="container">
         <h1>Giỏ hàng</h1>
         <ul v-if="carts.length" class="list-unstyled">
-            <li v-for="cart in carts" :key="cart.id" class="cart-item row mb-3 p-3 rounded shadow-sm">
+            <li v-for="cart in carts" :key="cart.id" 
+                class="cart-item row mb-3 p-3 rounded shadow-sm">
                 <div class="col-12 col-md-3 mb-3 mb-md-0">
                     <img :src="productPicture(cart.product.picture)" alt="Product Image"
                         class="product-image img-fluid" />
@@ -36,7 +37,6 @@
     </div>
 </template>
 
-
 <script>
 import CartService from '@/services/cart.service';
 import ProductService from '@/services/product.service';
@@ -55,18 +55,20 @@ export default {
             try {
                 const carts = await CartService.findByUser(userId);
                 for (const cart of carts) {
-                    const product = await ProductService.get(cart.productid);
-                    const priceData = await PriceService.findByProductWithNoEndDate(cart.productid);
-                    if (priceData.length > 0) {
-                        cart.price = priceData[0].price;
-                        cart.discount = priceData[0].discount;
-                    } else {
-                        cart.price = null;
-                        cart.discount = null;
+                    if (cart.state !== 'done') {
+                        const product = await ProductService.get(cart.productid);
+                        const priceData = await PriceService.findByProductWithNoEndDate(cart.productid);
+                        if (priceData.length > 0) {
+                            cart.price = priceData[0].price;
+                            cart.discount = priceData[0].discount;
+                        } else {
+                            cart.price = null;
+                            cart.discount = null;
+                        }
+                        cart.product = product;
                     }
-                    cart.product = product;
                 }
-                this.carts = carts;
+                this.carts = carts.filter(cart => cart.state !== 'done');
             } catch (error) {
                 console.error('Error fetching cart or product data:', error);
             }
@@ -95,14 +97,10 @@ export default {
             const confirmed = confirm('Bạn có muốn xóa sản phẩm này khỏi giỏ hàng hay không?');
             if (confirmed) {
                 try {
-                    // Fetch the product details
                     const product = await ProductService.get(cart.productid);
-                    // Update the product count
                     product.count += cart.count;
                     await ProductService.update(cart.productid, { count: product.count });
-                    // Delete the cart item
                     await CartService.delete(cart._id);
-                    // Remove the cart item from the local list
                     this.carts = this.carts.filter(c => c._id !== cart._id);
                 } catch (error) {
                     console.error('Error deleting cart item:', error);
@@ -112,7 +110,6 @@ export default {
     },
 };
 </script>
-
 
 <style scoped>
 .cart-item {

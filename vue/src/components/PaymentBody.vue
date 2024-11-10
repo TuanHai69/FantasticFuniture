@@ -63,7 +63,6 @@
 
 <script>
 import OrderService from '@/services/order.service';
-import OrderDetailService from '@/services/orderdetail.service';
 import LocalStorageHelper from '@/services/local.service';
 import CodedService from '@/services/coded.service';
 import CodeuseService from '@/services/codeuse.service';
@@ -98,18 +97,18 @@ export default {
                 if (orders.length === 0) {
                     await this.createOrder(userId, storeId);
                     let orderss = await OrderService.findByUserIdAndStoreId(userId, storeId);
-                    const pendingOrder = orderss.find(order => order.state === 'Pending Confirmation');
+                    const pendingOrder = orderss.find(order => order.state === 'Chờ xác nhận');
                     if (pendingOrder) {
                         this.order = pendingOrder;
                     }
                 } else {
-                    const pendingOrder = orders.find(order => order.state === 'Pending Confirmation');
+                    const pendingOrder = orders.find(order => order.state === 'Chờ xác nhận');
                     if (pendingOrder) {
                         this.order = pendingOrder;
                     } else {
                         await this.createOrder(userId, storeId);
                         let orderss = await OrderService.findByUserIdAndStoreId(userId, storeId);
-                        const pendingOrder = orderss.find(order => order.state === 'Pending Confirmation');
+                        const pendingOrder = orderss.find(order => order.state === 'Chờ xác nhận');
                         if (pendingOrder) {
                             this.order = pendingOrder;
                         }
@@ -127,13 +126,13 @@ export default {
                 userid: userId,
                 storeid: storeId,
                 date: new Date().toISOString(),
-                state: 'Pending Confirmation',
+                state: 'Chờ xác nhận',
                 price: 0,
             };
             try {
                 await OrderService.create(newOrder);
                 const orders = await OrderService.findByUserIdAndStoreId(userId, storeId);
-                this.order = orders.find(order => order.state === 'Pending Confirmation');
+                this.order = orders.find(order => order.state === 'Chờ xác nhận');
             } catch (error) {
                 console.error('Error creating order:', error);
             }
@@ -206,6 +205,7 @@ export default {
             }
             try {
                 let cost;
+                let disc;
                 if (this.discountPercent) {
                     cost = this.calculateTotal(this.cart.count * this.calculateCost(this.cart.price, this.cart.discount), this.discountPercent);
                     const userId = LocalStorageHelper.getItem('id');
@@ -216,33 +216,42 @@ export default {
                         day: this.formatDate(new Date())
                     };
                     await CodeuseService.create(newCodeUse);
+
+                    if (this.cart.discount) {
+                        disc = (this.cart.discount + this.discountPercent) - (this.discountPercent * this.cart.discount) / 100;
+                    } else {
+                        disc = this.discountPercent;
+                    }
+
+
                 } else {
                     cost = this.cart.count * this.calculateCost(this.cart.price, this.cart.discount);
+                    disc = this.cart.discount ? this.cart.discount : 0;
                 }
 
-                const orderDetail = {
-                    orderid: this.order._id,
-                    name: this.cart.product.name,
-                    cost: cost,
+                const updatedCart = {
+                    userid: this.cart.userid,
+                    productid: this.cart.productid,
                     count: this.cart.count,
-                    picture: this.cart.product.picture,
-                    material: this.cart.product.material,
-                    size: this.cart.product.size,
-                    warranty: this.cart.product.warranty,
                     payment: this.paymentMethod,
+                    note: this.cart.note,
+                    discount: disc,
+                    phonenumber: this.phonenumber,
                     address: this.address,
-                    description: this.description,
-                    state: 'Chờ xác nhận'
+                    day: new Date().toISOString(),
+                    storeid: this.cart.storeid,
+                    orderid: this.order._id,
+                    state: "done"
                 };
-                await OrderDetailService.create(orderDetail);
+                await CartService.update(this.cart._id, updatedCart);
+
                 const updatedOrder = {
-                    state: 'Pending Confirmation',
+                    state: 'Chờ xác nhận',
                     date: this.formatDate(new Date()),
                     price: this.order.price + cost
                 };
 
                 await OrderService.update(this.order._id, updatedOrder);
-                await CartService.delete(this.cart._id);
                 alert('Đơn hàng đã được xác nhận');
 
                 const userId = LocalStorageHelper.getItem('id');

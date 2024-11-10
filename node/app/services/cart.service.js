@@ -10,10 +10,14 @@ class CartService {
             userid: payload.userid,
             productid: payload.productid,
             count: payload.count,
+            payment: payload.payment,
             note: payload.note,
             discount: payload.discount,
+            phonenumber: payload.phonenumber,
+            address: payload.address,
             day: payload.day,
             storeid: payload.storeid,
+            orderid: payload.orderid,
             state: payload.state,
         };
 
@@ -40,7 +44,8 @@ class CartService {
     async findByUserIdAndStoreId(userid, storeid) {
         const filter = {
             userid: userid,
-            storeid: storeid
+            storeid: storeid,
+            state: { $ne: 'done' } 
         };
     
         const documents = await this.Cart.find(filter);
