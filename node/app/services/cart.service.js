@@ -45,13 +45,13 @@ class CartService {
         const filter = {
             userid: userid,
             storeid: storeid,
-            state: { $ne: 'done' } 
+            state: { $ne: 'done' }
         };
-    
+
         const documents = await this.Cart.find(filter);
         return await documents.toArray();
     }
-    
+
     async findByProduct(keyword) {
         return await this.find({
             productid: { $regex: new RegExp(keyword), $options: "i" },
@@ -77,8 +77,13 @@ class CartService {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
     }
+    async findByOrderId(orderid) {
+        return await this.find({
+            orderid: { $regex: new RegExp(orderid), $options: "i" },
+        });
+    }
 
-    async update(id, payload){
+    async update(id, payload) {
         const filter = {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         };

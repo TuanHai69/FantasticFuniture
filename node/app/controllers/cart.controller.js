@@ -79,7 +79,16 @@ exports.findByUserIdAndStoreId = async (req, res, next) => {
     }
     return res.send(documents.length ? documents : []);
 };
-
+exports.findByOrderId = async (req, res, next) => {
+    let documents = [];
+    try {
+        const cartService = new CartService(MongoDB.client);
+        documents = await cartService.findByOrderId(req.params.orderid);
+    } catch (error) {
+        return next(new ApiError(500, `Error when fetching cart for order with id=${req.params.orderid}`));
+    }
+    return res.send(documents.length ? documents : []);
+};
 
 
 exports.update = async (req, res, next) => {

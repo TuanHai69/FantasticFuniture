@@ -21,4 +21,6 @@ router.route("/store/:id")
 router.route("/user/:userid/store/:storeid")
     .get(cart.findByUserIdAndStoreId)
 
+router.route("/order/:orderid")
+    .get(cart.findByOrderId);
 module.exports = router;

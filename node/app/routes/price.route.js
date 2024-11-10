@@ -15,7 +15,7 @@ router.route("/:id")
 router.route("/product/:productid/no-end-date")
     .get(price.findByProductWithNoEndDate);
 
-router.route("/product/:productid/date-range")
-    .get(price.findByProductWithinDateRange);
+router.route("/product/:productid")
+    .get(price.findByProduct);
 
 module.exports = router;

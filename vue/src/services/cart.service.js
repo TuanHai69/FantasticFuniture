@@ -36,6 +36,11 @@ class CartService {
     async findByUserIdAndStoreId(userid, storeid) {
         return (await this.api.get(`/user/${userid}/store/${storeid}`)).data;
     }
+
+    async findByOrderId(orderid) {
+        return (await this.api.get(`/order/${orderid}`)).data;
+    }
+
 }
 
 export default new CartService();

@@ -67,17 +67,16 @@ exports.findByProductWithNoEndDate = async (req, res, next) => {
     return res.send(documents);
 }
 
-exports.findByProductWithinDateRange = async (req, res, next) => {
+exports.findByProduct = async (req, res, next) => {
     let documents = [];
 
     try {
         const priceService = new PriceService(MongoDB.client);
-        const { productid, date } = req.query;
-        documents = await priceService.findByProductWithinDateRange(productid, date);
+        documents = await priceService.findByProduct(req.params.productid);
     } catch (error) {
         return next(
             new ApiError(
-                500, `Error when retrieving prices for product with id=${productid} within date range`
+                500, `Error when retrieving prices for product with id=${req.params.productid}`
             )
         );
     }

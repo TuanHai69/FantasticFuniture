@@ -48,14 +48,6 @@ class PriceService {
         });
     }
 
-    async findByProductWithinDateRange(productid, date) {
-        return await this.find({
-            productid: { $regex: new RegExp(productid), $options: "i" },
-            daystart: { $lte: date },
-            dayend: { $gte: date },
-        });
-    }
-
     async findById(id) {
         return await this.Price.findOne({
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,

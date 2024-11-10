@@ -38,14 +38,14 @@
                         <li v-for="detail in orderDetails[order._id]" :key="detail._id"
                             class="order-detail-item row mb-3 p-3 rounded shadow-sm">
                             <div class="col-12 col-md-2 mb-3 mb-md-0  d-flex justify-content-center">
-                                <img :src="productPicture(detail.picture)" alt="Product Image"
+                                <img :src="productPicture(detail.productPicture)" alt="Product Image"
                                     class="product-image img-fluid" />
                             </div>
                             <div class="col-12 col-md-3 mb-3 mb-md-0">
-                                <p><strong>Tên sản phẩm:</strong> {{ detail.name }}</p>
-                                <p><strong>Vặt liệu:</strong> {{ detail.material }}</p>
-                                <p><strong>Kích thước:</strong> {{ detail.size }}</p>
-                                <p><strong>Bảo hành:</strong> {{ detail.warranty }}</p>
+                                <p><strong>Tên sản phẩm:</strong> {{ detail.productName }}</p>
+                                <p><strong>Vặt liệu:</strong> {{ detail.productMaterial }}</p>
+                                <p><strong>Kích thước:</strong> {{ detail.productSize }}</p>
+                                <p><strong>Bảo hành:</strong> {{ detail.productWarranty }}</p>
 
                             </div>
                             <div class="col-12 col-md-4 mb-3 mb-md-0">
@@ -59,7 +59,7 @@
                             </div>
                             <div class="col-12 col-md-3 mb-3 mb-md-0">
                                 <p><strong>Số lượng:</strong> {{ detail.count }}</p>
-                                <p><strong>Tổng giá:</strong> {{ formatCurrency(detail.cost) }}</p>
+                                <p><strong>Tổng giá:</strong> {{ formatCurrency( ((detail.productPrice*detail.count) - (detail.productPrice*detail.count*detail.discount/100)) ) }}</p>
                                 <p class="description"><strong>Mô tả:</strong> {{ detail.description }}</p>
                             </div>
                         </li>
@@ -74,9 +74,11 @@
 import { reactive } from 'vue';
 import LocalStorageHelper from '@/services/local.service';
 import OrderService from '@/services/order.service';
-import OrderDetailService from '@/services/orderdetail.service';
 import StoreService from '@/services/store.service';
 import AccountsService from "@/services/accounts.service";
+import CartService from '@/services/cart.service';
+import ProductService from '@/services/product.service';
+import PriceService from '@/services/price.service';
 
 export default {
     props: {
@@ -134,7 +136,21 @@ export default {
         },
         async fetchOrderDetails(orderId) {
             try {
-                const details = await OrderDetailService.findByOrder(orderId);
+                const cartItems = await CartService.findByOrderId(orderId);
+                const details = await Promise.all(cartItems.map(async (cart) => {
+                    const product = await ProductService.get(cart.productid);
+                    const price = await PriceService.findByProduct(cart.productid);
+                    return {
+                        ...cart,
+                        productName: product.name,
+                        productMaterial: product.material,
+                        productSize: product.size,
+                        productWarranty: product.warranty,
+                        productPicture: product.picture,
+                        productPrice: price.length ? price[0].price : 'N/A',
+                    };
+
+                }));
                 this.orderDetails[orderId] = details;
             } catch (error) {
                 console.error('Error fetching order details:', error);
@@ -166,7 +182,7 @@ export default {
             try {
                 await OrderService.update(orderId, { state: newState });
                 alert(`Order state updated to ${newState}`);
-                await this.fetchOrders(); // Refresh orders to reflect the updated state
+                await this.fetchOrders();
             } catch (error) {
                 console.error('Error updating order state:', error);
                 alert('Có lỗi xảy ra khi cập nhật trạng thái đơn hàng.');
@@ -174,7 +190,7 @@ export default {
         },
         showConfirmButton(order) {
             const role = LocalStorageHelper.getItem('role');
-            return role === 'storeowner' && order.state === 'Pending Confirmation';
+            return role === 'storeowner' && order.state === 'Chờ xác nhận';
         },
         showDeliveryButton(order) {
             const role = LocalStorageHelper.getItem('role');
@@ -221,13 +237,11 @@ export default {
 
 .description {
     max-height: 80px;
-    /* Adjust this value as needed */
     overflow-y: auto;
 }
 
 .address {
     max-height: 80px;
-    /* Adjust this value as needed */
     overflow-y: auto;
 }
 </style>

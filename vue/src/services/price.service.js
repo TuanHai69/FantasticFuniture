@@ -33,9 +33,7 @@ class PriceService {
         return (await this.api.get(`/product/${productid}/no-end-date`)).data;
     }
 
-    async findByProductWithinDateRange(productid, date) {
-        return (await this.api.get(`/product/${productid}/date-range`, { params: { date } })).data;
-    }
+
 }
 
 export default new PriceService();
