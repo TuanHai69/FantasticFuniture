@@ -7,7 +7,7 @@
                         <p><strong>Mã đơn hàng: </strong> MD{{ order._id }}</p>
                         <p>
                             <strong>Tổng giá:</strong>
-                            {{ order.price ? formatCurrency(order.price) : 'Chưa thanh toán' }}
+                            {{ orderTotals[order._id] ? formatCurrency(orderTotals[order._id]) : 'Chưa thanh toán' }}
                         </p>
                         <p><strong>Ngày đặt hàng:</strong> {{ order.date }}</p>
 
@@ -59,8 +59,9 @@
                             </div>
                             <div class="col-12 col-md-3 mb-3 mb-md-0">
                                 <p><strong>Số lượng:</strong> {{ detail.count }}</p>
-                                <p><strong>Tổng giá:</strong> {{ formatCurrency( ((detail.productPrice*detail.count) - (detail.productPrice*detail.count*detail.discount/100)) ) }}</p>
-                                <p class="description"><strong>Mô tả:</strong> {{ detail.description }}</p>
+                                <p><strong>Tổng giá:</strong> {{ formatCurrency(((detail.productPrice * detail.count) -
+                                    (detail.productPrice * detail.count * (detail.discount / 100)))) }}</p>
+                                <p class="description"><strong>Mô tả:</strong> {{ detail.note }}</p>
                             </div>
                         </li>
                     </ul>
@@ -93,11 +94,13 @@ export default {
             orderDetails: reactive({}),
             stores: reactive({}),
             expandedOrderId: null,
+            orderTotals: reactive({}),
         };
     },
     async created() {
         await this.fetchOrders();
         await this.checkrole();
+
     },
     methods: {
         async checkrole() {
@@ -118,6 +121,7 @@ export default {
                     }
                 }
                 await this.fetchStores();
+                await this.calculateAllOrderTotals();
             } catch (error) {
                 console.error('Error fetching orders:', error);
             }
@@ -139,7 +143,16 @@ export default {
                 const cartItems = await CartService.findByOrderId(orderId);
                 const details = await Promise.all(cartItems.map(async (cart) => {
                     const product = await ProductService.get(cart.productid);
-                    const price = await PriceService.findByProduct(cart.productid);
+                    const prices = await PriceService.findByProduct(cart.productid);
+
+                    const applicablePrice = prices.find(price => {
+                        const daystart = new Date(price.daystart);
+                        const dayend = price.dayend ? new Date(price.dayend) : null;
+                        const cartDay = new Date(cart.day);
+
+                        return cartDay >= daystart && (!dayend || cartDay <= dayend);
+                    });
+
                     return {
                         ...cart,
                         productName: product.name,
@@ -147,14 +160,29 @@ export default {
                         productSize: product.size,
                         productWarranty: product.warranty,
                         productPicture: product.picture,
-                        productPrice: price.length ? price[0].price : 'N/A',
+                        productPrice: applicablePrice ? applicablePrice.price : 'N/A',
                     };
-
                 }));
                 this.orderDetails[orderId] = details;
+                this.orderTotals[orderId] = this.calculateOrderTotal(orderId);
+
             } catch (error) {
                 console.error('Error fetching order details:', error);
             }
+        },
+        async calculateAllOrderTotals() {
+            for (const order of this.orders) {
+                await this.fetchOrderDetails(order._id);
+            }
+        },
+
+        calculateOrderTotal(orderId) {
+            const details = this.orderDetails[orderId] || [];
+            
+            return details.reduce((total, detail) => {
+                const productTotal = (detail.productPrice * detail.count) - (detail.productPrice * detail.count * (detail.discount / 100));
+                return total + productTotal;
+            }, 0);
         },
         toggleOrderDetails(orderId) {
             if (this.expandedOrderId === orderId) {

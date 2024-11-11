@@ -234,7 +234,7 @@ export default {
                     productid: this.cart.productid,
                     count: this.cart.count,
                     payment: this.paymentMethod,
-                    note: this.cart.note,
+                    note: this.description,
                     discount: disc,
                     phonenumber: this.phonenumber,
                     address: this.address,
