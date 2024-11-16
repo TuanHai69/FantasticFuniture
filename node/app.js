@@ -6,7 +6,7 @@ const ApiError = require("./app/api-error");
 const app = express();
 
 app.use(cors());
-app.use(express.json({ limit: '10mb'}));
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true })); // Tăng giới hạn kích thước payload cho URL-encoded
 
 
@@ -94,6 +94,12 @@ const priceRouter = require("./app/routes/price.route");
 
 // Use the Price router
 app.use("/api/price", priceRouter);
+
+// Import VNPay router
+const vnpayRouter = require("./app/routes/vnpay.route");
+
+// Use VNPay router
+app.use("/api/vnpay", vnpayRouter);
 
 // handle 404 response
 app.use((req, res, next) => {

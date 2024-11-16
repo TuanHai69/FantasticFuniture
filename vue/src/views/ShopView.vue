@@ -8,6 +8,7 @@
                         <h2>Danh sách cửa hàng</h2>
                     </div>
                     <ShopCard />
+                    <Vnpayment />
                 </div>
             </div>
         </div>
@@ -17,10 +18,13 @@
 <script>
 import AppHeader from "@/components/AppHeader.vue";
 import ShopCard from "@/components/ShopCard.vue";
+import Vnpayment from "@/components/Vnpayment.vue";
+
 export default {
     components: {
         AppHeader,
         ShopCard,
+        Vnpayment,
     },
 };
 </script>
