@@ -9,7 +9,7 @@ class VNPayService {
     createSignature(params) {
         const sortedParams = Object.keys(params).sort().map(key => `${key}=${params[key]}`).join('&');
         return crypto.createHmac('sha512', this.secretKey).update(sortedParams).digest('hex');
-    }    
+    }
 
     formatDate(date) {
         const yyyy = date.getFullYear().toString();
@@ -21,7 +21,7 @@ class VNPayService {
         return `${yyyy}${MM}${dd}${HH}${mm}${ss}`;
     }
 
-    createPaymentRequest(amount, orderInfo, returnUrl) {
+    createPaymentRequest(amount, orderInfo, returnUrl, ipAddr, bankCode, orderType, locale = 'vn') {
         const params = {
             vnp_Version: '2.1.0',
             vnp_Command: 'pay',
@@ -30,12 +30,16 @@ class VNPayService {
             vnp_CurrCode: 'VND',
             vnp_TxnRef: Date.now().toString(),
             vnp_OrderInfo: orderInfo,
-            vnp_OrderType: 'other',
-            vnp_Locale: 'vn',
+            vnp_OrderType: orderType,
+            vnp_Locale: locale,
             vnp_ReturnUrl: returnUrl,
-            vnp_IpAddr: '127.0.0.1',
+            vnp_IpAddr: ipAddr,
             vnp_CreateDate: this.formatDate(new Date())
         };
+
+        if (bankCode) {
+            params.vnp_BankCode = bankCode;
+        }
 
         params.vnp_SecureHash = this.createSignature(params);
 
