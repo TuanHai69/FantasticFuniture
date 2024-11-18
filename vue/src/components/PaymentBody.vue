@@ -69,6 +69,7 @@ import CodeuseService from '@/services/codeuse.service';
 import CartService from '@/services/cart.service';
 import CommentService from '@/services/comment.service';
 import PriceService from '@/services/price.service';
+import zaloService from '@/services/zalo.service';
 
 export default {
     props: {
@@ -222,41 +223,124 @@ export default {
                     } else {
                         disc = this.discountPercent;
                     }
-
-
                 } else {
                     cost = this.cart.count * this.calculateCost(this.cart.price, this.cart.discount);
                     disc = this.cart.discount ? this.cart.discount : 0;
                 }
 
-                const updatedCart = {
-                    userid: this.cart.userid,
-                    productid: this.cart.productid,
-                    count: this.cart.count,
-                    payment: this.paymentMethod,
-                    note: this.description,
-                    discount: disc,
-                    phonenumber: this.phonenumber,
-                    address: this.address,
-                    day: new Date().toISOString(),
-                    storeid: this.cart.storeid,
-                    orderid: this.order._id,
-                    state: "done"
+                if (this.paymentMethod === "Chuyển khoảng") {
+                    const updatedCart = {
+                        _id: this.cart._id,
+                        userid: this.cart.userid,
+                        productid: this.cart.productid,
+                        count: this.cart.count,
+                        payment: this.paymentMethod,
+                        note: this.description,
+                        discount: disc,
+                        phonenumber: this.phonenumber,
+                        address: this.address,
+                        day: new Date().toISOString(),
+                        storeid: this.cart.storeid,
+                        orderid: this.order._id,
+                        state: "done"
+                    };
+                    const updatedOrder = {
+                        _id: this.order._id,
+                        state: 'Chờ xác nhận',
+                        date: this.formatDate(new Date()),
+                        price: this.order.price + cost
+                    }; const userId = LocalStorageHelper.getItem('id');
+                    const userComments = await CommentService.findByUser(userId);
+                    let newComment;
+                    if (userComments.length === 0) {
+                        newComment = {
+                            userid: userId,
+                            productid: this.cart.product._id,
+                            rate: "",
+                            comment: "",
+                            state: ""
+                        };
+                    } else {
+                        const hasCommented = userComments.some(comment => comment.productid === this.cart.product._id);
+                        if (!hasCommented) {
+                            newComment = {
+                                userid: userId,
+                                productid: this.cart.product._id,
+                                rate: "",
+                                comment: "",
+                                state: ""
+                            };
+                        }
+                    } const zaloPayData = {
+                        amount: cost,
+                        description: this.cart.product.name
+                    };
+                    const paymentData = {
+                        zaloPayData,
+                        updatedCart,
+                        updatedOrder,
+                        newComment
+                    };
+                    const response = await zaloService.createOrder(paymentData);
+                    // Handle the response from ZaloPay
+                    if (response.return_code === 1) {  // Check if the payment was successful
+                        // Redirect user to ZaloPay payment page
+                        window.location.href = response.order_url;
+                        return; // Stop further processing and await callback confirmation
+                    } else {
+                        alert('Có lỗi xảy ra khi xử lý thanh toán qua ZaloPay.');
+                        return; // Stop further processing if payment failed
+                    }
+                }
+
+                // Continue with order update if not using ZaloPay
+                await this.updateOrderAndCart(cost, disc);
+                alert ('Thanh toán thành công');
+                this.$emit('checkout-complete');
+            } catch (error) {
+                console.error('Error confirming payment:', error);
+                alert('Có lỗi xảy ra khi xác nhận đơn hàng');
+            }
+        },
+        async updateOrderAndCart(cost, disc) {
+            const updatedCart = {
+                userid: this.cart.userid,
+                productid: this.cart.productid,
+                count: this.cart.count,
+                payment: this.paymentMethod,
+                note: this.description,
+                discount: disc,
+                phonenumber: this.phonenumber,
+                address: this.address,
+                day: new Date().toISOString(),
+                storeid: this.cart.storeid,
+                orderid: this.order._id,
+                state: "done"
+            };
+            await CartService.update(this.cart._id, updatedCart);
+
+            const updatedOrder = {
+                state: 'Chờ xác nhận',
+                date: this.formatDate(new Date()),
+                price: this.order.price + cost
+            };
+
+            await OrderService.update(this.order._id, updatedOrder);
+
+            const userId = LocalStorageHelper.getItem('id');
+            const userComments = await CommentService.findByUser(userId);
+            if (userComments.length === 0) {
+                const newComment = {
+                    userid: userId,
+                    productid: this.cart.product._id,
+                    rate: "",
+                    comment: "",
+                    state: ""
                 };
-                await CartService.update(this.cart._id, updatedCart);
-
-                const updatedOrder = {
-                    state: 'Chờ xác nhận',
-                    date: this.formatDate(new Date()),
-                    price: this.order.price + cost
-                };
-
-                await OrderService.update(this.order._id, updatedOrder);
-                alert('Đơn hàng đã được xác nhận');
-
-                const userId = LocalStorageHelper.getItem('id');
-                const userComments = await CommentService.findByUser(userId);
-                if (userComments.length === 0) {
+                await CommentService.create(newComment);
+            } else {
+                const hasCommented = userComments.some(comment => comment.productid === this.cart.product._id);
+                if (!hasCommented) {
                     const newComment = {
                         userid: userId,
                         productid: this.cart.product._id,
@@ -265,24 +349,7 @@ export default {
                         state: ""
                     };
                     await CommentService.create(newComment);
-                } else {
-                    const hasCommented = userComments.some(comment => comment.productid === this.cart.product._id);
-                    if (!hasCommented) {
-                        const newComment = {
-                            userid: userId,
-                            productid: this.cart.product._id,
-                            rate: "",
-                            comment: "",
-                            state: ""
-                        };
-                        await CommentService.create(newComment);
-                    }
                 }
-                this.$emit('checkout-complete');
-
-            } catch (error) {
-                console.error('Error confirming payment:', error);
-                alert('Có lỗi xảy ra khi xác nhận đơn hàng');
             }
         },
         goBack() {
