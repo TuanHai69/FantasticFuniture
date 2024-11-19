@@ -113,3 +113,14 @@ exports.delete = async (req, res, next) => {
         )
     }
 }
+
+exports.isLiked = async (req, res, next) => {
+    try {
+        const { userid, storeid } = req.params;
+        const commentstoreService = new CommentstoreService(MongoDB.client);
+        const document = await commentstoreService.isLiked(userid, storeid);
+        return res.send(document.length ? document : []);
+    } catch (error) {
+        return next(new ApiError(500, `Error when checking if commentstore is liked by user with id=${req.params.userid} for store with id=${req.params.storeid}`));
+    }
+}

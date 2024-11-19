@@ -18,5 +18,7 @@ router.route("/user/:id")
 router.route("/product/:id")
     .get(comment.findByProduct)
 
+router.route("/liked/:userid/:productid")
+    .get(comment.isLiked)
 
 module.exports = router;

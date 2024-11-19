@@ -32,6 +32,10 @@ class CommentService {
     async findByProduct(id) {
         return (await this.api.get(`/product/${id}`)).data;
     }
+
+    async isLiked(userid, productid) {
+        return (await this.api.get(`/liked/${userid}/${productid}`)).data;
+    }
 }
 
 export default new CommentService();

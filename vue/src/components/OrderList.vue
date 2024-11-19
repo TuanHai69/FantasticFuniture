@@ -6,11 +6,26 @@
                     <div class="col-md-5">
                         <p><strong>Mã đơn hàng: </strong> MD{{ order._id }}</p>
                         <p>
-                            <strong>Tổng giá:</strong>
+                            <strong>Tổng giá: </strong>
                             {{ orderTotals[order._id] ? formatCurrency(orderTotals[order._id]) : 'Chưa thanh toán' }}
                         </p>
+                        <p>
+                            <strong>Đã thanh toán: </strong>
+                            {{ orderPaymentTotals[order._id] ? formatCurrency(orderPaymentTotals[order._id].transfer) :
+                                '0' }}
+                        </p>
+                        <p>
+                            <strong>Chưa thanh toán:</strong>
+                            {{ orderPaymentTotals[order._id] ? formatCurrency(orderPaymentTotals[order._id].nonTransfer)
+                                : '0' }}
+                        </p>
                         <p><strong>Ngày đặt hàng:</strong> {{ order.date }}</p>
-
+                    </div>
+                    <div class="col-md-5" v-if="stores[order.storeid]">
+                        <p><strong>Tên cửa hàng:</strong> {{ stores[order.storeid].name }}</p>
+                        <p><strong>Địa chỉ cửa hàng:</strong> {{ stores[order.storeid].address }}</p>
+                        <p><strong>Điện thoại cửa hàng:</strong> {{ stores[order.storeid].phonenumber }}</p>
+                        <p><strong>Email cửa hàng:</strong> {{ stores[order.storeid].email }}</p>
                         <p><strong>Trạng thái:</strong> {{ order.state }} ||
                             <button v-if="showConfirmButton(order)" class="btn btn-success ml-2"
                                 @click="updateOrderState(order._id, 'prepare for delivery')">Xác nhận</button>
@@ -19,13 +34,6 @@
                             <button v-if="showReceivedButton(order)" class="btn btn-info ml-2"
                                 @click="updateOrderState(order._id, 'Received')">Đã nhận hàng</button>
                         </p>
-
-                    </div>
-                    <div class="col-md-5" v-if="stores[order.storeid]">
-                        <p><strong>Tên cửa hàng:</strong> {{ stores[order.storeid].name }}</p>
-                        <p><strong>Địa chỉ cửa hàng:</strong> {{ stores[order.storeid].address }}</p>
-                        <p><strong>Điện thoại cửa hàng:</strong> {{ stores[order.storeid].phonenumber }}</p>
-                        <p><strong>Email cửa hàng:</strong> {{ stores[order.storeid].email }}</p>
                     </div>
                     <div class="col-md-2 d-flex align-items-center justify-content-center">
                         <button class="btn btn-primary" @click="toggleOrderDetails(order._id)">
@@ -51,7 +59,7 @@
                             <div class="col-12 col-md-4 mb-3 mb-md-0">
                                 <p><strong>Số điện thoại:</strong> {{ detail.phonenumber }}</p>
                                 <p><strong>Phương thức trả:</strong>
-                                    <span v-if="detail.payment === 'Chuyển khoảng'">STK</span>
+                                    <span v-if="detail.payment === 'Chuyển khoảng'"> Đã trả bằng zalopay</span>
                                     <span v-else>{{ detail.payment }}</span>
                                 </p>
                                 <p class="address"><strong>Địa chỉ giao hàng:</strong> {{ detail.address }}</p>
@@ -95,6 +103,7 @@ export default {
             stores: reactive({}),
             expandedOrderId: null,
             orderTotals: reactive({}),
+            orderPaymentTotals: reactive({}),
         };
     },
     async created() {
@@ -165,7 +174,7 @@ export default {
                 }));
                 this.orderDetails[orderId] = details;
                 this.orderTotals[orderId] = this.calculateOrderTotal(orderId);
-
+                this.orderPaymentTotals[orderId] = this.calculateOrderPaymentTotals(orderId);
             } catch (error) {
                 console.error('Error fetching order details:', error);
             }
@@ -175,14 +184,25 @@ export default {
                 await this.fetchOrderDetails(order._id);
             }
         },
-
         calculateOrderTotal(orderId) {
             const details = this.orderDetails[orderId] || [];
-            
+
             return details.reduce((total, detail) => {
                 const productTotal = (detail.productPrice * detail.count) - (detail.productPrice * detail.count * (detail.discount / 100));
                 return total + productTotal;
             }, 0);
+        },
+        calculateOrderPaymentTotals(orderId) {
+            const details = this.orderDetails[orderId] || [];
+            const paymentTotals = { transfer: 0, nonTransfer: 0 };
+            details.forEach(detail => {
+                const productTotal = (detail.productPrice * detail.count) - (detail.productPrice * detail.count * (detail.discount / 100));
+                if (detail.payment === 'Chuyển khoảng') {
+                    paymentTotals.transfer += productTotal;
+                } else {
+                    paymentTotals.nonTransfer += productTotal;
+                }
+            }); return paymentTotals;
         },
         toggleOrderDetails(orderId) {
             if (this.expandedOrderId === orderId) {

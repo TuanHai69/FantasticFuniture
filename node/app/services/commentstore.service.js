@@ -12,6 +12,7 @@ class CommentstoreService {
             rate: payload.rate,
             commentstore: payload.commentstore,
             state: payload.state,
+            like: payload.like,
         };
 
         Object.keys(commentstore).forEach(
@@ -34,7 +35,7 @@ class CommentstoreService {
         const cursor = await this.Commentstore.find(filter);
         return await cursor.toArray();
     }
-    
+
     async findByStore(keyword) {
         return await this.find({
             storeid: { $regex: new RegExp(keyword), $options: "i" },
@@ -56,7 +57,7 @@ class CommentstoreService {
         });
     }
 
-    async update(id, payload){
+    async update(id, payload) {
         const filter = {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         };
@@ -73,6 +74,14 @@ class CommentstoreService {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
         return result;
+    }
+    async isLiked(userid, storeid) {
+        const commentstore = await this.Commentstore.findOne({
+            userid: userid,
+            storeid: storeid,
+            like: true,
+        });
+        return commentstore ? [commentstore] : [];
     }
 }
 

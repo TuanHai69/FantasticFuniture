@@ -105,3 +105,13 @@ exports.delete = async (req, res, next) => {
         )
     }
 }
+exports.isLiked = async (req, res, next) => {
+    try {
+        const { userid, productid } = req.params;
+        const commentService = new CommentService(MongoDB.client);
+        const document = await commentService.isLiked(userid, productid);
+        return res.send(document.length ? document : []);
+    } catch (error) {
+        return next(new ApiError(500, `Error when checking if comment is liked by user with id=${req.params.userid} for product with id=${req.params.productid}`));
+    }
+}

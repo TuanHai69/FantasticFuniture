@@ -12,6 +12,7 @@ class CommentService {
             rate: payload.rate,
             comment: payload.comment,
             state: payload.state,
+            like: payload.like,
         };
 
         Object.keys(comment).forEach(
@@ -34,7 +35,7 @@ class CommentService {
         const cursor = await this.Comment.find(filter);
         return await cursor.toArray();
     }
-    
+
     async findByProduct(keyword) {
         return await this.find({
             productid: { $regex: new RegExp(keyword), $options: "i" },
@@ -56,7 +57,7 @@ class CommentService {
         });
     }
 
-    async update(id, payload){
+    async update(id, payload) {
         const filter = {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         };
@@ -73,6 +74,14 @@ class CommentService {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
         return result;
+    }
+    async isLiked(userid, productid) {
+        const comment = await this.Comment.findOne({
+            userid: userid,
+            productid: productid,
+            like: true,
+        });
+        return comment ? [comment] : [];
     }
 }
 
