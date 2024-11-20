@@ -29,10 +29,12 @@
                         <p><strong>Tổng đơn hàng:</strong> {{ totalOrders }}</p>
                         <p><strong>Tổng số sản phẩm:</strong> {{ totalOrderDetails }}</p>
                         <p><strong>Tổng giá trị:</strong> {{ formatCurrency(totalPrice) }}</p>
-                        <p><strong>Giá đơn hàng lớn nhất:</strong> {{ highestCostDetail.name }} : {{
-                            formatCurrency(highestCostDetail.cost) }}</p>
-                        <p><strong>Số lượng sản phẩm nhiều nhất:</strong> {{ mostCountDetail.name }} : {{
-                            mostCountDetail.count }}</p>
+                        <p><strong>Giá sản phẩm lớn nhất trên 1 đơn hàng:</strong> {{ highestCostDetail.productName }} :
+                            {{
+                                formatCurrency(highestCostDetail.productPrice) }}</p>
+                        <p><strong>Số lượng bán nhiều nhất trên 1 đơn hàng:</strong> {{ mostCountDetail.productName }} :
+                            {{
+                                mostCountDetail.count }} sản phẩm</p>
                     </div>
                 </div>
             </div>
@@ -43,7 +45,8 @@
                             <p><strong>Mã đơn hàng:</strong> {{ order._id }}</p>
                             <p>
                                 <strong>Tổng giá đơn hàng:</strong>
-                                {{ order.price ? formatCurrency(order.price) : 'Chưa thanh toán' }}
+                                {{ calculateOrderTotal(order._id) ? formatCurrency(calculateOrderTotal(order._id)) :
+                                'Chưa thanh toán' }}
                             </p>
                             <p><strong>Ngày thành lập:</strong> {{ order.date }}</p>
                             <p><strong>Trạng thái:</strong> {{ order.state }}</p>
@@ -65,27 +68,28 @@
                             <li v-for="detail in orderDetails[order._id]" :key="detail._id"
                                 class="order-detail-item row mb-3 p-3 rounded shadow-sm">
                                 <div class="col-12 col-md-2 mb-3 mb-md-0 d-flex justify-content-center">
-                                    <img :src="productPicture(detail.picture)" alt="Product Image"
+                                    <img :src="productPicture(detail.productPicture)" alt="Product Image"
                                         class="product-image img-fluid" />
                                 </div>
                                 <div class="col-12 col-md-3 mb-3 mb-md-0">
-                                    <p><strong>Tên sản phẩm:</strong> {{ detail.name }}</p>
-                                    <p><strong>Chất liệu:</strong> {{ detail.material }}</p>
-                                    <p><strong>Kích thước:</strong> {{ detail.size }}</p>
-                                    <p><strong>Bảo hành:</strong> {{ detail.warranty }}</p>
+                                    <p><strong>Tên sản phẩm:</strong> {{ detail.productName }}</p>
+                                    <p><strong>Chất liệu:</strong> {{ detail.productMaterial }}</p>
+                                    <p><strong>Kích thước:</strong> {{ detail.productSize }}</p>
+                                    <p><strong>Bảo hành:</strong> {{ detail.productWarranty }}</p>
                                 </div>
                                 <div class="col-12 col-md-4 mb-3 mb-md-0">
                                     <p><strong>Số điện thoại người nhận:</strong> {{ detail.phonenumber }}</p>
                                     <p><strong>Phương thức trả:</strong>
-                                        <span v-if="detail.payment === 'Chuyển khoảng'">STK</span>
+                                        <span v-if="detail.payment === 'Chuyển khoảng'"> Đã trả bằng zalopay</span>
                                         <span v-else>{{ detail.payment }}</span>
                                     </p>
                                     <p class="address"><strong>Địa chỉ giao hàng:</strong> {{ detail.address }}</p>
                                 </div>
                                 <div class="col-12 col-md-3 mb-3 mb-md-0">
                                     <p><strong>Số lượng:</strong> {{ detail.count }}</p>
-                                    <p><strong>Tổng cộng:</strong> {{ formatCurrency(detail.cost) }}</p>
-                                    <p class="description"><strong>Mô tả:</strong> {{ detail.description }}</p>
+                                    <p><strong>Tổng cộng:</strong> {{ formatCurrency((detail.productPrice * detail.count
+                                        - detail.productPrice * detail.count * (detail.discount / 100))) }}</p>
+                                    <p class="description"><strong>Mô tả:</strong> {{ detail.note }}</p>
                                 </div>
                             </li>
                         </ul>
@@ -97,13 +101,14 @@
             <div class="card mb-3">
                 <div class="card-body">
                     <div class="statistics">
-                        <p><strong>Total Orders:</strong> {{ totalOrders }}</p>
-                        <p><strong>Total Order Details:</strong> {{ totalOrderDetails }}</p>
-                        <p><strong>Total Price:</strong> {{ formatCurrency(totalPrice) }}</p>
-                        <p><strong>Highest Cost Order Detail:</strong> {{ highestCostDetail.name }} : {{
-                            formatCurrency(highestCostDetail.cost) }}</p>
-                        <p><strong>Most Count Order Detail:</strong> {{ mostCountDetail.name }} : {{
-                            mostCountDetail.count }}</p>
+                        <p><strong>Tống số đơn hàng:</strong> {{ totalOrders }}</p>
+                        <p><strong>Tổng số sản phẩm:</strong> {{ totalOrderDetails }}</p>
+                        <p><strong>Tổng giá trị:</strong> {{ formatCurrency(totalPrice) }}</p>
+                        <p><strong>Giá sản phẩm lớn nhất trên 1 đơn hàng:</strong> {{ highestCostDetail.productName }} :
+                            {{
+                                formatCurrency(highestCostDetail.productPrice) }}</p>
+                        <p><strong>Số lượng bán nhiều nhất trên 1 đơn hàng:</strong> {{ mostCountDetail.name }} : {{
+                            mostCountDetail.count }} sản phẩm</p>
                     </div>
                 </div>
             </div>
@@ -111,21 +116,22 @@
                 <div class="card-body">
                     <div class="order-summary row">
                         <div class="col-md-5">
-                            <p><strong>Order ID:</strong> {{ order._id }}</p>
-                            <p><strong>Total Price:</strong>
-                                {{ order.price ? formatCurrency(order.price) : 'Chưa thanh toán' }}</p>
-                            <p><strong>Date:</strong> {{ order.date }}</p>
-                            <p><strong>State:</strong> {{ order.state }}</p>
+                            <p><strong>Mã đơn hàng:</strong> {{ order._id }}</p>
+                            <p><strong>Tổng đơn hàng:</strong>
+                                {{ calculateOrderTotal(order._id) ? formatCurrency(calculateOrderTotal(order._id)) :
+                                'Chưa thanh toán' }}</p>
+                            <p><strong>Ngày thành lập:</strong> {{ order.date }}</p>
+                            <p><strong>Trạng thái:</strong> {{ order.state }}</p>
                         </div>
                         <div class="col-md-5" v-if="stores[order.storeid]">
-                            <p><strong>Store name:</strong> {{ stores[order.storeid].name }}</p>
-                            <p><strong>Store address:</strong> {{ stores[order.storeid].address }}</p>
-                            <p><strong>Store Phonenumber:</strong> {{ stores[order.storeid].phonenumber }}</p>
-                            <p><strong>Store Email:</strong> {{ stores[order.storeid].email }}</p>
+                            <p><strong>Tên cửa hàng:</strong> {{ stores[order.storeid].name }}</p>
+                            <p><strong>Địa chỉ cửa hàng:</strong> {{ stores[order.storeid].address }}</p>
+                            <p><strong>Số điện thoại cửa hàng:</strong> {{ stores[order.storeid].phonenumber }}</p>
+                            <p><strong>Email cửa hàng:</strong> {{ stores[order.storeid].email }}</p>
                         </div>
                         <div class="col-md-2 d-flex align-items-center justify-content-center">
                             <button class="btn btn-primary" @click="toggleOrderDetails(order._id)">
-                                {{ expandedOrderId === order._id ? 'Hide Details' : 'Show Details' }}
+                                {{ expandedOrderId === order._id ? 'Ẩn chi tiết' : 'Hiện chi tiết' }}
                             </button>
                         </div>
                     </div>
@@ -134,14 +140,14 @@
                             <li v-for="detail in orderDetails[order._id]" :key="detail._id"
                                 class="order-detail-item row mb-3 p-3 rounded shadow-sm">
                                 <div class="col-12 col-md-2 mb-3 mb-md-0 d-flex justify-content-center">
-                                    <img :src="productPicture(detail.picture)" alt="Product Image"
+                                    <img :src="productPicture(detail.productPicture)" alt="Product Image"
                                         class="product-image img-fluid" />
                                 </div>
                                 <div class="col-12 col-md-3 mb-3 mb-md-0">
-                                    <p><strong>Name:</strong> {{ detail.name }}</p>
-                                    <p><strong>Material:</strong> {{ detail.material }}</p>
-                                    <p><strong>Size:</strong> {{ detail.size }}</p>
-                                    <p><strong>Warranty:</strong> {{ detail.warranty }}</p>
+                                    <p><strong>Name:</strong> {{ detail.productName }}</p>
+                                    <p><strong>Material:</strong> {{ detail.productMaterial }}</p>
+                                    <p><strong>Size:</strong> {{ detail.productSize }}</p>
+                                    <p><strong>Warranty:</strong> {{ detail.productWarranty }}</p>
                                 </div>
                                 <div class="col-12 col-md-4 mb-3 mb-md-0">
                                     <p><strong>Phonenumber:</strong> {{ detail.phonenumber }}</p>
@@ -152,8 +158,9 @@
                                 </div>
                                 <div class="col-12 col-md-3 mb-3 mb-md-0">
                                     <p><strong>Count:</strong> {{ detail.count }}</p>
-                                    <p><strong>Sum:</strong> {{ formatCurrency(detail.cost) }}</p>
-                                    <p class="description"><strong>Description:</strong> {{ detail.description }}</p>
+                                    <p><strong>Sum:</strong> {{ formatCurrency((detail.productPrice * detail.count
+                                        - detail.productPrice * detail.count * (detail.discount / 100))) }}</p>
+                                    <p class="description"><strong>Description:</strong> {{ detail.note }}</p>
                                 </div>
                             </li>
                         </ul>
@@ -162,18 +169,20 @@
             </div>
         </div>
         <div v-else-if="dateRangeConfirmed && !filteredByDateOrders.length">
-            <p>No orders found between {{ startDate }} and {{ endDate }}.</p>
+            <p>Không có đơn hàng trong khoản {{ startDate }} đến {{ endDate }}.</p>
         </div>
         <div v-else>
-            <p>No orders found for this store. </p>
+            <p>Không có đơn hàng nào. </p>
         </div>
     </div>
 </template>
 
 <script>
 import OrderService from '@/services/order.service';
-import OrderDetailService from '@/services/orderdetail.service';
 import StoreService from '@/services/store.service';
+import CartService from '@/services/cart.service';
+import ProductService from '@/services/product.service';
+import PriceService from '@/services/price.service';
 
 export default {
     name: 'RevenueCard',
@@ -188,12 +197,12 @@ export default {
             orders: [],
             orderDetails: {},
             expandedOrderId: null,
-            stores: {}, // Assuming you have a way to fetch store details
+            stores: {},
             totalOrders: 0,
             totalOrderDetails: 0,
             totalPrice: 0,
-            highestCostDetail: { name: '', cost: 0 },
-            mostCountDetail: { name: '', count: 0 },
+            highestCostDetail: { productName: '', productPrice: 0 },
+            mostCountDetail: { productName: '', count: 0 },
             startDate: '',
             endDate: '',
             dateRangeConfirmed: false,
@@ -234,7 +243,33 @@ export default {
         },
         async fetchOrderDetails(orderId) {
             try {
-                const details = await OrderDetailService.findByOrder(orderId);
+                const cartItems = await CartService.findByOrderId(orderId);
+                if (!cartItems || cartItems.length === 0) {
+                    console.warn(`No cart items found for order ID: ${orderId}`);
+                    return [];
+                }
+                const details = await Promise.all(cartItems.map(async (cart) => {
+                    const product = await ProductService.get(cart.productid);
+                    const prices = await PriceService.findByProduct(cart.productid);
+
+                    const applicablePrice = prices.find(price => {
+                        const daystart = new Date(price.daystart);
+                        const dayend = price.dayend ? new Date(price.dayend) : null;
+                        const cartDay = new Date(cart.day);
+
+                        return cartDay >= daystart && (!dayend || cartDay <= dayend);
+                    });
+
+                    return {
+                        ...cart,
+                        productName: product.name,
+                        productMaterial: product.material,
+                        productSize: product.size,
+                        productWarranty: product.warranty,
+                        productPicture: product.picture,
+                        productPrice: applicablePrice ? applicablePrice.price : 'N/A',
+                    };
+                }));
                 return details;
             } catch (error) {
                 console.error('Error fetching order details:', error);
@@ -251,8 +286,8 @@ export default {
         },
         calculateStatistics(orders) {
             let totalOrderDetails = 0;
-            let highestCostDetail = { name: '', cost: 0 };
-            let mostCountDetail = { name: '', count: 0 };
+            let highestCostDetail = { productName: '', productPrice: 0 };
+            let mostCountDetail = { productName: '', count: 0 };
             this.totalPrice = 0;
             for (const order of orders) {
                 this.totalPrice += order.price || 0;
@@ -260,7 +295,7 @@ export default {
                 totalOrderDetails += details.length;
 
                 for (const detail of details) {
-                    if (detail.cost > highestCostDetail.cost) {
+                    if (detail.productPrice > highestCostDetail.productPrice) {
                         highestCostDetail = detail;
                     }
                     if (detail.count > mostCountDetail.count) {
@@ -273,6 +308,14 @@ export default {
             this.totalOrderDetails = totalOrderDetails;
             this.highestCostDetail = highestCostDetail;
             this.mostCountDetail = mostCountDetail;
+        },
+        calculateOrderTotal(orderId) {
+            const details = this.orderDetails[orderId] || [];
+
+            return details.reduce((total, detail) => {
+                const productTotal = (detail.productPrice * detail.count) - (detail.productPrice * detail.count * (detail.discount / 100));
+                return total + productTotal;
+            }, 0);
         },
         toggleOrderDetails(orderId) {
             if (this.expandedOrderId === orderId) {

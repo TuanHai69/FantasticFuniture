@@ -1,16 +1,15 @@
 <template>
     <div class="admin-revenue p-3">
-        <h2>Admin Revenue</h2>
         <div class="row mb-4">
             <div class="col-md-6">
                 <div class="overall-stats p-3 border rounded bg-light">
-                    <h3>Overall Statistics</h3>
-                    <p><strong>Total Revenue:</strong> {{ formatCurrency(totalRevenue) }}</p>
-                    <p><strong>Highest Revenue Order:</strong> {{ highestRevenueOrder ? highestRevenueOrder.storeName +
+                    <h3>thống kê</h3>
+                    <p><strong>Tổng doanh thu:</strong> {{ formatCurrency(totalRevenue) }}</p>
+                    <p><strong>Đơn hàng giá trị lớn nhất:</strong> {{ highestRevenueOrder ? highestRevenueOrder.storeName +
                         ' (' + formatCurrency(highestRevenueOrder.price) + ')' : 'Chưa có đơn hàng trong yêu cầu' }}</p>
-                    <p><strong>Highest Revenue Store:</strong> {{ highestRevenueStore ? highestRevenueStore.name + ' ('
+                    <p><strong>Cửa hàng danh thu lớn nhất:</strong> {{ highestRevenueStore ? highestRevenueStore.name + ' ('
                         + formatCurrency(highestRevenueStore.revenue) + ')' : 'Chưa có đơn hàng trong yêu cầu' }}</p>
-                    <p><strong>Highest Item Count:</strong>
+                    <p><strong>Số lượng sản phẩm nhiều nhất:</strong>
                         {{ highestRevenueOrder ? highestRevenueOrder.storeName +
                             '(' + highestItemCount + ')' : 'Chưa có đơn hàng trong yêu cầu' }}</p>
                 </div>
@@ -18,11 +17,11 @@
             <div class="col-md-6">
                 <div class="date-filters p-3 border rounded bg-light">
                     <div class="form-group me-3">
-                        <label for="startDate" class="form-label"><strong>Start Date:</strong></label>
+                        <label for="startDate" class="form-label"><strong>Ngày bắt đầu:</strong></label>
                         <input type="date" id="startDate" v-model="startDate" class="form-control">
                     </div>
                     <div class="form-group me-3">
-                        <label for="endDate" class="form-label"><strong>End Date:</strong></label>
+                        <label for="endDate" class="form-label"><strong>Ngày kết thúc:</strong></label>
                         <input type="date" id="endDate" v-model="endDate" class="form-control">
                     </div>
                     <div class="button-group d-flex">

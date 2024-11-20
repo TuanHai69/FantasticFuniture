@@ -2,7 +2,7 @@
     <AppHeader />
     <hr>
     <div class="admin-revenue-view p-3">
-        <h1>Admin Revenue Management</h1>
+        <h1>Doanh thu hệ thống</h1>
         <AdminRevenue />
     </div>
 </template>

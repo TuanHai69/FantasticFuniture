@@ -248,7 +248,7 @@ export default {
                         _id: this.order._id,
                         state: 'Chờ xác nhận',
                         date: this.formatDate(new Date()),
-                        price: this.order.price + cost
+                        price: parseFloat(this.order.price) + parseFloat(cost)
                     }; const userId = LocalStorageHelper.getItem('id');
                     const userComments = await CommentService.findByUser(userId);
                     let newComment;
@@ -295,7 +295,7 @@ export default {
 
                 // Continue with order update if not using ZaloPay
                 await this.updateOrderAndCart(cost, disc);
-                alert ('Thanh toán thành công');
+                alert('Thanh toán thành công');
                 this.$emit('checkout-complete');
             } catch (error) {
                 console.error('Error confirming payment:', error);
@@ -322,7 +322,7 @@ export default {
             const updatedOrder = {
                 state: 'Chờ xác nhận',
                 date: this.formatDate(new Date()),
-                price: this.order.price + cost
+                price: parseFloat(this.order.price) + parseFloat(cost)
             };
 
             await OrderService.update(this.order._id, updatedOrder);
