@@ -46,7 +46,7 @@
                             <p>
                                 <strong>Tổng giá đơn hàng:</strong>
                                 {{ calculateOrderTotal(order._id) ? formatCurrency(calculateOrderTotal(order._id)) :
-                                'Chưa thanh toán' }}
+                                    'Chưa thanh toán' }}
                             </p>
                             <p><strong>Ngày thành lập:</strong> {{ order.date }}</p>
                             <p><strong>Trạng thái:</strong> {{ order.state }}</p>
@@ -107,8 +107,9 @@
                         <p><strong>Giá sản phẩm lớn nhất trên 1 đơn hàng:</strong> {{ highestCostDetail.productName }} :
                             {{
                                 formatCurrency(highestCostDetail.productPrice) }}</p>
-                        <p><strong>Số lượng bán nhiều nhất trên 1 đơn hàng:</strong> {{ mostCountDetail.productName }} : {{
-                            mostCountDetail.count }} sản phẩm</p>
+                        <p><strong>Số lượng bán nhiều nhất trên 1 đơn hàng:</strong> {{ mostCountDetail.productName }} :
+                            {{
+                                mostCountDetail.count }} sản phẩm</p>
                     </div>
                 </div>
             </div>
@@ -119,7 +120,7 @@
                             <p><strong>Mã đơn hàng:</strong> {{ order._id }}</p>
                             <p><strong>Tổng đơn hàng:</strong>
                                 {{ calculateOrderTotal(order._id) ? formatCurrency(calculateOrderTotal(order._id)) :
-                                'Chưa thanh toán' }}</p>
+                                    'Chưa thanh toán' }}</p>
                             <p><strong>Ngày thành lập:</strong> {{ order.date }}</p>
                             <p><strong>Trạng thái:</strong> {{ order.state }}</p>
                         </div>
@@ -152,7 +153,8 @@
                                 <div class="col-12 col-md-4 mb-3 mb-md-0">
                                     <p><strong>Số điện thoại:</strong> {{ detail.phonenumber }}</p>
                                     <p><strong>Phương thức thanh toán:</strong> <span
-                                            v-if="detail.payment === 'Chuyển khoảng'"> Đã trả bằng zalopay</span> <span v-else>{{
+                                            v-if="detail.payment === 'Chuyển khoảng'"> Đã trả bằng zalopay</span> <span
+                                            v-else>{{
                                                 detail.payment }}</span></p>
                                     <p class="address"><strong>Địa chỉ giao hàng:</strong> {{ detail.address }}</p>
                                 </div>
@@ -328,9 +330,9 @@ export default {
             }
         },
         formatCurrency(value) {
-            return new Intl.NumberFormat('en-US', {
+            return new Intl.NumberFormat('vi-VN', {
                 style: 'currency',
-                currency: 'USD'
+                currency: 'VND'
             }).format(value);
         },
         isDateInRange(date) {

@@ -215,9 +215,9 @@ export default {
             }
         },
         formatCurrency(value) {
-            return new Intl.NumberFormat('en-US', {
+            return new Intl.NumberFormat('vi-VN', {
                 style: 'currency',
-                currency: 'USD'
+                currency: 'VND'
             }).format(value);
         },
         productPicture(picture) {
