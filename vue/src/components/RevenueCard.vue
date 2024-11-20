@@ -79,7 +79,7 @@
                                 </div>
                                 <div class="col-12 col-md-4 mb-3 mb-md-0">
                                     <p><strong>Số điện thoại người nhận:</strong> {{ detail.phonenumber }}</p>
-                                    <p><strong>Phương thức trả:</strong>
+                                    <p><strong>Phương thức thanh toán:</strong>
                                         <span v-if="detail.payment === 'Chuyển khoảng'"> Đã trả bằng zalopay</span>
                                         <span v-else>{{ detail.payment }}</span>
                                     </p>
@@ -107,7 +107,7 @@
                         <p><strong>Giá sản phẩm lớn nhất trên 1 đơn hàng:</strong> {{ highestCostDetail.productName }} :
                             {{
                                 formatCurrency(highestCostDetail.productPrice) }}</p>
-                        <p><strong>Số lượng bán nhiều nhất trên 1 đơn hàng:</strong> {{ mostCountDetail.name }} : {{
+                        <p><strong>Số lượng bán nhiều nhất trên 1 đơn hàng:</strong> {{ mostCountDetail.productName }} : {{
                             mostCountDetail.count }} sản phẩm</p>
                     </div>
                 </div>
@@ -144,23 +144,23 @@
                                         class="product-image img-fluid" />
                                 </div>
                                 <div class="col-12 col-md-3 mb-3 mb-md-0">
-                                    <p><strong>Name:</strong> {{ detail.productName }}</p>
-                                    <p><strong>Material:</strong> {{ detail.productMaterial }}</p>
-                                    <p><strong>Size:</strong> {{ detail.productSize }}</p>
-                                    <p><strong>Warranty:</strong> {{ detail.productWarranty }}</p>
+                                    <p><strong>Tên sản phẩm:</strong> {{ detail.productName }}</p>
+                                    <p><strong>Vật liệu:</strong> {{ detail.productMaterial }}</p>
+                                    <p><strong>Kích thước:</strong> {{ detail.productSize }}</p>
+                                    <p><strong>Bảo hành:</strong> {{ detail.productWarranty }}</p>
                                 </div>
                                 <div class="col-12 col-md-4 mb-3 mb-md-0">
-                                    <p><strong>Phonenumber:</strong> {{ detail.phonenumber }}</p>
-                                    <p><strong>Payment:</strong> <span
-                                            v-if="detail.payment === 'Chuyển khoảng'">STK</span> <span v-else>{{
+                                    <p><strong>Số điện thoại:</strong> {{ detail.phonenumber }}</p>
+                                    <p><strong>Phương thức thanh toán:</strong> <span
+                                            v-if="detail.payment === 'Chuyển khoảng'"> Đã trả bằng zalopay</span> <span v-else>{{
                                                 detail.payment }}</span></p>
-                                    <p class="address"><strong>Delivery address:</strong> {{ detail.address }}</p>
+                                    <p class="address"><strong>Địa chỉ giao hàng:</strong> {{ detail.address }}</p>
                                 </div>
                                 <div class="col-12 col-md-3 mb-3 mb-md-0">
-                                    <p><strong>Count:</strong> {{ detail.count }}</p>
-                                    <p><strong>Sum:</strong> {{ formatCurrency((detail.productPrice * detail.count
+                                    <p><strong>Số lượng:</strong> {{ detail.count }}</p>
+                                    <p><strong>Tổng cộng:</strong> {{ formatCurrency((detail.productPrice * detail.count
                                         - detail.productPrice * detail.count * (detail.discount / 100))) }}</p>
-                                    <p class="description"><strong>Description:</strong> {{ detail.note }}</p>
+                                    <p class="description"><strong>Mô tả:</strong> {{ detail.note }}</p>
                                 </div>
                             </li>
                         </ul>

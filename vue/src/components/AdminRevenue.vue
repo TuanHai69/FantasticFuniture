@@ -5,9 +5,11 @@
                 <div class="overall-stats p-3 border rounded bg-light">
                     <h3>thống kê</h3>
                     <p><strong>Tổng doanh thu:</strong> {{ formatCurrency(totalRevenue) }}</p>
-                    <p><strong>Đơn hàng giá trị lớn nhất:</strong> {{ highestRevenueOrder ? highestRevenueOrder.storeName +
+                    <p><strong>Đơn hàng giá trị lớn nhất:</strong> {{ highestRevenueOrder ?
+                        highestRevenueOrder.storeName +
                         ' (' + formatCurrency(highestRevenueOrder.price) + ')' : 'Chưa có đơn hàng trong yêu cầu' }}</p>
-                    <p><strong>Cửa hàng danh thu lớn nhất:</strong> {{ highestRevenueStore ? highestRevenueStore.name + ' ('
+                    <p><strong>Cửa hàng danh thu lớn nhất:</strong> {{ highestRevenueStore ? highestRevenueStore.name +
+                        ' ('
                         + formatCurrency(highestRevenueStore.revenue) + ')' : 'Chưa có đơn hàng trong yêu cầu' }}</p>
                     <p><strong>Số lượng sản phẩm nhiều nhất:</strong>
                         {{ highestRevenueOrder ? highestRevenueOrder.storeName +
@@ -25,14 +27,14 @@
                         <input type="date" id="endDate" v-model="endDate" class="form-control">
                     </div>
                     <div class="button-group d-flex">
-                        <button @click="confirmDateRange" class="btn btn-primary me-2">Confirm</button>
+                        <button @click="confirmDateRange" class="btn btn-primary me-2">Xác nhận</button>
                         <button @click="resetDateRange" class="btn btn-secondary">Reset</button>
                     </div>
                     <div v-if="isInvalidDateRange" class="alert alert-danger mt-3">
-                        Start date cannot be greater than end date, and end date cannot be less than start date.
+                        Ngày bắt đầu không thể sau ngày kết thúc và ngược lại
                     </div>
                     <div v-if="dateRangeConfirmed" class="alert alert-success mt-3">
-                        Orders found between {{ startDate }} and {{ endDate }}.
+                        Danh sách đơn hàng tìm được trong khoảng {{ startDate }} đến {{ endDate }}.
                     </div>
                 </div>
             </div>
@@ -45,10 +47,10 @@
                 <div class="card">
                     <div class="card-body">
                         <h3>{{ store.name }}</h3>
-                        <p><strong>Address:</strong> {{ store.address }}</p>
-                        <p><strong>Phone number:</strong> {{ store.phonenumber }}</p>
+                        <p><strong>Địa chỉ:</strong> {{ store.address }}</p>
+                        <p><strong>Số điện thoại:</strong> {{ store.phonenumber }}</p>
                         <p><strong>Email:</strong> {{ store.email }}</p>
-                        <p><strong>Total Revenue:</strong>
+                        <p><strong>Tổng doanh thu:</strong>
                             {{ (dateRangeConfirmed
                                 ? (filteredStoreRevenues[store._id] != null && filteredStoreRevenues[store._id] !== ''
                                     ? formatCurrency(filteredStoreRevenues[store._id])
@@ -58,7 +60,7 @@
                                     : 'Chưa có đơn hàng')) }}
                         </p>
                         <button @click="toggleStoreOrders(store._id)" class="btn btn-primary">
-                            {{ expandedStoreId === store._id ? 'Hide Orders' : 'Show Orders' }}
+                            {{ expandedStoreId === store._id ? 'Ẩn đơn hàng' : 'Hiển thị đơn hàng' }}
                         </button>
                         <div
                             v-if="expandedStoreId === store._id && (dateRangeConfirmed ? filteredStoreOrders[store._id] : storeOrders[store._id])">
@@ -67,21 +69,21 @@
                                 <div class="card-body">
                                     <div class="order-summary row">
                                         <div class="col-md-5">
-                                            <p><strong>Order ID:</strong> {{ order._id }}</p>
-                                            <p><strong>Total Price:</strong> {{ order.price ?
+                                            <p><strong>Mã đơn hàng:</strong> {{ order._id }}</p>
+                                            <p><strong>Tổng tiền:</strong> {{ order.price ?
                                                 formatCurrency(order.price) : 'Unpaid' }}</p>
-                                            <p><strong>Date:</strong> {{ order.date }}</p>
-                                            <p><strong>State:</strong> {{ order.state }}</p>
+                                            <p><strong>Ngày thành lập:</strong> {{ order.date }}</p>
+                                            <p><strong>Trạng thái:</strong> {{ order.state }}</p>
                                         </div>
                                         <div class="col-md-5">
-                                            <p><strong>Store name:</strong> {{ store.name }}</p>
-                                            <p><strong>Store address:</strong> {{ store.address }}</p>
-                                            <p><strong>Store Phonenumber:</strong> {{ store.phonenumber }}</p>
-                                            <p><strong>Store Email:</strong> {{ store.email }}</p>
+                                            <p><strong>Tên cửa hàng:</strong> {{ store.name }}</p>
+                                            <p><strong>Địa chỉ cửa hàng:</strong> {{ store.address }}</p>
+                                            <p><strong>Số điện thoại cửa hàng:</strong> {{ store.phonenumber }}</p>
+                                            <p><strong>Email cửa hàng:</strong> {{ store.email }}</p>
                                         </div>
                                         <div class="col-md-2 d-flex align-items-center justify-content-center">
                                             <button @click="toggleOrderDetails(order._id)" class="btn btn-secondary">
-                                                {{ expandedOrderId === order._id ? 'Hide Details' : 'Show Details' }}
+                                                {{ expandedOrderId === order._id ? 'Ẩn chi tiết' : 'Hiện chi tiết' }}
                                             </button>
                                         </div>
                                     </div>
@@ -90,28 +92,31 @@
                                             <li v-for="detail in orderDetails[order._id]" :key="detail._id"
                                                 class="order-detail-item row mb-3 p-3 rounded shadow-sm">
                                                 <div class="col-12 col-md-2 mb-3 mb-md-0 d-flex justify-content-center">
-                                                    <img :src="productPicture(detail.picture)" alt="Product Image"
-                                                        class="product-image img-fluid" />
+                                                    <img :src="productPicture(detail.productPicture)"
+                                                        alt="Product Image" class="product-image img-fluid" />
                                                 </div>
                                                 <div class="col-12 col-md-3 mb-3 mb-md-0">
-                                                    <p><strong>Name:</strong> {{ detail.name }}</p>
-                                                    <p><strong>Material:</strong> {{ detail.material }}</p>
-                                                    <p><strong>Size:</strong> {{ detail.size }}</p>
-                                                    <p><strong>Warranty:</strong> {{ detail.warranty }}</p>
+                                                    <p><strong>Tên sản phẩm:</strong> {{ detail.productName }}</p>
+                                                    <p><strong>Vật liệu:</strong> {{ detail.productMaterial }}</p>
+                                                    <p><strong>Kích thước:</strong> {{ detail.productSize }}</p>
+                                                    <p><strong>Bảo hàng:</strong> {{ detail.productWarranty }}</p>
                                                 </div>
                                                 <div class="col-12 col-md-4 mb-3 mb-md-0">
                                                     <p><strong>Phonenumber:</strong> {{ detail.phonenumber }}</p>
                                                     <p><strong>Payment:</strong> <span
-                                                            v-if="detail.payment === 'Chuyển khoảng'">STK</span> <span
-                                                            v-else>{{ detail.payment }}</span></p>
-                                                    <p class="address"><strong>Delivery address:</strong> {{
+                                                            v-if="detail.payment === 'Chuyển khoảng'"> Đã trả bằng
+                                                            zalopay</span> <span v-else>{{ detail.payment }}</span></p>
+                                                    <p class="address"><strong>Địa chỉ giao hàng:</strong> {{
                                                         detail.address }}</p>
                                                 </div>
                                                 <div class="col-12 col-md-3 mb-3 mb-md-0">
-                                                    <p><strong>Count:</strong> {{ detail.count }}</p>
-                                                    <p><strong>Sum:</strong> {{ formatCurrency(detail.cost) }}</p>
+                                                    <p><strong>Số lượng:</strong> {{ detail.count }}</p>
+                                                    <p><strong>Tổng tiền:</strong> {{
+                                                        formatCurrency((detail.productPrice * detail.count
+                                                        - detail.productPrice * detail.count * (detail.discount / 100)))
+                                                        }}</p>
                                                     <p class="description"><strong>Description:</strong> {{
-                                                        detail.description }}</p>
+                                                        detail.note }}</p>
                                                 </div>
                                             </li>
                                         </ul>
@@ -133,7 +138,9 @@
 <script>
 import StoreService from '@/services/store.service';
 import OrderService from '@/services/order.service';
-import OrderDetailService from '@/services/orderdetail.service';
+import CartService from '@/services/cart.service';
+import ProductService from '@/services/product.service';
+import PriceService from '@/services/price.service';
 
 export default {
     name: 'AdminRevenue',
@@ -166,7 +173,7 @@ export default {
         this.calculateOverallStatistics();
     },
     computed: {
-        isInvalidDateRange1() {
+        isInvalidDateRange() {
             if (this.startDate && this.endDate) {
                 return new Date(this.startDate) > new Date(this.endDate);
             }
@@ -186,22 +193,54 @@ export default {
             const orderPromises = this.stores.map(store => this.fetchOrdersForStore(store._id));
             await Promise.all(orderPromises);
         },
+
         async fetchOrdersForStore(storeId) {
             try {
                 const orders = await OrderService.findByStore(storeId);
                 this.storeOrders = { ...this.storeOrders, [storeId]: orders };
-                const orderDetailPromises = orders.map(order => this.fetchOrderDetails(order._id));
-                await Promise.all(orderDetailPromises);
+
+                for (const order of orders) {
+                    const details = await this.fetchOrderDetails(order._id);
+                    this.orderDetails[order._id] = details;
+                }
             } catch (error) {
                 console.error(`Error fetching orders for store ${storeId}:`, error);
             }
         },
         async fetchOrderDetails(orderId) {
             try {
-                const details = await OrderDetailService.findByOrder(orderId);
-                this.orderDetails = { ...this.orderDetails, [orderId]: details };
+                const cartItems = await CartService.findByOrderId(orderId);
+                if (!cartItems || cartItems.length === 0) {
+                    console.warn(`No cart items found for order ID: ${orderId}`);
+                    return [];
+                }
+
+                const details = await Promise.all(cartItems.map(async (cart) => {
+                    const product = await ProductService.get(cart.productid);
+                    const prices = await PriceService.findByProduct(cart.productid);
+
+                    const applicablePrice = prices.find(price => {
+                        const daystart = new Date(price.daystart);
+                        const dayend = price.dayend ? new Date(price.dayend) : null;
+                        const cartDay = new Date(cart.day);
+
+                        return cartDay >= daystart && (!dayend || cartDay <= dayend);
+                    });
+
+                    return {
+                        ...cart,
+                        productName: product.name,
+                        productMaterial: product.material,
+                        productSize: product.size,
+                        productWarranty: product.warranty,
+                        productPicture: product.picture,
+                        productPrice: applicablePrice ? applicablePrice.price : 'N/A',
+                    };
+                }));
+                return details;
             } catch (error) {
-                console.error(`Error fetching order details for order ${orderId}:`, error);
+                console.error('Error fetching order details:', error);
+                return [];
             }
         },
         toggleStoreOrders(storeId) {
@@ -299,7 +338,6 @@ export default {
 
             this.calculateOverallStatistics();
         },
-
         resetDateRange() {
             this.startDate = '';
             this.endDate = '';
