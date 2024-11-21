@@ -30,7 +30,14 @@
             <div v-if="filteredProducts.length > 0" class="col-md-3" v-for="(product, index) in filteredProducts"
                 :key="`filtered-${product._id}`">
                 <div class="card mb-4 product-card">
-                    <img :src="productPicture(product.picture)" class="card-img-top shoplistcard" :alt="product.name">
+                    <div class="position-relative">
+                        <img :src="productPicture(product.picture)" class="card-img-top shoplistcard"
+                            :alt="product.name">
+                        <button class="btn btn-heart" @click="toggleLike(product._id)">
+                            <i :class="{ 'fas fa-heart': isLiked[product._id], 'far fa-heart': !isLiked[product._id] }">
+                            </i>
+                        </button>
+                    </div>
                     <div class="card-body">
                         <h5 class="card-title">{{ product.name }}</h5>
                         <div v-if="product.price">
@@ -63,7 +70,14 @@
             <div v-else class="col-md-3" v-for="(product, index) in displayedProducts"
                 :key="`displayed-${product._id}`">
                 <div class="card mb-4 product-card">
-                    <img :src="productPicture(product.picture)" class="card-img-top shoplistcard" :alt="product.name">
+                    <div class="position-relative">
+                        <img :src="productPicture(product.picture)" class="card-img-top shoplistcard"
+                            :alt="product.name">
+                        <button class="btn btn-heart" @click="toggleLike(product._id)">
+                            <i :class="{ 'fas fa-heart': isLiked[product._id], 'far fa-heart': !isLiked[product._id] }">
+                            </i>
+                        </button>
+                    </div>
                     <div class="card-body">
                         <h5 class="card-title">{{ product.name }}</h5>
                         <div v-if="product.price">
@@ -100,8 +114,6 @@
     </div>
 </template>
 
-
-
 <script>
 import ProductService from "@/services/product.service";
 import PriceService from "@/services/price.service";
@@ -109,6 +121,7 @@ import TypeService from "@/services/type.service";
 import ProductTypeService from "@/services/producttype.service";
 import CartService from "@/services/cart.service";
 import LocalStorageHelper from "@/services/local.service";
+import CommentService from "@/services/comment.service";
 
 export default {
     name: 'ProductList',
@@ -132,6 +145,7 @@ export default {
             error: null,
             selectedFilters: [],
             filterOptions: [],
+            isLiked: {},
         }
     },
     async created() {
@@ -145,6 +159,7 @@ export default {
             await this.logSelectedFilters();
         }
         this.loading = false;
+        await this.checkLikedStatus();
     },
     watch: {
         searchQuery(newQuery) {
@@ -232,6 +247,63 @@ export default {
                 console.error("Error adding product to cart:", error);
             }
         },
+        async checkLikedStatus() {
+            const userId = LocalStorageHelper.getItem('id');
+            if (!userId) return;
+            try {
+                const likePromises = this.products.map(async (product) => {
+                    const response = await CommentService.isLiked(userId, product._id);
+                    this.isLiked = {
+                        ...this.isLiked, [product._id]: response.length > 0 && response[0].like === true
+                    };
+                }); await Promise.all(likePromises);
+            } catch (error) {
+                console.error('Error checking liked status:', error);
+            }
+        },
+        async toggleLike(productId) {
+            const userId = LocalStorageHelper.getItem('id');
+            if (!userId) {
+                alert('Bạn cần đăng nhập để thích sản phẩm');
+                return;
+            }
+            try {
+                const userComments = await CommentService.findByUser(userId);
+                if (userComments.length === 0) {
+                    // Create a new comment
+                    const comment = {
+                        rate: '',
+                        comment: '',
+                        state: 'Nopay',
+                        userid: userId,
+                        productid: productId,
+                        like: true,
+                    };
+                    await CommentService.create(comment);
+                } else {
+                    const existingComment = userComments.find(comment => comment.productid === productId);
+                    if (!existingComment) {
+                        // Create a new comment if no comment exists for this product
+                        const comment = {
+                            rate: '',
+                            comment: '',
+                            state: 'Nopay',
+                            userid: userId,
+                            productid: productId,
+                            like: true,
+                        };
+                        await CommentService.create(comment);
+                    } else {
+                        // Update the like status of the existing comment
+                        this.isLiked[productId] = !this.isLiked[productId];
+                        await CommentService.update(existingComment._id, { like: this.isLiked[productId] });
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling like status:', error);
+            }
+        },
+
         loadMore() {
             const nextItems = this.displayedProducts.length + 8;
             if (nextItems <= this.products.length) {
@@ -302,7 +374,6 @@ export default {
 
 </script>
 
-
 <style>
 .loading {
     text-align: center;
@@ -320,5 +391,23 @@ export default {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
+}
+
+.btn-heart {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: pink;
+}
+
+.btn-heart .far.fa-heart {
+    color: red;
+}
+
+.btn-heart .fas.fa-heart {
+    color: pink;
 }
 </style>

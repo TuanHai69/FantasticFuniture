@@ -104,7 +104,7 @@ export default {
             if (this.isStoreOwner) {
                 return this.comments.filter(comment => comment.state !== '');
             }
-            return this.comments.filter(comment => comment.state !== 'hide' && comment.state !== '');
+            return this.comments.filter(comment => comment.state !== 'hide' && comment.state !== '' && comment.state !== 'Nopay');
         }
     },
     methods: {

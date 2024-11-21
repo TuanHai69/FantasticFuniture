@@ -43,9 +43,12 @@ exports.handleCallback = async (req, res, next) => {
                 }
                 if (newComment) {
                     const commentService = new CommentService(MongoDB.client);
-                    const kq3 = await commentService.create(newComment);
+                    if(newComment._id) {
+                        const kq4 = await commentService.update(newComment._id,newComment);
+                    }else {
+                        const kq3 = await commentService.create(newComment);
+                    }
                 }
-
                 // Xóa dữ liệu tạm thời sau khi sử dụng
                 await zaloPayService.deleteTempData(app_trans_id);
             }

@@ -258,18 +258,27 @@ export default {
                             productid: this.cart.product._id,
                             rate: "",
                             comment: "",
-                            state: ""
+                            state: "",
+                            like: false,
                         };
                     } else {
-                        const hasCommented = userComments.some(comment => comment.productid === this.cart.product._id);
+                        const hasCommented = userComments.find(comment => comment.productid === this.cart.product._id);
                         if (!hasCommented) {
                             newComment = {
                                 userid: userId,
                                 productid: this.cart.product._id,
                                 rate: "",
                                 comment: "",
-                                state: ""
+                                state: "",
+                                like: false,
                             };
+                        } else {
+                            if (hasCommented.state == 'Nopay') {
+                                newComment = {
+                                    _id: hasCommented._id,
+                                    state: ""
+                                };
+                            }
                         }
                     } const zaloPayData = {
                         amount: cost,
@@ -335,20 +344,26 @@ export default {
                     productid: this.cart.product._id,
                     rate: "",
                     comment: "",
-                    state: ""
+                    state: "",
+                    like: false
                 };
                 await CommentService.create(newComment);
             } else {
-                const hasCommented = userComments.some(comment => comment.productid === this.cart.product._id);
+                const hasCommented = userComments.find(comment => comment.productid === this.cart.product._id);
                 if (!hasCommented) {
                     const newComment = {
                         userid: userId,
                         productid: this.cart.product._id,
                         rate: "",
                         comment: "",
-                        state: ""
+                        state: "",
+                        like: false,
                     };
                     await CommentService.create(newComment);
+                } else {
+                    if (hasCommented.state == 'Nopay') {
+                        await CommentService.update(hasCommented._id, { state: "" });
+                    }
                 }
             }
         },
