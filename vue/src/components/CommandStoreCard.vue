@@ -186,29 +186,53 @@ export default {
                 this.isLoading = false;
             }
         },
+        async fetchComments() {
+            try {
+                const comments = await CommentStoreService.findByStore(this.storeid);
+                this.hasCommented = comments.some(comment => comment.userid === this.userId);
+                const filteredComments = comments.filter(comment => comment.state !== 'Nopay');
+
+                await Promise.all(filteredComments.map(async comment => {
+                    const user = await AccountsService.get(comment.userid);
+                    comment.userName = user.name;
+                    comment.userPicture = user.picture;
+                }));
+
+                this.comments = filteredComments;
+            } catch (error) {
+                console.error('Error fetching comments:', error);
+            } finally {
+                this.isLoading = false;
+            }
+        },
         async submitComment() {
             if (!this.rate || !this.commentText.trim()) {
-                alert('Vui lòng chọn đánh giá và nhập bình luận.');
-                return;
-            }
-
-            try {
-                const newComment = {
-                    userid: this.userId,
-                    storeid: this.storeid,
-                    rate: this.rate,
-                    commentstore: this.commentText,
-                    state: 'show'
-                };
-                await CommentStoreService.create(newComment);
+                alert('Vui lòng chọn đánh giá và nhập bình luận.'); return;
+            } try {
+                const userComments = await CommentStoreService.findByUser(this.userId);
+                const existingComment = userComments.find(comment => comment.storeid === this.storeid);
+                if (!existingComment) { 
+                    const newComment = {
+                        userid: this.userId,
+                        storeid: this.storeid,
+                        rate: this.rate,
+                        commentstore: this.commentText,
+                        state: 'show',
+                        like: false,
+                    };
+                    await CommentStoreService.create(newComment);
+                } else {
+                    await CommentStoreService.update(existingComment._id, {
+                        rate: this.rate,
+                        commentstore: this.commentText,
+                        state: 'show',
+                    });
+                }
                 this.commentText = '';
                 this.rate = '';
                 await this.fetchComments();
-            } catch (error) {
-                console.error('Error submitting comment:', error);
-            }
+            } catch (error) { console.error('Error submitting comment:', error); }
         },
-
         productPicture(picture) {
             if (picture) {
                 return `data:image/jpeg;base64,${picture}`;

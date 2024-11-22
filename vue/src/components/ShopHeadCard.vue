@@ -9,13 +9,25 @@
                     <div class="col-10">
                         <h3>{{ store.name }}</h3>
                         <p class="address">Địa chỉ: {{ store.address }}</p>
-                        <p class="review"> Đánh giá:
-                            <span v-for="(star, index) in getStarIcons(averageRating)" :key="index"
-                                :class="star"></span>
-                            <span>({{ averageRating }})</span>
-                        </p>
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <p class="review">Đánh giá:
+                                    <span v-for="(star, index) in getStarIcons(averageRating)" :key="index"
+                                        :class="star"></span>
+                                    <span>({{ averageRating }})</span>
+                                </p>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-follow" @click="toggleFollow">
+                                    {{ isFollowed ? 'Đã theo dõi' : 'Theo dõi' }}
+                                </button>
+                            </div>
+                        </div>
+
                         <p class="open">Mở cửa: {{ store.opentime }}</p>
                         <p class="phone">Số điện thoại: {{ store.phonenumber }}</p>
+                        <p class="description">Về chúng tôi: {{ store.description }}</p>
+
                     </div>
                     <div class="col-2" v-if="isStoreOwner">
                         <button v-if="isStoreOwner" @click="editStore" class="btn btn-secondary bg-primary">Chỉnh
@@ -57,13 +69,55 @@ export default {
             isStoreOwner: false,
             userId: LocalStorageHelper.getItem('id'),
             userRole: LocalStorageHelper.getItem('role'),
+            isFollowed: false,
         };
     },
     async mounted() {
         await this.fetchStoreData();
         await this.checkReportPermission();
+        await this.checkFollowStatus();
     },
     methods: {
+        async toggleFollow() {
+            const userId = this.userId;
+            if (!userId) {
+                alert('Bạn cần đăng nhập để theo dõi cửa hàng'); return;
+            }
+            try {
+                const userComments = await CommentstoreService.findByUser(userId);
+                const existingComment = userComments.find(comment => comment.storeid === this.id);
+                if (!existingComment) { // Create a new follow commentstore 
+                    const commentstore = {
+                        userid: this.userId,
+                        storeid: this.id,
+                        rate: "",
+                        commentstore: "",
+                        state: "Nopay",
+                        like: true,
+                    };
+                    await CommentstoreService.create(commentstore);
+                    await this.checkFollowStatus();
+                } else { 
+                    await CommentstoreService.update(existingComment._id, { like: !existingComment.like });
+                    this.isFollowed = !existingComment.like;
+                    await this.checkFollowStatus();
+                }
+            } catch (error) {
+                console.error('Error toggling follow status:', error);
+            }
+        },
+        async checkFollowStatus() {
+            const userId = this.userId;
+            if (!userId) {
+                return;
+            }
+            try {
+                const response = await CommentstoreService.isLiked(userId, this.id);
+                this.isFollowed = response.length > 0 && response[0].like === true;
+            } catch (error) {
+                console.error('Error checking follow status:', error);
+            }
+        },
         async fetchStoreData() {
             try {
                 this.store = await StoreService.get(this.id);
@@ -134,6 +188,18 @@ export default {
 </script>
 
 <style scoped>
+.btn-follow {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.btn-follow:hover {
+    background-color: #0056b3;
+}
+
 .image-container {
     max-height: 250px;
     overflow: hidden;
