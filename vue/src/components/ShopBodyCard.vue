@@ -9,13 +9,34 @@
             </div>
             <div class="col-8" v-if="products.length > 0">
                 <div class="row bg-white p-3 justify-content-evenly">
-                    <div class="col-md-5" v-for="(Product, index) in displayedproducts" :key="Product.id">
+                    <div class="col-md-5" v-for="(Product, index) in displayedproducts" :key="Product._id">
                         <div class="card mb-4 product-card">
-                            <img :src="productPicture(Product.picture)" class="card-img-top shoplistcard"
-                                :alt="Product.name">
+                            <div class="position-relative">
+                                <img :src="productPicture(Product.picture)" class="card-img-top shoplistcard"
+                                    :alt="Product.name"> <button class="btn btn-heart" @click="toggleLike(Product._id)">
+                                    <i
+                                        :class="{ 'fas fa-heart': isLiked[Product._id], 'far fa-heart': !isLiked[Product._id] }">
+                                    </i>
+                                </button>
+                            </div>
+
                             <div class="card-body">
                                 <h5 class="card-title">{{ Product.name }}</h5>
-                                <div class="card-cost d-flex justify-content-end">{{ formatCurrency(Product.cost) }}
+                                <div v-if="Product.cost">
+                                    <div class="card-cost d-flex justify-content-end">
+                                        <span v-if="Product.discount">
+                                            <s>{{ formatCurrency(Product.cost) }}</s>
+                                        </span>
+                                        <span v-else>
+                                            {{ formatCurrency(Product.cost) }}
+                                        </span>
+                                    </div>
+                                    <div class="card-cost d-flex justify-content-end" v-if="Product.discount">
+                                        {{ formatCurrency(Product.cost - Product.cost * Product.discount / 100) }}
+                                    </div>
+                                </div>
+                                <div v-else>
+                                    <p>Sản phẩm này chưa có giá</p>
                                 </div>
                                 <div class="card-buttons d-flex justify-content-evenly">
                                     <button class="btn btn-primary" @click="moveToProduct(Product._id)">Xem
@@ -48,6 +69,8 @@ import TypeService from "@/services/type.service";
 import CartService from "@/services/cart.service";
 import LocalStorageHelper from "@/services/local.service";
 import StoreService from '@/services/store.service';
+import PriceService from "@/services/price.service";
+import CommentService from "@/services/comment.service";
 
 export default {
     name: 'ProductList',
@@ -70,6 +93,7 @@ export default {
             isStoreOwner: false,
             userId: LocalStorageHelper.getItem('id'),
             userRole: LocalStorageHelper.getItem('role'),
+            isLiked: {},
         }
     },
     async mounted() {
@@ -79,19 +103,19 @@ export default {
             await this.fetchTypes();
         }
         await this.checkReportPermission();
+        await this.checkLikedStatus();
     },
     methods: {
         async fetchProducts() {
             try {
-                // console.log(this.storeid);
                 const response = await ProductService.findByStore(this.storeid);
-                // console.log(response);
                 this.products = response;
-                // console.log(this.products);
+                await this.fetchPricesForProducts(this.products); // Fetch prices for products
             } catch (error) {
                 console.log('Error fetching products:', error);
             }
         },
+
         async checkReportPermission() {
             try {
                 const store = await StoreService.get(this.storeid);
@@ -99,6 +123,74 @@ export default {
             } catch (error) {
                 console.error('Error checking report permission:', error);
             }
+        },
+        async fetchPricesForProducts(products) {
+            try {
+                const pricePromises = products.map(async (product) => {
+                    const priceResponse = await PriceService.findByProductWithNoEndDate(product._id);
+                    if (priceResponse.length > 0) {
+                        product.cost = priceResponse[0].price;
+                        product.discount = priceResponse[0].discount;
+                    } else {
+                        product.cost = null;
+                        product.discount = null;
+                    }
+                });
+                await Promise.all(pricePromises);
+            } catch (error) {
+                console.error('Error fetching prices:', error);
+            }
+        },
+        async checkLikedStatus() {
+            const userId = LocalStorageHelper.getItem('id');
+            if (!userId) return;
+            try {
+                const likePromises = this.products.map(async (product) => {
+                    const response = await CommentService.isLiked(userId, product._id);
+                    this.isLiked = { ...this.isLiked, [product._id]: response.length > 0 && response[0].like === true };
+                }); await Promise.all(likePromises);
+            } catch (error) {
+                console.error('Error checking liked status:', error);
+            }
+        },
+        async toggleLike(productId) {
+            const userId = LocalStorageHelper.getItem('id');
+            if (!userId) {
+                alert('Bạn cần đăng nhập để thích sản phẩm'); return;
+            }
+            try {
+                const userComments = await CommentService.findByUser(userId);
+                if (userComments.length === 0) {
+                    // Create a new comment 
+                    const comment = {
+                        rate: '',
+                        comment: '',
+                        state: 'Nopay',
+                        userid: userId,
+                        productid: productId,
+                        like: true,
+                    };
+                    await CommentService.create(comment);
+                }
+                else {
+                    const existingComment = userComments.find(comment => comment.productid === productId); if (!existingComment) {
+                        // Create a new comment if no comment exists for this product 
+                        const comment = {
+                            rate: '',
+                            comment: '',
+                            state: 'Nopay',
+                            userid: userId,
+                            productid: productId,
+                            like: true,
+                        };
+                        await CommentService.create(comment);
+                    } else {
+                        // Update the like status of the existing comment
+                        this.isLiked[productId] = !this.isLiked[productId];
+                        await CommentService.update(existingComment._id, { like: this.isLiked[productId] });
+                    }
+                }
+            } catch (error) { console.error('Error toggling like status:', error); }
         },
         async addToCart(product) {
             const userId = LocalStorageHelper.getItem('id');
@@ -220,5 +312,23 @@ export default {
 
 .water-drop-button:active {
     transform: scale(0.95);
+}
+
+.btn-heart {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: pink;
+}
+
+.btn-heart .far.fa-heart {
+    color: red;
+}
+
+.btn-heart .fas.fa-heart {
+    color: pink;
 }
 </style>

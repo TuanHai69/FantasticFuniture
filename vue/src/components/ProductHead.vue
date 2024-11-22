@@ -6,9 +6,13 @@
                     class="img-fluid large-image limited-height" />
             </div>
             <div class="col-6 text-container m-4">
-                <h3>Tên sản phẩm {{ product.name }}
-                </h3>
 
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3>Tên sản phẩm {{ product.name }}</h3>
+                    <button class="btn btn-heart1 " @click="toggleLike(id)">
+                        <i :class="{ 'fas fa-heart': isLiked, 'far fa-heart': !isLiked }"></i>
+                    </button>
+                </div>
                 <p>Vật liệu: {{ product.material }}</p>
                 <p class="address">Kích thước: {{ product.size }}</p>
                 <p class="review"> Đánh giá:
@@ -158,6 +162,7 @@ export default {
             types: [],
             quantity: 1,
             averageRating: 0,
+            isLiked: false,
         };
     },
     async mounted() {
@@ -165,12 +170,61 @@ export default {
             await this.fetchProduct();
             await this.fetchProductTypes();
             await this.checkPermission();
+            await this.checkLikedStatus();
         } catch (error) {
             console.error('Error fetching product:', error);
             this.error = error;
         }
     },
     methods: {
+        async toggleLike(productId) {
+            const userId = LocalStorageHelper.getItem('id');
+            if (!userId) {
+                alert('Bạn cần đăng nhập để thích sản phẩm');
+                return;
+            } try {
+                const userComments = await CommentService.findByUser(userId);
+                if (userComments.length === 0) { // Create a new comment
+                    const comment = {
+                        rate: '',
+                        comment: '',
+                        state: 'Nopay',
+                        userid: userId,
+                        productid: productId,
+                        like: true,
+                    };
+                    await CommentService.create(comment);
+                } else {
+                    const existingComment = userComments.find(comment => comment.productid === productId);
+                    if (!existingComment) {
+                        const comment = {
+                            rate: '',
+                            comment: '',
+                            state: 'Nopay',
+                            userid: userId,
+                            productid: productId,
+                            like: true,
+                        };
+                        await CommentService.create(comment);
+                    } else {
+                        this.isLiked = !this.isLiked; await CommentService.update(existingComment._id, { like: this.isLiked });
+                    }
+                }
+            } catch (error) { console.error('Error toggling like status:', error); }
+        },
+        async checkLikedStatus() {
+            const userId = LocalStorageHelper.getItem('id');
+            if (!userId) {
+                return;
+            }
+            try {
+                const response = await CommentService.isLiked(userId, this.id);
+                this.isLiked = response.length > 0 && response[0].like === true;
+                console.log(this.isLiked);
+            } catch (error) {
+                console.error('Error checking liked status:', error);
+            }
+        },
         productPicture(picture) {
             if (picture) {
                 return `data:image/jpeg;base64,${picture}`;
@@ -333,6 +387,22 @@ export default {
 
 
 <style scoped>
+.btn-heart1 {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: pink;
+    cursor: pointer;
+}
+
+.btn-heart1 .far.fa-heart {
+    color: red;
+}
+
+.btn-heart1 .fas.fa-heart {
+    color: pink;
+}
+
 .fa-star,
 .fa-star-half-alt,
 .far.fa-star {
