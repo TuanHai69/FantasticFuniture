@@ -97,6 +97,7 @@ export default {
                 count: '',
                 storeid: '',
                 state: 'Hoạt động',
+                day: '',
             },
             errors: {},
             isLoading: false,
@@ -106,6 +107,9 @@ export default {
         this.product.storeid = this.storeid;
         if (this.productid) {
             await this.fetchProduct();
+        }
+        else {
+            this.product.day = new Date().toISOString().split('T')[0];
         }
     },
     methods: {
@@ -183,6 +187,7 @@ export default {
                 count: '',
                 storeid: this.storeid,
                 state: 'Hoạt động',
+                day: new Date().toISOString().split('T')[0],
             };
         },
     },

@@ -17,6 +17,7 @@ class ProductService {
             storeid: payload.storeid,
             state: payload.state,
             count: payload.count,
+            day: payload.day,
         };
 
         Object.keys(product).forEach(

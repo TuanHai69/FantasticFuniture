@@ -37,6 +37,7 @@
                             <i :class="{ 'fas fa-heart': isLiked[product._id], 'far fa-heart': !isLiked[product._id] }">
                             </i>
                         </button>
+                        <div v-if="isNewProduct(product.day)" class="new-badge"> Mới </div>
                     </div>
                     <div class="card-body">
                         <h5 class="card-title">{{ product.name }}</h5>
@@ -77,6 +78,7 @@
                             <i :class="{ 'fas fa-heart': isLiked[product._id], 'far fa-heart': !isLiked[product._id] }">
                             </i>
                         </button>
+                        <div v-if="isNewProduct(product.day)" class="new-badge"> Mới </div>
                     </div>
                     <div class="card-body">
                         <h5 class="card-title">{{ product.name }}</h5>
@@ -122,6 +124,7 @@ import ProductTypeService from "@/services/producttype.service";
 import CartService from "@/services/cart.service";
 import LocalStorageHelper from "@/services/local.service";
 import CommentService from "@/services/comment.service";
+import CommentStoreService from "@/services/commentstore.service";
 
 export default {
     name: 'ProductList',
@@ -152,6 +155,7 @@ export default {
         this.loading = true;
         await this.fetchProducts();
         await this.fetchTypes();
+        await this.prioritizeFollowedStoreNewProducts();
         this.displayedProducts = this.products.slice(0, this.itemsToShow);
 
         if (this.id) {
@@ -195,6 +199,13 @@ export default {
                 this.error = 'Error fetching prices';
                 console.error('Error fetching prices:', error);
             }
+        },
+        isNewProduct(productDay) {
+            const currentDate = new Date();
+            const productDate = new Date(productDay);
+            const timeDiff = currentDate - productDate;
+            const daysDiff = timeDiff / (1000 * 3600 * 24);
+            return daysDiff <= 7;
         },
         async fetchTypes() {
             try {
@@ -355,6 +366,7 @@ export default {
                 await this.fetchPricesForProducts(products);
 
                 this.filteredProducts = products.filter(product => product.state !== 'hide');
+                await this.prioritizeFollowedStoreNewProducts();
             } catch (error) {
                 console.error('Error fetching product types or products:', error);
             }
@@ -368,13 +380,84 @@ export default {
             this.filteredProducts = this.products.filter(product =>
                 product.name.toLowerCase().includes(lowerCaseQuery)
             );
-        }
+        },
+        async prioritizeFollowedStoreNewProducts() {
+            const userId = LocalStorageHelper.getItem('id');
+            if (!userId) return;
+            try {
+                const userComments = await CommentStoreService.findByUser(userId);
+                if (userComments.length === 0) return;
+                const likedStores = userComments
+                    .filter(comment => comment.like === true)
+                    .map(comment => comment.storeid); if (likedStores.length === 0) return;
+                const prioritizeProducts = (products) => {
+                    const prioritized = [];
+                    const others = [];
+                    products.forEach(product => {
+                        if (likedStores.includes(product.storeid) && this.isNewProduct(product.day)) {
+                            prioritized.push(product);
+                        }
+                        else {
+                            others.push(product);
+                        }
+                    });
+                    return [...prioritized, ...others];
+                };
+                this.displayedProducts = prioritizeProducts(this.displayedProducts);
+                this.filteredProducts = prioritizeProducts(this.filteredProducts);
+            } catch (error) { console.error('Error prioritizing followed store new products:', error); }
+        },
+        // async prioritizeFollowedStoreNewProducts() {
+        //     const userId = LocalStorageHelper.getItem('id');
+        //     if (!userId) {
+        //         return;
+        //     }
+        //     try {
+        //         const userComments = await CommentStoreService.findByUser(userId);
+        //         if (userComments.length === 0) {
+        //             return;
+        //         }
+        //         const likedStores = userComments
+        //             .filter(comment => comment.like === true)
+        //             .map(comment => comment.storeid);
+        //         if (likedStores.length === 0) {
+        //             return
+        //         };
+        //         const prioritizedProducts = [];
+        //         const otherProducts = [];
+        //         this.products.forEach(product => {
+        //             if (likedStores.includes(product.storeid) && this.isNewProduct(product.day)) {
+        //                 prioritizedProducts.push(product);
+        //             } else { otherProducts.push(product); }
+        //         });
+        //         this.products = [...prioritizedProducts, ...otherProducts];
+        //         this.displayedProducts = this.products.slice(0, this.itemsToShow);
+
+        //         console.log(this.products);
+        //         console.log(this.displayedProducts);
+        //     } catch (error) {
+        //         console.error('Error prioritizing followed store new products:', error);
+        //     }
+        // }
     }
 };
 
 </script>
 
 <style>
+.new-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: red;
+    color: white;
+    padding: 5px 10px;
+    font-size: 14px;
+    font-weight: bold;
+    transform: rotate(-15deg);
+    z-index: 1;
+}
+
 .loading {
     text-align: center;
     font-size: 1.5em;

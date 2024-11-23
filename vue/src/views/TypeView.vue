@@ -19,6 +19,7 @@ import TypeForm from '@/components/TypeForm.vue';
 import TypeList from '@/components/TypeList.vue';
 import TypeService from '@/services/type.service';
 import AppHeader from "@/components/AppHeader.vue";
+import LocalStorageHelper from '@/services/local.service';
 
 export default {
     name: 'TypeView',
@@ -69,6 +70,7 @@ export default {
         },
         handleCancel() {
             this.selectedType = {};
+            this.selectedType.userid = LocalStorageHelper.getItem("id");
         },
     },
 };
