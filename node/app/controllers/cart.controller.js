@@ -1,6 +1,7 @@
 const MongoDB = require("../utils/mongodb.util");
 const ApiError = require("../api-error");
 const CartService = require("../services/cart.service");
+const { emitEvent } = require("../../socket.io");
 
 exports.create = async (req, res, next) => {
     if (!req.body?.userid || !req.body?.productid || !req.body?.storeid || !req.body?.state) {
@@ -10,6 +11,7 @@ exports.create = async (req, res, next) => {
     try {
         const cartService = new CartService(MongoDB.client);
         const document = await cartService.create(req.body);
+        emitEvent('createCart' ,{userId : req.body.userId});
         return res.send(document);
     } catch (error) {
         return next(
@@ -102,6 +104,7 @@ exports.update = async (req, res, next) => {
         if (!document) {
             return next(new ApiError(404, "Cart not found"));
         }
+        emitEvent('updateCart' ,{id: req.params.id});
         return res.send({ message: "Cart update successfully" });
     } catch (error) {
         return next(
@@ -117,6 +120,7 @@ exports.delete = async (req, res, next) => {
         if (!document) {
             return next(new ApiError(404, "Can't find the cart"));
         }
+        emitEvent('deleteCart' ,{id: req.params.id});
         return res.send({ message: "Cart were deleted" });
     } catch (error) {
         return next(

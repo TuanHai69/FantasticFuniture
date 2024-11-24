@@ -2,8 +2,7 @@
     <div class="container">
         <h1>Giỏ hàng</h1>
         <ul v-if="carts.length" class="list-unstyled">
-            <li v-for="cart in carts" :key="cart.id" 
-                class="cart-item row mb-3 p-3 rounded shadow-sm">
+            <li v-for="cart in carts" :key="cart.id" class="cart-item row mb-3 p-3 rounded shadow-sm">
                 <div class="col-12 col-md-3 mb-3 mb-md-0">
                     <img :src="productPicture(cart.product.picture)" alt="Product Image"
                         class="product-image img-fluid" />
@@ -42,12 +41,92 @@ import CartService from '@/services/cart.service';
 import ProductService from '@/services/product.service';
 import PriceService from '@/services/price.service';
 import LocalStorageHelper from '@/services/local.service';
-
+import io from 'socket.io-client';
 export default {
     data() {
         return {
             carts: [],
         };
+    },
+
+    mounted() {
+        const socket = io('http://localhost:3000');
+        socket.on('createCart', async (data) => {
+            console.log(data);
+            const userId = LocalStorageHelper.getItem('id');
+            if (userId) {
+                try {
+                    const carts = await CartService.findByUser(userId);
+                    for (const cart of carts) {
+                        if (cart.state !== 'done') {
+                            const product = await ProductService.get(cart.productid);
+                            const priceData = await PriceService.findByProductWithNoEndDate(cart.productid);
+                            if (priceData.length > 0) {
+                                cart.price = priceData[0].price;
+                                cart.discount = priceData[0].discount;
+                            } else {
+                                cart.price = null;
+                                cart.discount = null;
+                            }
+                            cart.product = product;
+                        }
+                    }
+                    this.carts = carts.filter(cart => cart.state !== 'done');
+                } catch (error) {
+                    console.error('Error fetching cart or product data:', error);
+                }
+            }
+        });
+        socket.on('deleteCart', async (data) => {
+            const userId = LocalStorageHelper.getItem('id');
+            if (userId) {
+                try {
+                    const carts = await CartService.findByUser(userId);
+                    for (const cart of carts) {
+                        if (cart.state !== 'done') {
+                            const product = await ProductService.get(cart.productid);
+                            const priceData = await PriceService.findByProductWithNoEndDate(cart.productid);
+                            if (priceData.length > 0) {
+                                cart.price = priceData[0].price;
+                                cart.discount = priceData[0].discount;
+                            } else {
+                                cart.price = null;
+                                cart.discount = null;
+                            }
+                            cart.product = product;
+                        }
+                    }
+                    this.carts = carts.filter(cart => cart.state !== 'done');
+                } catch (error) {
+                    console.error('Error fetching cart or product data:', error);
+                }
+            }
+        });
+        socket.on('updateCart', async (data) => {
+            const userId = LocalStorageHelper.getItem('id');
+            if (userId) {
+                try {
+                    const carts = await CartService.findByUser(userId);
+                    for (const cart of carts) {
+                        if (cart.state !== 'done') {
+                            const product = await ProductService.get(cart.productid);
+                            const priceData = await PriceService.findByProductWithNoEndDate(cart.productid);
+                            if (priceData.length > 0) {
+                                cart.price = priceData[0].price;
+                                cart.discount = priceData[0].discount;
+                            } else {
+                                cart.price = null;
+                                cart.discount = null;
+                            }
+                            cart.product = product;
+                        }
+                    }
+                    this.carts = carts.filter(cart => cart.state !== 'done');
+                } catch (error) {
+                    console.error('Error fetching cart or product data:', error);
+                }
+            }
+        });
     },
     async created() {
         const userId = LocalStorageHelper.getItem('id');
@@ -75,6 +154,31 @@ export default {
         }
     },
     methods: {
+        // async fetchcard() {
+        //     const userId = LocalStorageHelper.getItem('id');
+        //     if (userId) {
+        //         try {
+        //             const carts = await CartService.findByUser(userId);
+        //             for (const cart of carts) {
+        //                 if (cart.state !== 'done') {
+        //                     const product = await ProductService.get(cart.productid);
+        //                     const priceData = await PriceService.findByProductWithNoEndDate(cart.productid);
+        //                     if (priceData.length > 0) {
+        //                         cart.price = priceData[0].price;
+        //                         cart.discount = priceData[0].discount;
+        //                     } else {
+        //                         cart.price = null;
+        //                         cart.discount = null;
+        //                     }
+        //                     cart.product = product;
+        //                 }
+        //             }
+        //             this.carts = carts.filter(cart => cart.state !== 'done');
+        //         } catch (error) {
+        //             console.error('Error fetching cart or product data:', error);
+        //         }
+        //     }
+        // },
         productPicture(picture) {
             if (picture) {
                 return `data:image/jpeg;base64,${picture}`;
