@@ -1,6 +1,10 @@
 <template>
     <div class="container mt-4">
         <h2>products</h2>
+        <confirm-dialog v-if="showConfirmDialog" :show="showConfirmDialog" title="Thông báo"
+            :message="`Có sản phẩm có số lượng <= 1. Bạn muốn làm gì?`" :productName="currentProductName"
+            @confirm="handleConfirm">
+        </confirm-dialog>
         <div class="row m-3 d-flex justify-content-evenly">
             <div class="col-3 bg-white p-4 tag-container">
                 <button v-for="type in types" :key="type._id" class="water-drop-button" @click="handleTypeClick(type)">
@@ -58,8 +62,9 @@
             </div>
         </div>
         <div class="d-flex justify-content-center mb-4" v-if="products.length > 0">
-            <button v-if="displayedproducts.length < products.length" @click="loadMore" class="btn btn-primary">Hiển thị
-                thêm</button>
+            <button v-if="displayedproducts.length < products.length" @click="loadMore" class="btn btn-primary">
+                Hiển thị thêm
+            </button>
         </div>
     </div>
 </template>
@@ -72,6 +77,7 @@ import LocalStorageHelper from "@/services/local.service";
 import StoreService from '@/services/store.service';
 import PriceService from "@/services/price.service";
 import CommentService from "@/services/comment.service";
+import ConfirmDialog from './ConfirmDialog.vue';
 
 export default {
     name: 'ProductList',
@@ -85,6 +91,9 @@ export default {
             required: true,
         }
     },
+    components: {
+        ConfirmDialog,
+    },
     data() {
         return {
             products: [],
@@ -95,6 +104,10 @@ export default {
             userId: LocalStorageHelper.getItem('id'),
             userRole: LocalStorageHelper.getItem('role'),
             isLiked: {},
+            showConfirmDialog: false,
+            currentProductId: null,
+            currentProductName: '',
+            action: '',
         }
     },
     async mounted() {
@@ -105,6 +118,7 @@ export default {
         }
         await this.checkReportPermission();
         await this.checkLikedStatus();
+        await this.checkProductCounts();
     },
     methods: {
         async fetchProducts() {
@@ -288,6 +302,34 @@ export default {
         },
         moveToProduct(productId) {
             this.$router.push(`/product/${productId}`);
+        },
+        async checkProductCounts() {
+            if (!this.isStoreOwner) {
+                return;
+            }
+            for (const product of this.products) {
+                if (product.count <= 1) {
+                    this.currentProductId = product._id;
+                    this.currentProductName = product.name;
+                    this.showConfirmDialog = true;
+                    while (!this.action) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    const choice = this.action;
+                    this.action = '';
+                    if (choice === 'skip') {
+                        continue; // Bỏ qua sản phẩm này và kiểm tra sản phẩm khác
+                    } else if (choice === 'goto') {
+                        this.moveToProduct(product._id); // Chuyển đến trang chi tiết của sản phẩm 
+                        return; // Dừng kiểm tra khi người dùng muốn đi đến sản phẩm
+                    } else if (choice === 'skipAll') {
+                        break; // Bỏ qua toàn bộ kiểm tra
+                    }
+                }
+            } this.showConfirmDialog = false;
+        },
+        handleConfirm(action) {
+            this.action = action;
         },
     }
 }
