@@ -2,7 +2,7 @@
     <div v-if="show" class="modal-overlay">
         <div class="modal-container">
             <h3>{{ title }}</h3>
-            <p>{{ message }}</p>
+            <p>{{ displayMessage }}</p>
             <div class="modal-buttons">
                 <button class="btn btn-secondary" @click="confirm('skip')">Bỏ qua sản phẩm này</button>
                 <button class="btn btn-primary" @click="confirm('goto')">Đi đến sản phẩm này</button>
@@ -25,7 +25,7 @@ export default {
         },
         message: {
             type: String,
-            default: 'Bạn có muốn tiếp tục?',
+            default: 'sản phẩm có số lượng <= 1. Bạn muốn làm gì?',
         },
         productName: {
             type: String,
@@ -34,7 +34,7 @@ export default {
     },
     computed: {
         displayMessage() {
-            return `${this.message} (${this.productName})`;
+            return `Sản phẩm ${this.productName} ${this.message}`;
         },
     },
     methods: {

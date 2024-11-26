@@ -10,7 +10,7 @@
                     <CommandProductCard v-if="this.product.storeid" :productid="id" :storeid="this.product.storeid" />
                 </div>
 
-                <ShopBodyCard :storeid="this.product.storeid" :editstate="'hide'" v-if="this.product.storeid" />
+                <ShopBodyCard :storeid="this.product.storeid" :editstate="'hide'" :productid="id" v-if="this.product.storeid" />
                 <ProductCard />
             </div>
             <div class="page row" v-else-if="editingProductId">

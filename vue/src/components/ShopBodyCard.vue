@@ -2,8 +2,7 @@
     <div class="container mt-4">
         <h2>products</h2>
         <confirm-dialog v-if="showConfirmDialog" :show="showConfirmDialog" title="Thông báo"
-            :message="`Có sản phẩm có số lượng <= 1. Bạn muốn làm gì?`" :productName="currentProductName"
-            @confirm="handleConfirm">
+            :productName="currentProductName" @confirm="handleConfirm">
         </confirm-dialog>
         <div class="row m-3 d-flex justify-content-evenly">
             <div class="col-3 bg-white p-4 tag-container">
@@ -89,7 +88,11 @@ export default {
         editstate: {
             type: String,
             required: true,
-        }
+        },
+        productid: {
+            type: String,
+            required: false,
+        },
     },
     components: {
         ConfirmDialog,
@@ -125,7 +128,7 @@ export default {
             try {
                 const response = await ProductService.findByStore(this.storeid);
                 this.products = response;
-                await this.fetchPricesForProducts(this.products); // Fetch prices for products
+                await this.fetchPricesForProducts(this.products); 
             } catch (error) {
                 console.log('Error fetching products:', error);
             }
@@ -308,6 +311,10 @@ export default {
                 return;
             }
             for (const product of this.products) {
+                if (this.productid && product._id === this.productid) {
+                    // Bỏ qua sản phẩm có productid trùng với prop productid
+                    continue;
+                }
                 if (product.count <= 1) {
                     this.currentProductId = product._id;
                     this.currentProductName = product.name;
@@ -321,7 +328,7 @@ export default {
                         continue; // Bỏ qua sản phẩm này và kiểm tra sản phẩm khác
                     } else if (choice === 'goto') {
                         this.moveToProduct(product._id); // Chuyển đến trang chi tiết của sản phẩm 
-                        return; // Dừng kiểm tra khi người dùng muốn đi đến sản phẩm
+                        break; // Dừng kiểm tra khi người dùng muốn đi đến sản phẩm
                     } else if (choice === 'skipAll') {
                         break; // Bỏ qua toàn bộ kiểm tra
                     }
