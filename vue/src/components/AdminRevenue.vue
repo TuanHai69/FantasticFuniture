@@ -197,6 +197,7 @@ export default {
         async fetchOrdersForStore(storeId) {
             try {
                 const orders = await OrderService.findByStore(storeId);
+                orders.sort((a, b) => new Date(b.date) - new Date(a.date));
                 this.storeOrders = { ...this.storeOrders, [storeId]: orders };
 
                 for (const order of orders) {

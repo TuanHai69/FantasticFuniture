@@ -23,7 +23,8 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{ Product.name }}</h5>
                                 <div v-if="Product.cost">
-                                    <div class="card-cost d-flex justify-content-end">
+                                    <div class="card-cost d-flex justify-content-between">
+                                        <span> Số lượng {{ Product.count }} </span>
                                         <span v-if="Product.discount">
                                             <s>{{ formatCurrency(Product.cost) }}</s>
                                         </span>

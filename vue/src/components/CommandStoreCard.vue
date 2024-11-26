@@ -24,8 +24,6 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
-
-
             </div>
             <hr>
             <div v-if="visibleComments.length === 0" class="no-comments">
@@ -170,28 +168,28 @@ export default {
             }
             return stars;
         },
+        // async fetchComments() {
+        //     try {
+        //         const comments = await CommentStoreService.findByStore(this.storeid);
+        //         this.hasCommented = comments.some(comment => comment.userid === this.userId);
+        //         await Promise.all(comments.map(async comment => {
+        //             const user = await AccountsService.get(comment.userid);
+        //             comment.userName = user.name;
+        //             comment.userPicture = user.picture;
+        //         }));
+        //         this.comments = comments;
+        //     } catch (error) {
+        //         console.error('Error fetching comments:', error);
+        //     } finally {
+        //         this.isLoading = false;
+        //     }
+        // },
         async fetchComments() {
             try {
                 const comments = await CommentStoreService.findByStore(this.storeid);
-                this.hasCommented = comments.some(comment => comment.userid === this.userId);
-                await Promise.all(comments.map(async comment => {
-                    const user = await AccountsService.get(comment.userid);
-                    comment.userName = user.name;
-                    comment.userPicture = user.picture;
-                }));
-                this.comments = comments;
-            } catch (error) {
-                console.error('Error fetching comments:', error);
-            } finally {
-                this.isLoading = false;
-            }
-        },
-        async fetchComments() {
-            try {
-                const comments = await CommentStoreService.findByStore(this.storeid);
-                this.hasCommented = comments.some(comment => comment.userid === this.userId);
                 const filteredComments = comments.filter(comment => comment.state !== 'Nopay');
-
+                this.hasCommented = filteredComments.some(comment => comment.userid === this.userId);
+                
                 await Promise.all(filteredComments.map(async comment => {
                     const user = await AccountsService.get(comment.userid);
                     comment.userName = user.name;
@@ -211,7 +209,7 @@ export default {
             } try {
                 const userComments = await CommentStoreService.findByUser(this.userId);
                 const existingComment = userComments.find(comment => comment.storeid === this.storeid);
-                if (!existingComment) { 
+                if (!existingComment) {
                     const newComment = {
                         userid: this.userId,
                         storeid: this.storeid,

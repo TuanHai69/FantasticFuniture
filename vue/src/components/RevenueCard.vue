@@ -231,6 +231,7 @@ export default {
             try {
                 const orders = await OrderService.findByStore(this.storeid);
                 this.orders = orders;
+                this.orders.sort((a, b) => new Date(b.date) - new Date(a.date));
                 await this.fetchOrderDetailsForOrders(orders);
                 this.calculateStatistics(this.orders);
             } catch (error) {

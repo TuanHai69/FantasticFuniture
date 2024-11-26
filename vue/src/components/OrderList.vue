@@ -129,6 +129,7 @@ export default {
                         this.orders = await OrderService.findByUser(userId);
                     }
                 }
+                this.orders.sort((a, b) => new Date(b.date) - new Date(a.date));
                 await this.fetchStores();
                 await this.calculateAllOrderTotals();
             } catch (error) {
