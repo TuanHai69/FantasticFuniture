@@ -1,6 +1,5 @@
 <template>
     <div class="container mt-4">
-        <h2>Products</h2>
         <div class="accordion" id="filterAccordion">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingOne">

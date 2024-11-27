@@ -25,7 +25,7 @@
                 </li>
                 <li class="nav-item active" v-if="role === 'admin' || role === 'storeowner'">
                     <router-link :to="{ name: 'type' }" class="nav-link">
-                        Type
+                        Quản lý loại
                     </router-link>
                 </li>
                 <li class="nav-item active" v-if="role === 'admin'">
@@ -50,12 +50,12 @@
                 </li>
                 <li class="nav-item active" v-if="role === 'admin'">
                     <router-link :to="{ name: 'coded' }" class="nav-link">
-                        code
+                        Quản lý khuyến mãi
                     </router-link>
                 </li>
                 <li class="nav-item active" v-if="role === 'admin'">
                     <router-link :to="{ name: 'revenue' }" class="nav-link">
-                        revenue
+                        Doanh thu
                     </router-link>
                 </li>
             </ul>

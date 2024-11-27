@@ -1,6 +1,6 @@
 <template>
     <AppHeader />
-    <div class="shopcardbg">
+    <div class="shopcardbg bg-warning bg-gradient">
         <div class="container-fluid ">
             <div class="page row">
                 <div class="offset-1 col-md-10">

@@ -1,15 +1,15 @@
 <template>
     <div class="container">
-        <h2 class="mb-4">Coded List</h2>
+        <h2 class="mb-4">Danh sách mã giảm giá</h2>
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Code</th>
-                    <th>Percent</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>State</th>
-                    <th>Actions</th>
+                    <th>Mã giảm giá</th>
+                    <th>Số % giảm giá</th>
+                    <th>Ngày bắt đầu</th>
+                    <th>Ngày kết thúc</th>
+                    <th>Trạng thái</th>
+                    <th>Chức năng</th>
                 </tr>
             </thead>
             <tbody>

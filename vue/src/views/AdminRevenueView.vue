@@ -1,8 +1,8 @@
 <template>
     <AppHeader />
     <hr>
-    <div class="admin-revenue-view p-3">
-        <h1>Doanh thu hệ thống</h1>
+    <div class="admin-revenue-view p-3 bg-danger bg-gradient">
+        <h1 class="text-white">Doanh thu hệ thống</h1>
         <AdminRevenue />
     </div>
 </template>

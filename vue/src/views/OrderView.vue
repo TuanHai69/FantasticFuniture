@@ -1,8 +1,8 @@
 <template>
     <AppHeader />
     <hr>
-    <div class="container order-view">
-        <h1 class="my-4">Your Orders</h1>
+    <div class="container order-view bg-danger bg-gradient">
+        <h1 class="my-4 text-white">Đơn hàng của bạn</h1>
         <OrderList />
     </div>
 </template>

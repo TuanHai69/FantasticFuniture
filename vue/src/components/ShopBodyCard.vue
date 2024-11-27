@@ -1,6 +1,5 @@
 <template>
     <div class="container mt-4">
-        <h2>products</h2>
         <confirm-dialog v-if="showConfirmDialog" :show="showConfirmDialog" title="Thông báo"
             :productName="currentProductName" @confirm="handleConfirm">
         </confirm-dialog>

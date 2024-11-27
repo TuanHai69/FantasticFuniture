@@ -1,6 +1,6 @@
 <template>
     <div class="container mt-4">
-        <h2>Danh sách chuỗi cửa hàng</h2>
+        <h2 class="text-white">Danh sách chuỗi cửa hàng</h2>
         <div class="row">
             <div class="col-md-12">
                 <table class="table table-bordered">

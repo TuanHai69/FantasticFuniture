@@ -1,7 +1,7 @@
 <template>
     <AppHeader />
     <hr>
-    <div class="container mt-4 branch-list-container">
+    <div class="container mt-4 branch-list-container bg-success bg-gradient">
         <BranchList v-if="!selectedBranch" @view-branch="viewBranch" />
         <BranchCard v-if="selectedBranch" :branch="selectedBranch" @back="selectedBranch = null" />
     </div>

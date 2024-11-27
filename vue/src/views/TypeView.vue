@@ -1,7 +1,7 @@
 <template>
     <AppHeader />
     <hr>
-    <div class="type-view container">
+    <div class="type-view container bg-info bg-gradient">
         <div class="row">
             <div class="col-md-4">
                 <TypeForm :type="selectedType" @create-type="handleCreateType" @update-type="handleUpdateType"

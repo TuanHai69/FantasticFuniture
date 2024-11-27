@@ -1,9 +1,12 @@
 <template>
     <AppHeader />
     <hr>
-    <div class="container mt-4">
-        <AccountList />
+    <div class="bg-success bg-gradient">
+        <div class="mt-4 ">
+            <AccountList />
+        </div>
     </div>
+
 </template>
 
 <script>

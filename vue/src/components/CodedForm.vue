@@ -1,29 +1,29 @@
 <template>
     <div class="container">
-        <h2 class="mb-4">{{ isEdit ? 'Edit Code' : 'Create New Code' }}</h2>
+        <h2 class="mb-4">{{ isEdit ? 'Cập nhật mã' : 'Tạo mã mới' }}</h2>
         <form @submit.prevent="handleSubmit">
             <div class="mb-3">
-                <label for="code" class="form-label">Code</label>
+                <label for="code" class="form-label">Mã giảm giá</label>
                 <input type="text" class="form-control" id="code" v-model="form.code" required />
             </div>
             <div class="mb-3">
-                <label for="percent" class="form-label">Percent</label>
+                <label for="percent" class="form-label">Số phần trăm giảm giá</label>
                 <input type="number" class="form-control" id="percent" v-model="form.percent" min="1" max="99"
                     required />
             </div>
             <div class="mb-3">
-                <label for="start" class="form-label">Start Date</label>
+                <label for="start" class="form-label">Ngày bắt đầu</label>
                 <input type="date" class="form-control" id="start" v-model="form.start" required />
             </div>
             <div class="mb-3">
-                <label for="end" class="form-label">End Date</label>
+                <label for="end" class="form-label">Ngày kết thúc</label>
                 <input type="date" class="form-control" id="end" v-model="form.end" required />
             </div>
             <div class="mb-3">
-                <label for="state" class="form-label">State</label>
+                <label for="state" class="form-label">Trạng thái</label>
                 <select class="form-select" id="state" v-model="form.state" required>
-                    <option value="enable">Enable</option>
-                    <option value="disable">Disable</option>
+                    <option value="enable">Kích hoạt</option>
+                    <option value="disable">Ẩn đi</option>
                 </select>
             </div>
             <div class="d-flex justify-content-center">
