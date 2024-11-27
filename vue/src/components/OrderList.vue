@@ -29,6 +29,9 @@
                         <p><strong>Trạng thái:</strong> {{ order.state }} ||
                             <button v-if="showConfirmButton(order)" class="btn btn-success ml-2"
                                 @click="updateOrderState(order._id, 'prepare for delivery')">Xác nhận</button>
+                            <button v-if="showCancelButton(order)" class="btn btn-danger ml-2"
+                                @click="confirmCancelOrder(order._id)">Hủy đơn hàng</button>
+
                             <button v-if="showDeliveryButton(order)" class="btn btn-warning ml-2"
                                 @click="updateOrderState(order._id, 'Shipping')">Giao hàng</button>
                             <button v-if="showReceivedButton(order)" class="btn btn-info ml-2"
@@ -109,7 +112,9 @@ export default {
     async created() {
         await this.fetchOrders();
         await this.checkrole();
-
+        console.log(this.orders[0]._id);
+        console.log(this.orderDetails[this.orders[0]._id][0]);
+        console.log(this.orderDetails);
     },
     methods: {
         async checkrole() {
@@ -239,7 +244,7 @@ export default {
         },
         showConfirmButton(order) {
             const role = LocalStorageHelper.getItem('role');
-            return role === 'storeowner' && order.state === 'Chờ xác nhận';
+            return role === 'storeowner' && order.state === 'Chờ xác nhận' && order.price > 0;
         },
         showDeliveryButton(order) {
             const role = LocalStorageHelper.getItem('role');
@@ -248,6 +253,40 @@ export default {
         showReceivedButton(order) {
             const userId = LocalStorageHelper.getItem('id');
             return order.state === 'Shipping' && order.userid === userId;
+        },
+        showCancelButton(order) {
+            const userId = LocalStorageHelper.getItem('id');
+            return order.userid === userId && order.state === 'Chờ xác nhận' && this.orderPaymentTotals[order._id]?.transfer === 0;
+        },
+        confirmCancelOrder(orderId) {
+            if (confirm('Bạn có muốn hủy đơn hàng này không?')) {
+                this.cancelOrder(orderId);
+            }
+        },
+        async cancelOrder(orderId) {
+            try {
+                // Lấy danh sách các cart liên quan đến order
+                const carts = await CartService.findByOrderId(orderId);
+                // Xử lý từng cart
+                for (const cart of carts) {
+                    // Lấy product theo productid 
+                    const product = await ProductService.get(cart.productid);
+                    // Cập nhật product count
+                    const updatedProduct = {
+                        ...product,
+                        count: product.count + cart.count,
+                    }; await ProductService.update(product._id, updatedProduct);
+                    // Xóa cart sau khi đã cập nhật product 
+                    await CartService.delete(cart._id);
+                }
+                // Xóa order sau khi đã xử lý xong các cart 
+                await OrderService.delete(orderId); // Hiển thị thông báo thành công
+                alert('Đơn hàng đã được hủy thành công'); // Cập nhật lại danh sách đơn hàng 
+                await this.fetchOrders();
+            } catch (error) {
+                console.error('Error canceling order:', error);
+                alert('Có lỗi xảy ra khi hủy đơn hàng.');
+            }
         },
     },
 };
