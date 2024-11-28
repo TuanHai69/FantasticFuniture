@@ -281,7 +281,7 @@ export default {
                             }
                         }
                     } const zaloPayData = {
-                        amount: cost,
+                        amount: parseFloat(cost),
                         description: this.cart.product.name
                     };
                     const paymentData = {
@@ -290,8 +290,9 @@ export default {
                         updatedOrder,
                         newComment
                     };
+                    console.log(paymentData);
                     const response = await zaloService.createOrder(paymentData);
-                    // Handle the response from ZaloPay
+                    console.log(response);
                     if (response.return_code === 1) {  // Check if the payment was successful
                         // Redirect user to ZaloPay payment page
                         window.location.href = response.order_url;

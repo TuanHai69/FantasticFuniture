@@ -1,5 +1,5 @@
 <template>
-    <div class="comment-store-card p-3 border rounded" style="max-height: 600px; overflow-y: auto;">
+    <div class="comment-store-card p-3 border rounded bg-white" style="max-height: 600px; overflow-y: auto;">
         <h4>Đánh giá</h4>
         <div v-if="isLoading" class="loading">
             Loading comments...

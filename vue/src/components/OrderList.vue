@@ -9,12 +9,12 @@
                             <strong>Tổng giá: </strong>
                             {{ orderTotals[order._id] ? formatCurrency(orderTotals[order._id]) : 'Chưa thanh toán' }}
                         </p>
-                        <p>
+                        <p v-if="order.state != 'Received'">
                             <strong>Đã thanh toán: </strong>
                             {{ orderPaymentTotals[order._id] ? formatCurrency(orderPaymentTotals[order._id].transfer) :
                                 '0' }}
                         </p>
-                        <p>
+                        <p v-if="order.state != 'Received'">
                             <strong>Chưa thanh toán:</strong>
                             {{ orderPaymentTotals[order._id] ? formatCurrency(orderPaymentTotals[order._id].nonTransfer)
                                 : '0' }}

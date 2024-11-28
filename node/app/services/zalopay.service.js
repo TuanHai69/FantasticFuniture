@@ -33,7 +33,7 @@ class ZaloPayService {
             amount: zaloPayData.amount,
             description: `thanh toán cho đơn hàng ${zaloPayData.description}`,
             bank_code: "",
-            callback_url: "https://6389-115-76-173-102.ngrok-free.app/callback" // Update this to your correct callback URL
+            callback_url: "https://de5e-115-76-173-102.ngrok-free.app/callback" // Update this to your correct callback URL
         };
 
         const data = `${config.app_id}|${order.app_trans_id}|${order.app_user}|${order.amount}|${order.app_time}|${order.embed_data}|${order.item}`;
