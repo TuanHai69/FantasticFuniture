@@ -43,6 +43,8 @@
                     <input type="number" id="quantity" v-model.number="quantity" min="1" :max="product.count" />
                 </div>
                 <button class="btn btn-primary" @click="addToCart(product)" :disabled="!price">Thêm vào giỏ</button>
+                ->
+                <button class="btn btn-info text-white" @click="navigateToStore(product.storeid)">Đến cửa hàng</button>
                 </p>
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -220,7 +222,6 @@ export default {
             try {
                 const response = await CommentService.isLiked(userId, this.id);
                 this.isLiked = response.length > 0 && response[0].like === true;
-                console.log(this.isLiked);
             } catch (error) {
                 console.error('Error checking liked status:', error);
             }
@@ -246,6 +247,9 @@ export default {
                 this.calculateAverageRating(comments);
                 this.product = response;
                 await this.fetchPrice(this.id);
+                await this.fetchProductTypes();
+                await this.checkPermission();
+                await this.checkLikedStatus();
             } catch (error) {
                 console.error('Error fetching product:', error);
             }
@@ -274,7 +278,7 @@ export default {
                 totalRating += parseInt(comment.rate, 10);
             });
 
-          
+
             this.averageRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : 0;
         },
         async fetchProductTypes() {
@@ -338,6 +342,9 @@ export default {
 
         navigateToProduct(type) {
             this.$router.push({ name: 'products', params: { id: type._id } });
+        },
+        navigateToStore(storeId) {
+            this.$router.push(`/shop/${storeId}`);
         },
         async deleteProductType(id) {
             try {

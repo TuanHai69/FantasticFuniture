@@ -81,6 +81,16 @@ export default {
             required: true
         }
     },
+    watch: {
+        productid: {
+            handler(newId) {
+                this.checkPurchaseStatus();
+                this.fetchComments();
+                this.checkReportPermission();
+            },
+            immediate: true
+        }
+    },
     data() {
         return {
             comments: [],
