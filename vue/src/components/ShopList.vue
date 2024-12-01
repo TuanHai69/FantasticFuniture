@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import StoreService from "@/services/store.service"; // Đảm bảo đường dẫn đúng
+import StoreService from "@/services/store.service";
 
 export default {
   name: 'CategoryList',
@@ -68,14 +68,20 @@ export default {
 
 <style scoped>
 .fixed-col {
-    background-color: rgba(245, 245, 245, 0.8); 
-    border: 2px solid #000000;
-    padding: 10px;
-    border-radius: 10px;
+  background-color: rgba(245, 245, 245, 0.8);
+  border: 2px solid #000000;
+  padding: 10px;
+  border-radius: 10px;
 }
+
 .booode {
   border: 2px solid #000000;
   padding: 10px;
   border-radius: 10px;
+}
+
+.container {
+  overflow: auto;
+  /* Đảm bảo rằng container có thể cuộn nếu nội dung vượt quá chiều cao của nó */
 }
 </style>

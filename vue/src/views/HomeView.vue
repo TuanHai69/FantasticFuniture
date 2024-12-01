@@ -17,8 +17,10 @@
                     </div>
                 </div>
             </div>
+            <Footer></Footer>
         </div>
     </div>
+    
 </template>
 
 <script>
@@ -26,12 +28,13 @@ import AppHeader from "@/components/AppHeader.vue";
 import ShopCard from "@/components/ShopCard.vue";
 import ShopList from "@/components/ShopList.vue";
 import TypeService from "@/services/type.service";
-
+import Footer from "@/components/Footer.vue";
 export default {
     components: {
         AppHeader,
         ShopCard,
         ShopList,
+        Footer,
     },
     data() {
         return {

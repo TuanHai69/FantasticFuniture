@@ -22,6 +22,7 @@
             </div>
         </div>
     </div>
+    <Footer></Footer>
 </template>
 
 <script>
@@ -33,6 +34,7 @@ import ProductService from "@/services/product.service";
 import ProductForm from "@/components/ProductForm.vue";
 import CommandProductCard from "@/components/CommandProductCard.vue";
 import PriceForm from "@/components/PriceForm.vue";
+import Footer from "@/components/Footer.vue";
 
 export default {
     props: {
@@ -56,6 +58,7 @@ export default {
         ProductForm,
         CommandProductCard,
         PriceForm,
+        Footer,
     },
     watch: {
         id: {

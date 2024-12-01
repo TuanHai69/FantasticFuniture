@@ -10,6 +10,7 @@
                     <ProductCard :id="$route.params.id" :searchQuery="$route.query.search" />
                 </div>
             </div>
+            <Footer></Footer>
         </div>
     </div>
 </template>
@@ -17,10 +18,13 @@
 <script>
 import AppHeader from "@/components/AppHeader.vue";
 import ProductCard from "@/components/ProductCard.vue";
+import Footer from "@/components/Footer.vue";
+
 export default {
     components: {
         AppHeader,
-        ProductCard
+        ProductCard,
+        Footer,
     },
     props: {
         id: {

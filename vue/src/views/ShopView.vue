@@ -10,6 +10,7 @@
                     <ShopCard />
                 </div>
             </div>
+            <Footer></Footer>
         </div>
     </div>
 </template>
@@ -17,11 +18,13 @@
 <script>
 import AppHeader from "@/components/AppHeader.vue";
 import ShopCard from "@/components/ShopCard.vue";
+import Footer from "@/components/Footer.vue";
 
 export default {
     components: {
         AppHeader,
         ShopCard,
+        Footer,
     },
 };
 </script>

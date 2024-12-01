@@ -33,6 +33,7 @@
             </div>
         </div>
     </div>
+    <Footer></Footer>
 </template>
 
 <script>
@@ -45,6 +46,7 @@ import ProductService from "@/services/product.service";
 import OrderList from "@/components/OrderList.vue";
 import RevenueCard from "@/components/RevenueCard.vue";
 import CommandStoreCard from "@/components/CommandStoreCard.vue";
+import Footer from "@/components/Footer.vue";
 
 export default {
     props: {
@@ -62,6 +64,7 @@ export default {
         OrderList,
         RevenueCard,
         CommandStoreCard,
+        Footer,
     },
     data() {
         return {
