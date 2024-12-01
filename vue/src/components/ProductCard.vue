@@ -20,11 +20,15 @@
                                     <label class="form-check-label">{{ option.text }}</label>
                                 </div>
                             </div>
+                            <div class="d-flex justify-content-center mb-4"> <button @click="filterLikedProducts"
+                                    class="btn btn-primary">Đã
+                                    yêu thích</button> </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="row m-3">
             <div v-if="filteredProducts.length > 0" class="col-md-3" v-for="(product, index) in filteredProducts"
                 :key="`filtered-${product._id}`">
@@ -149,6 +153,7 @@ export default {
             selectedFilters: [],
             filterOptions: [],
             isLiked: {},
+            showLikedProducts: false,
         }
     },
     async created() {
@@ -181,6 +186,10 @@ export default {
                 this.error = 'Error fetching products';
                 console.error('Error fetching products:', error);
             }
+        },
+        filterLikedProducts() {
+            this.showLikedProducts = !this.showLikedProducts;
+            this.logSelectedFilters();
         },
         async fetchPricesForProducts(products) {
             try {
@@ -336,10 +345,17 @@ export default {
             this.$router.push(`/product/${productId}`);
         },
         async logSelectedFilters() {
+            if (this.showLikedProducts) {
+                const likedProductIds = Object.keys(this.isLiked).filter(productId => this.isLiked[productId]);
+                this.filteredProducts = this.products.filter(product => likedProductIds.includes(product._id));
+                return;
+            }
+
             if (this.selectedFilters.length === 0) {
                 this.filteredProducts = [];
                 return;
             }
+
             try {
                 const results = await Promise.all(
                     this.selectedFilters.map(id => ProductTypeService.findByType(id))
@@ -371,6 +387,43 @@ export default {
                 console.error('Error fetching product types or products:', error);
             }
         },
+
+        // async logSelectedFilters() {
+        //     if (this.selectedFilters.length === 0) {
+        //         this.filteredProducts = [];
+        //         return;
+        //     }
+        //     try {
+        //         const results = await Promise.all(
+        //             this.selectedFilters.map(id => ProductTypeService.findByType(id))
+        //         );
+
+        //         const productIds = results.reduce((acc, result) => {
+        //             result.forEach(item => {
+        //                 if (!acc[item.productid]) {
+        //                     acc[item.productid] = 0;
+        //                 }
+        //                 acc[item.productid]++;
+        //             });
+        //             return acc;
+        //         }, {});
+
+        //         const filteredProductIds = Object.keys(productIds).filter(
+        //             id => productIds[id] === this.selectedFilters.length
+        //         );
+
+        //         const products = await Promise.all(
+        //             filteredProductIds.map(id => ProductService.get(id))
+        //         );
+
+        //         await this.fetchPricesForProducts(products);
+
+        //         this.filteredProducts = products.filter(product => product.state !== 'hide');
+        //         await this.prioritizeFollowedStoreNewProducts();
+        //     } catch (error) {
+        //         console.error('Error fetching product types or products:', error);
+        //     }
+        // },
         filterProducts(query) {
             if (!query) {
                 this.filteredProducts = this.products;
@@ -407,41 +460,8 @@ export default {
                 this.filteredProducts = prioritizeProducts(this.filteredProducts);
             } catch (error) { console.error('Error prioritizing followed store new products:', error); }
         },
-        // async prioritizeFollowedStoreNewProducts() {
-        //     const userId = LocalStorageHelper.getItem('id');
-        //     if (!userId) {
-        //         return;
-        //     }
-        //     try {
-        //         const userComments = await CommentStoreService.findByUser(userId);
-        //         if (userComments.length === 0) {
-        //             return;
-        //         }
-        //         const likedStores = userComments
-        //             .filter(comment => comment.like === true)
-        //             .map(comment => comment.storeid);
-        //         if (likedStores.length === 0) {
-        //             return
-        //         };
-        //         const prioritizedProducts = [];
-        //         const otherProducts = [];
-        //         this.products.forEach(product => {
-        //             if (likedStores.includes(product.storeid) && this.isNewProduct(product.day)) {
-        //                 prioritizedProducts.push(product);
-        //             } else { otherProducts.push(product); }
-        //         });
-        //         this.products = [...prioritizedProducts, ...otherProducts];
-        //         this.displayedProducts = this.products.slice(0, this.itemsToShow);
-
-        //         console.log(this.products);
-        //         console.log(this.displayedProducts);
-        //     } catch (error) {
-        //         console.error('Error prioritizing followed store new products:', error);
-        //     }
-        // }
     }
 };
-
 </script>
 
 <style>

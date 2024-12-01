@@ -2,13 +2,16 @@
     <AppHeader />
     <hr>
     <div class="account-page">
-        <AccountInfo v-if="!isEditing && !isRegistering && !isCreatingStore" :account="account" :branch-data="branch"
-            @edit="toggleEdit" @register="toggleRegister" @create-store="toggleCreateStore" />
+        <AccountInfo v-if="!isEditing && !isRegistering && !isCreatingStore && !isUpdatingPassword" :account="account"
+            :branch-data="branch" @edit="toggleEdit" @register="toggleRegister" @create-store="toggleCreateStore"
+            @update-password="toggleUpdatePassword" />
         <UpdateAccountForm v-else-if="isEditing" :account="account" @update-account="updateAccount"
             @cancel="toggleEdit" />
         <BranchForm v-else-if="isRegistering" :branch="branch" @update-branch="updateBranch"
             @create-branch="createBranch" @cancel="toggleRegister" />
-        <StoreForm v-else :branch="branch" @create-store="createStore" @cancel="toggleCreateStore" />
+        <StoreForm v-else-if="isCreatingStore" :branch="branch" @create-store="createStore"
+            @cancel="toggleCreateStore" />
+        <Updatepass v-else :account="account" @update-account="updateAccount" @cancel="toggleUpdatePassword" />
     </div>
 </template>
 
@@ -22,6 +25,7 @@ import BranchForm from "@/components/BranchForm.vue"; // Đường dẫn tới c
 import BranchService from '@/services/branch.service';
 import StoreForm from "@/components/StoreForm.vue";
 import StoreService from '@/services/store.service'; // Đường dẫn tới API service của store
+import Updatepass from '@/components/Updatepass.vue';
 
 export default {
     name: 'AccountPage',
@@ -31,6 +35,7 @@ export default {
         UpdateAccountForm,
         BranchForm,
         StoreForm,
+        Updatepass,
     },
     data() {
         return {
@@ -59,7 +64,7 @@ export default {
             isEditing: false,
             isRegistering: false,
             isCreatingStore: false,
-
+            isUpdatingPassword: false,
         };
     },
     async mounted() {
@@ -89,12 +94,16 @@ export default {
         toggleCreateStore() {
             this.isCreatingStore = !this.isCreatingStore;
         },
+        toggleUpdatePassword() {
+            this.isUpdatingPassword = !this.isUpdatingPassword;
+        },
         async updateAccount(updatedAccount) {
             try {
                 // console.log(updatedAccount.picture);
                 await AccountService.update(updatedAccount._id, updatedAccount);
                 this.account = updatedAccount;
                 this.isEditing = false;
+                this.isUpdatingPassword = false;
                 alert('Cập nhật thông tin thành công!');
                 this.$router.push('/account');
             } catch (error) {

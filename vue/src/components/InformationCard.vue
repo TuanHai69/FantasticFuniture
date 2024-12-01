@@ -15,7 +15,13 @@
                             <i class="fas fa-pencil-alt"></i>
                         </button>
                     </div>
-                    <p><strong>Họ tên:</strong> {{ account.name }}</p>
+                    <div class="d-flex justify-content-between">
+                        <p><strong>Họ tên:</strong> {{ account.name }}</p>
+                        <button @click="$emit('update-password')" class="btn btn-link float-right">
+                            <i class="fas fa-key"></i>
+                        </button>
+                    </div>
+
                     <p><strong>Ngày sinh:</strong> {{ account.birthday }}</p>
                     <p><strong>Giới tính:</strong> {{ account.gender }}</p>
                     <p><strong>Địa chỉ:</strong> {{ account.address }}</p>
@@ -23,7 +29,8 @@
                     <p><strong>Email:</strong> {{ account.email }}</p>
                     <p>
                         <strong>Vai trò:</strong> {{ account.role }} ||
-                        <button v-if="account.role != 'admin'" @click="$emit('register')" class="btn btn-primary">Đăng ký bán hàng</button>||
+                        <button v-if="account.role != 'admin'" @click="$emit('register')" class="btn btn-primary">Đăng
+                            ký bán hàng</button>||
                         <button
                             v-if="branchData._id && branchData.state != 'unaccept' && branchData.storecount > storeCount"
                             @click="$emit('create-store')" class="btn btn-primary">Tạo cửa
@@ -33,7 +40,7 @@
 
             </div>
             <div class="col-12" v-if="branchData._id && branchData.state != 'unaccept'">
-                <StoreCard :branchId="branchData._id"  @store-count="updateStoreCount" />
+                <StoreCard :branchId="branchData._id" @store-count="updateStoreCount" />
             </div>
         </div>
     </div>

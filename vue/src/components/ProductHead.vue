@@ -266,12 +266,15 @@ export default {
         },
         calculateAverageRating(comments) {
             let totalRating = 0;
-            let ratingCount = comments.length;
 
-            comments.forEach(comment => {
+
+            const filteredComments = comments.filter(comment => comment.rate && parseInt(comment.rate, 10) > 0);
+            let ratingCount = filteredComments.length;
+            filteredComments.forEach(comment => {
                 totalRating += parseInt(comment.rate, 10);
             });
 
+          
             this.averageRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : 0;
         },
         async fetchProductTypes() {
