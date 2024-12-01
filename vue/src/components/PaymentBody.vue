@@ -70,6 +70,7 @@ import CartService from '@/services/cart.service';
 import CommentService from '@/services/comment.service';
 import PriceService from '@/services/price.service';
 import zaloService from '@/services/zalo.service';
+import AccountsService from '@/services/accounts.service';
 
 export default {
     props: {
@@ -116,6 +117,7 @@ export default {
                     }
                 }
                 await this.fetchPrice();
+                await this.fetchAccountData(userId);
             } catch (error) {
                 console.error('Error fetching or creating order:', error);
             }
@@ -136,6 +138,19 @@ export default {
                 this.order = orders.find(order => order.state === 'Chờ xác nhận');
             } catch (error) {
                 console.error('Error creating order:', error);
+            }
+        },
+        async fetchAccountData(userId) {
+            try {
+                const account = await AccountsService.get(userId);
+                if (account.phonenumber) {
+                    this.phonenumber = account.phonenumber;
+                }
+                if (account.address) {
+                    this.address = account.address;
+                }
+            } catch (error) {
+                console.error('Error fetching account data:', error);
             }
         },
         async fetchPrice() {
