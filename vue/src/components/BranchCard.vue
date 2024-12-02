@@ -26,8 +26,8 @@
                             <td>{{ branch.description }}</td>
                         </tr>
                         <tr>
-                            <th>User ID</th>
-                            <td>{{ branch.userid }}</td>
+                            <th>Tài khoản thành lập cửa hàng</th>
+                            <td>{{ branch.userName }}</td>
                         </tr>
                         <tr>
                             <th>Số lượng cửa hàng</th>

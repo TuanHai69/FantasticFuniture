@@ -68,7 +68,7 @@ export default {
                     const account = await AccountsService.get(branch.userid);
                     branch.userName = account.username;
                 }));
-
+                
             } catch (error) {
                 console.error('Error fetching branches:', error);
             }
